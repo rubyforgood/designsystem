@@ -16,19 +16,6 @@ exactly as the source projects state them. If you're implementing this system in
 reconciling drift in one of the three, treat this document as the reference and the per-project
 `sources/` documents as the full, citable detail behind each rule.
 
-## How the three projects relate
-
-Human Essentials' `design.md` is the most extensively reconciled against its own codebase (measured
-audits, before/after tables, multi-year decision log). CASA's `design.md` reads similarly and is
-the document Stocks in the Future explicitly adopted as its starting point ("Adopted from this
-document" is SIF's own framing). SIF then reconciled that inherited document against its own,
-much smaller and more constrained app (a school-issued Chromebook at 1366×768 is its primary
-target device), which is why SIF diverges the most — mainly on breakpoints, icon system, and
-brand color — while still sharing the same foundations and component vocabulary. All three
-maintain a running decision log (CASA and SIF have `design-todo.md`; HE has
-`docs/design-decisions.md`) and treat their `design.md` as the single source of truth that
-decisions eventually get promoted into.
-
 ---
 
 ## 1. Design principles
@@ -41,9 +28,7 @@ Themes stated independently across all three projects, converging on the same ph
   a bug to fix, not evidence to update the doc toward.
 - **A component earns its existence by being reused**, not by being theoretically nice. All three
   projects describe deleting or consolidating one-off styling in favor of a small shared set of
-  components/helpers (button/badge/card/table/modal), and treat "one shape, one class" as a repeated
-  fix pattern (CASA and SIF both independently converged on "one control shape" language for form
-  fields — SIF measured "seven treatments before, one control" for its own inputs).
+  components/helpers (button/badge/card/table/modal) — "one shape, one class."
 - **State is never carried by color alone.** A numeral, a table row, or an icon is never the sole
   signal of success/warning/danger — it's paired with an icon, a label, or a badge. This is stated
   explicitly and repeatedly in all three (WCAG 1.4.1, "use of color").
@@ -78,9 +63,7 @@ assignments:
 CASA and HE, with the exact same reasoning: `slate-400` on white measures **2.63:1** contrast and
 fails WCAG AA for text, while `slate-500` measures **4.77:1** and passes. `slate-400` is reserved
 for disabled states, decorative icons, and placeholders on top of a tinted (non-white) surface —
-never for text meant to be read. Both projects report having found and fixed live `slate-400`
-text-color bugs this way (CASA: `lg:hidden` org-settings group labels; both: audited placeholder
-text across all form fields to confirm `slate-500`).
+never for text meant to be read.
 
 Body/label text-color roles are identical across all three:
 - Page body: `text-sm text-slate-600` (CASA) / `text-sm text-slate-700` (HE, "default reading
@@ -114,8 +97,7 @@ identity) and uses a different naming convention (`sitf-*` rather than `brand-*`
 `brand-*` scale at all.
 
 **A hard rule specific to SIF, worth generalizing:** Tailwind's own built-in `teal-*` utility is a
-*different* color (mint-green) from SIF's brand `sitf-primary` blue-teal. SIF's own codebase
-confused the two five separate times before this was caught and swept. Any project introducing a
+*different* color (mint-green) from SIF's brand `sitf-primary` blue-teal. Any project introducing a
 custom brand hue that happens to be teal/blue-adjacent should audit for the same confusion against
 Tailwind's built-in `teal-*`, `cyan-*`, or `sky-*` scales.
 
@@ -125,17 +107,15 @@ Tailwind's built-in `teal-*`, `cyan-*`, or `sky-*` scales.
 
 ### 3.1 Typography
 
-**Figtree**, self-hosted (no CDN), is the typeface across all three projects — confirmed
-byte-for-byte identical usage:
+**Figtree**, self-hosted (no CDN), is the typeface across all three projects:
 
 ```css
 --font-sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 ```
 
 Weights 400/500/600/700/800, latin + latin-ext subsets, `woff2` under `public/vendor/figtree/`,
-declared once in each project's `@theme`/`@font-face` and set on `<body>`. SIF explicitly notes it
-uses the *variable* font (one file covers weights 400–800, rather than one file per weight) and
-that this was "Adopted" from CASA's document without modification.
+declared once in each project's `@theme`/`@font-face` and set on `<body>`. SIF uses the *variable*
+font (one file covers weights 400–800, rather than one file per weight).
 
 **Type scale** — identical across all three, role for role:
 
@@ -149,8 +129,8 @@ that this was "Adopted" from CASA's document without modification.
 | Meta/muted | `text-xs text-slate-500` | |
 
 Heading *level* communicates document structure, not visual size — all three warn against picking a
-heading tag for its default size (HE specifically flags AdminLTE's old habit of using `<h5>`/`<h6>`
-for "small bold" text, which broke the heading outline for screen-reader users).
+heading tag for its default size (e.g. using `<h5>`/`<h6>` purely for "small bold" text breaks the
+heading outline for screen-reader users).
 
 ### 3.2 Spacing, radius, elevation
 
@@ -163,22 +143,18 @@ Shared across all three, exactly:
   - Icon tiles: `rounded-xl`
   - Pills/avatars: `rounded-full`
 - **Elevation — a two-step scale tied to layering, not decoration:**
-  - In-page surfaces (cards, panels): `shadow-sm` (CASA/HE/SIF all state this identically; SIF's
-    stat/table components additionally use `shadow-xs` for the same "resting" layer)
+  - In-page surfaces (cards, panels): `shadow-sm` (SIF's stat/table components additionally use
+    `shadow-xs` for the same "resting" layer)
   - Anything rendered *over* the page (dialogs, modals, popovers): `shadow-xl` (CASA/HE) or the
     slightly heavier `shadow-2xl` in SIF's reconciled modal shell (see
     [Modals](#65-modals-confirmation-dialogs-popovers-disclosure))
-  - The rule, stated identically in HE and SIF: nothing else in the app should carry a shadow. A
-    shadow means "this is above the page."
+  - The rule: nothing else in the app should carry a shadow. A shadow means "this is above the page."
 - **Page background:** `bg-slate-50`, with cards/surfaces at `bg-white border border-slate-200`.
-  Stated identically across all three.
 - **Page vertical rhythm:** all three use a `px-4 py-6 sm:px-6 lg:px-8` (or SIF's equivalent)
   content wrapper with the page header inside it, and a consistent header-to-content gap (CASA:
   `mb-6`/24px between header and first section; a plain filter bar sits `mb-4`/16px above its
   table, while a *bordered* filter card keeps the full 24px section gap). Treat spacing between
-  major page regions as a fixed rhythm, not a per-page judgment call — all three projects report
-  finding and fixing drift here (CASA measured all roster filters converging on 16px, calling `mb-5`
-  or `mb-6` on a plain filter "drift").
+  major page regions as a fixed rhythm, not a per-page judgment call.
 
 ### 3.3 Breakpoints & responsive strategy
 
@@ -232,18 +208,12 @@ three, regardless of version target:
 - **Target size minimum 24px** (WCAG 2.5.8), with a documented 44px figure reserved for icon-only
   controls specifically (close buttons, kebab menus) across HE and SIF.
 - **Keyboard-reachable everything**, including scrollable regions (`tabindex="0"` on a scrolling
-  dialog body per WCAG 2.1.1, documented in HE) and table row actions that must not be dropped
-  "per viewer" — SIF documents a year-long bug where an unlabeled actions column was silently
-  dropped for some users because a narrower audience was assumed, rather than measuring the actual
-  constraint width.
+  dialog body per WCAG 2.1.1, documented in HE) and table row actions, which must not be dropped
+  for a narrower audience without measuring the actual constraint width (SIF).
 - **`aria-current="page"`** on the active sidebar nav item (SIF, and consistent with HE/CASA nav
   patterns).
 - **Focus-visible, not just focus** — programmatic focus should not trigger a visible focus ring
   unless it's also keyboard focus (HE, Chrome's `:focus-visible` matching on programmatic focus).
-
-Human Essentials additionally maintains a dedicated `docs/accessibility.md` describing its
-axe-core + manual-audit methodology, exemption categories, and the "an audit is a floor, not a
-certificate" framing that recurs across all three projects' audit philosophy.
 
 ---
 
@@ -252,10 +222,9 @@ certificate" framing that recurs across all three projects' audit philosophy.
 ### 5.1 Icon systems — a genuine cross-project difference
 
 CASA and Human Essentials both use **Bootstrap Icons** (`bi-*`), self-hosted as a font
-(`public/vendor/bootstrap-icons/`, vendored via npm at build time, no CDN). HE specifically
-rebuilt its Trix rich-text-editor toolbar to swap Trix's default inline-SVG icons for Bootstrap
-Icons "so it would have one icon set" — i.e., icon-system consistency is treated as a design rule
-worth engineering effort in both projects.
+(`public/vendor/bootstrap-icons/`, vendored via npm at build time, no CDN). HE rebuilt its Trix
+rich-text-editor toolbar to swap Trix's default inline-SVG icons for Bootstrap Icons — icon-system
+consistency is treated as a design rule worth engineering effort, not just a default.
 
 Stocks in the Future uses **Lucide** instead, via the `lucide-rails` gem and a `lucide_icon` helper
 that renders inline SVG, `aria-hidden` by default, inheriting `currentColor`. This is a genuine
@@ -343,16 +312,13 @@ meta/trend-delta line.**
 is always neutral `slate-900`, full stop — state is carried by the icon tile's tint (or a ring
 around it), never by coloring the digits themselves. A trend/delta line below the numeral may use
 color (green up-arrow, red down-arrow) but is never color-only — it always pairs the color with an
-arrow glyph and/or explicit text. SIF's design.md documents this as a rule reached only after
-getting it wrong multiple times (a "ragged metrics" case study, and three iterations before landing
-on today's shape).
+arrow glyph and/or explicit text. Treat this as a hard rule, not a style preference.
 
 **Numeric table columns follow the same discipline.** Right-aligned, `tabular-nums`, one uniform
 color/weight for the whole column — no per-cell emphasis for "the interesting row." Any
 drill-through action belongs in a dedicated actions column, never encoded via numeral color or an
 implicit link on the number itself. HE parallels this with `.numeric`/`.quantity`/`.percent` column
-classes for right-aligned tabular figures. SIF documents arriving at this only after three rounds of
-getting it wrong; treat it as a hard rule, not a style preference.
+classes for right-aligned tabular figures.
 
 ### 6.4 Tables
 
@@ -361,9 +327,9 @@ Shared conventions across all three, independently arrived at:
 - **A component class, not hand-rolled markup**, for the table shell (`.data-table` in HE; a
   `table-*` class set applied identically to header and body in SIF).
 - **Row actions get one visual weight per table** — not a mix of filled/outlined/ghost buttons in
-  the same actions column. HE's audit tooling (see [§8.4](#84-design-conformance-auditing))
-  measured this at 100% conformance across 152 screens after a sweep of legacy `UiHelper` shims
-  (`edit_button_to`, `delete_button_to`, etc.) that had been the source of the deviations.
+  the same actions column. HE enforces this by sweeping legacy `UiHelper` shims (`edit_button_to`,
+  `delete_button_to`, etc.) in favor of the audited helper (see
+  [§8.4](#84-design-conformance-auditing)).
 - **Actions column pinned to the right edge.** HE freezes it (`.pin-col`/`.cell-actions`) with a
   scroll-shadow shown only when content is actually hidden off-screen; SIF frames the same concern
   differently — a hard column-width budget at its real constraint width (see below) — but both
@@ -384,8 +350,7 @@ Shared conventions across all three, independently arrived at:
 - **Pagination**: CASA and HE both use **Pagy** (server-side, `params` + Pagy, rendered as a
   `shared/_pagination` footer inside the table card — its last child, not a detached bar below).
   SIF instead paginates with a fixed `ApplicationController::PER_PAGE = 25` and prev/next controls
-  (no numbered pages), citing Stripe's page-size convention and Kaminari's own default. The exact
-  Pagy per-page figure was not confirmed for CASA/HE in this synthesis pass.
+  (no numbered pages), citing Stripe's page-size convention and Kaminari's own default.
 
 ### 6.5 Filter bars and date-range pickers
 
@@ -412,13 +377,11 @@ fixing drift toward multiple ad hoc field treatments:
 - CASA's field base: `block w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-slate-900
   shadow-sm placeholder:text-slate-500 focus:border-brand-500 focus:ring-2
   focus:ring-brand-500/30 focus:outline-none` — a 42px control.
-- HE measured the same shape across its own forms: 1px border, 8px/14px padding, 44px height,
-  `slate-300` border — describing its own fix as going from "seven treatments before, one control."
+- HE's field shape: 1px border, 8px/14px padding, 44px height, `slate-300` border.
 - SIF's field token is `rounded-lg` (not `rounded-md`, which one drifted view used and which is
   explicitly called an error in SIF's own document) with the same `slate-300`/`shadow-xs` language.
 
-**Placeholder text is `slate-500`, never `slate-400`** — restated here because CASA specifically
-audited and fixed all 50 placeholder call sites in its codebase to this value.
+**Placeholder text is `slate-500`, never `slate-400`** (see [§2.1](#21-shared-neutral--semantic-palette)).
 
 **Field-width philosophy**: HE documents reconciling two different schools explicitly — Carbon/
 Material/Polaris/Fluent's "field width should hint at expected content length" versus GOV.UK/
@@ -487,8 +450,7 @@ and/or explicit text (see [§4](#4-accessibility-standards)).
 
 All three route every page's `h1` + optional subtitle + primary action through a **shared
 page-header partial/component**, rather than hand-writing headers per page — explicitly to keep
-title/subtitle/CTA spacing from drifting per page (CASA measured and fixed 19+ pages that had
-drifted from hand-written headers back onto the shared partial).
+title/subtitle/CTA spacing from drifting per page.
 
 **Sidebar navigation** (documented in most detail by SIF, consistent with CASA/HE's own shell
 patterns):
@@ -500,9 +462,8 @@ patterns):
 - `aria-current="page"` on the active item.
 - Icons rendered via the project's icon system (`lucide_icon`/`currentColor` in SIF; `bi-*` in
   CASA/HE), never a mix of icon systems within one nav.
-- **Keep navigation one level deep.** SIF documents fixing a "Trading floor" nav item that had grown
-  a nested row-counter as a symptom of trying to put too much into the nav itself; the fix was to
-  move a growing list out of nav and into the page it names.
+- **Keep navigation one level deep.** Move a growing list out of nav and into the page it names,
+  rather than nesting it under a nav item (SIF).
 - **A catalogue does not belong in the nav.** For a growing list of items (not a fixed set of
   destinations), reach for search/filter, a command palette, a recently-viewed list, or pinning —
   in that preference order — before adding it as scrolling nav content.
@@ -552,8 +513,7 @@ the canonical detailed statement of an RFG-wide house style:
 - **No gendered or ableist language.**
 - **Second person: "you," not "my" or "we"**, for anything describing the user's own data or
   actions — with three documented exception categories where "we"/"my" is acceptable: an onboarding
-  welcome email, a privacy policy, and marketing copy. HE measured its own before/after counts when
-  sweeping this rule across the app.
+  welcome email, a privacy policy, and marketing copy.
 - **A page title is a phrase, not a question.**
 - **A subtitle says something the title cannot** — it's not a restatement of the title in smaller
   text; if it doesn't add information, cut it. The right content for a subtitle differs by the kind
@@ -599,63 +559,23 @@ automated audits (below) check for call sites that bypass the helper with hand-w
 ### 8.4 Design-conformance auditing
 
 **Every project has built bespoke, automated scripts that check its own UI for conformance to its
-design system** — a shared methodology across all three, even though the specific tools are
-completely different implementations:
+design system** — a shared methodology across all three (accessibility, copy, layout, icon usage,
+row-action weight), even though the specific tools are completely different implementations. HE's
+companion methodology docs (`docs/table-audit.md`, `docs/view-audit.md`) describe a **DEFECT vs.
+debt** severity distinction worth adopting generally: a defect is wrong now; debt renders correctly
+but is implemented in a way that can't receive a system-wide fix.
 
-- **CASA**: `spec/system/accessibility/axe_spec.rb`, `bin/measure-responsive.mjs`,
-  `bin/caret-map.rb`.
-- **Human Essentials**: `bin/design/status.rb`, plus a large family of targeted audits —
-  `audit.js`, `address-audit.js`, `icon-audit.js`, `page-audit.rb`, `wcag-audit.js`,
-  `wcag-manual.js`, `overlay-audit.js`, `keyboard-audit.js`, `copy-audit.rb`,
-  `row-actions-audit.js`, `citation-audit.py`, `layout-shift-audit.js`, `button-audit`,
-  `form-validation-audit.js`, `tooltip-audit.js` — with companion methodology docs
-  (`docs/table-audit.md`, `docs/view-audit.md`) describing a **DEFECT vs. debt** severity
-  distinction (a defect is wrong now; debt renders correctly but is implemented in a way that can't
-  receive a system-wide fix).
-- **Stocks in the Future**: a family of Rails system tests doubling as design audits —
-  `spacing_test.rb`, `page_rhythm_test.rb`, `environment_ribbon_test.rb`,
-  `no_arbitrary_values_test.rb`, `button_variants_test.rb`, `one_primary_test.rb`,
-  `icon_tile_test.rb`, `wcag_audit_test`, `table_stacking_test`, `reflow_test`,
-  `row_action_alignment_test.rb`, `table_consistency_test.rb`, `dash_column_test`,
-  `table_actions_reachable_test`, `flash_dismiss_test.rb`, `modal_standards_test.rb`.
+**A shared "audit the audits" pattern**: both HE and SIF independently describe deliberately
+planting a known violation and confirming their own tooling catches it, as a self-test that the
+audit itself hasn't silently gone stale.
 
-**A shared "audit the audits" pattern**: both HE (documented in `docs/accessibility.md` and its
-copy-audit methodology) and SIF independently describe deliberately planting a known violation and
-confirming their own tooling catches it, as a self-test that the audit itself hasn't silently gone
-stale.
-
-**What an audit cannot see, documented independently by HE's `view-audit.md`**: unbalanced/
-mismatched HTML tags the browser silently recovers from, duplicate `<h1>`s inside a loop, stray
-template-expression output printing onto the page, and similar markup bugs that a class-name or
-DOM-structure scan will not catch — caught only by actually opening the page in a browser. The
-shared lesson: an automated audit is a floor, not a certificate: it catches known patterns, not
-"the page is correct."
+**What an audit cannot see**: unbalanced/mismatched HTML tags the browser silently recovers from,
+duplicate `<h1>`s inside a loop, stray template-expression output printing onto the page, and
+similar markup bugs that a class-name or DOM-structure scan will not catch — caught only by
+actually opening the page in a browser. The shared lesson: an automated audit is a floor, not a
+certificate: it catches known patterns, not "the page is correct."
 
 ---
-
-## 9. Supplementary source material folded into this synthesis
-
-Beyond each project's primary `design.md`, the following supporting documents were read and folded
-in above because they contain durable, transferable design rules (as opposed to one-off business
-decisions or process/tooling notes, which were left out):
-
-- `human-essentials/accessibility.md` — accessibility audit methodology, informs [§4](#4-accessibility-standards) and [§8.4](#84-design-conformance-auditing).
-- `human-essentials/table-audit.md` — row-action-weight and badge-usage measured audits, informs [§6.4](#64-tables) and [§8.4](#84-design-conformance-auditing).
-- `human-essentials/view-audit.md` — page-level conformance methodology, informs [§8.4](#84-design-conformance-auditing).
-- `stocks-in-the-future/responsive-design-guidelines.md` — breakpoint and container-query rules, informs [§3.3](#33-breakpoints--responsive-strategy).
-- `stocks-in-the-future/type-ahead-and-multiselect.md` — durable, framework-agnostic rules for a searchable multiselect control, worth knowing if any project builds one (not otherwise covered above since none of the three currently ships this control): clear the query on pick, address the control through its native `<select>` never the widget's own DOM, assert filtering by a decoy option's absence rather than reading the menu immediately after a keystroke, and never write "never" in an option's subtext hint.
-
-Select durable rules from `human-essentials/design-decisions.md` (a 9,954-line running decision
-log) are reflected above via HE's own "promote to design.md" workflow — the log explicitly states
-its purpose is to record one-off decisions until they're promoted into `design.md`, so this
-synthesis treats HE's `design.md` as already containing that log's generalizable content, and did
-not re-derive rules directly from the log itself. The full log is preserved verbatim in
-[sources/human-essentials/design-decisions.md](sources/human-essentials/design-decisions.md) for
-provenance.
-
-Each project's `design-todo.md` (CASA, SIF) is a migration backlog/status tracker, not a design
-rule source, and was not mined for this synthesis beyond confirming it didn't contain undocumented
-design decisions — preserved verbatim in `sources/` for provenance.
 
 See [INCONSISTENCIES.md](INCONSISTENCIES.md) for the open cross-project contradictions this
 synthesis deliberately did not paper over.
