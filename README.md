@@ -38,6 +38,18 @@ documentation.
   original nine documents this synthesis started from — they were pulled in after checking each
   project's `docs/` directory for other design-relevant material (see `design.md` §9 for the
   reasoning on what was included vs. left out).
+- **[`.claude/skills/`](.claude/skills/)** holds five Claude Code skills copied verbatim from
+  Human Essentials' `design` branch (`.claude/skills/`) — the working method behind that branch's
+  migration, not project-specific output like the `sources/` documents above. They're generic
+  enough to apply to any design-system work, including this repo's own synthesis process:
+
+  | Skill | Covers |
+  |---|---|
+  | `design-system-migration` | The end-to-end loop (spec → industry research → preview → sweep → decision log) for migrating an app onto a design system |
+  | `audit-suite` | Writing automated design/accessibility checks you can actually trust — scope, positive/negative controls, the ways a check lies |
+  | `wcag-conformance` | Auditing against WCAG 2.2 A/AA, including what automated tooling structurally cannot see |
+  | `evidence-discipline` | Measuring before asserting, keeping provenance on a figure, correcting a claim without erasing it |
+  | `session-durability` | Committing/pushing at every checkpoint, and detecting a working tree reverted out from under a long-running session |
 
 If you're implementing or auditing against this design system, start with `design.md`. If you hit
 a case it doesn't cover cleanly, check `INCONSISTENCIES.md` first — it may be a known open
