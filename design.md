@@ -3959,17 +3959,13 @@ looking for `clickhere`. Every multi-word branch now uses `\s+`, and every branc
 
 ## Responsive
 
-Tailwind's breakpoints, unchanged: `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536. The
-shell switches at **`lg`** — below it the sidebar is an off-canvas drawer, above it a sticky
-column.
-
-Audit with `pw bin/design/responsive-audit.js`, which visits every screen at **320, 375, 639,
-641, 767, 769, 1023, 1025, 1280 and 1440**, plus a landscape phone at **740×360**. 320 is not
-arbitrary: WCAG 1.4.10 Reflow is defined at 320 CSS px, which is also 1280px at 400% zoom.
-
-**The widths straddle each breakpoint.** 639 and 641 are different layouts and only one of them
-gets looked at by hand — a layout that breaks usually breaks at the switch, not in the middle of
-a range.
+**Portable — test widths should straddle each breakpoint (one just below, one just above),
+because a responsive layout that breaks usually breaks exactly at the switch, not in the middle
+of a range.** **Portable — 320 CSS px is not an arbitrary small-phone width to spot-check; it's
+WCAG 1.4.10 Reflow's actual defined width** (equivalent to 1280px at 400% zoom), so it's the
+correct floor to test against, not just a conservative extra. **Local — this default's
+breakpoints and audit:** Tailwind's unchanged `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl`
+1536; the shell switches at `lg`.
 
 Beyond the page geometry it checks the things that make a squeezed layout unusable rather than
 merely ugly: content clipped with no ellipsis to say so, a nav drawer that cannot be opened
@@ -3979,25 +3975,28 @@ tells you nothing about a phone, and that is where a 26rem panel runs out of roo
 
 ### The document never scrolls sideways
 
-`html { overflow-x: clip }`, in `@layer base`. A wide data table belongs in `.table-scroll` —
-1.4.10 exempts content needing two-dimensional layout, so the *table* may scroll — but the page
-must not.
+**Portable — the document root itself never scrolls horizontally; a wide element that genuinely
+needs 2D layout (a data table) gets its own scroll container, and only that container scrolls**
+— WCAG 1.4.10 exempts exactly this kind of content, but exempts the element, not the whole page.
 
-That rule is load-bearing, and it is not what you would guess. **Chrome counts content clipped
-inside a scroll container towards the root's scrollable overflow**, so a table in a working
-`overflow-x: auto` container, inside an ancestor with `overflow: hidden`, still let `/items` be
-swiped 821px sideways at 320px: the heading went from `left: 16` to `left: -805` and the user
-was left looking at blank space. `min-width: 0` on the flex ancestors does not fix it; only
-clipping the root does.
+**Portable, and genuinely counterintuitive — a descendant's clipped/scrollable content can still
+contribute to the document root's own scrollable overflow, even inside an ancestor that
+correctly sets `overflow: hidden`.** A working scroll container nested inside a correctly-clipped
+ancestor is not sufficient on its own to prevent the root from becoming horizontally scrollable —
+only constraining the root's own overflow directly is reliable. This is a real, easy-to-miss
+browser layout behavior, not specific to any one implementation.
 
-`clip` and not `hidden`: `hidden` makes the root a scroll container, which can break
-`position: sticky` descendants, and the sidebar is `lg:sticky`. `overflow-x: hidden` is left in
-front of it as the fallback for Safari below 16.
+**Portable — `clip` and `hidden` are not interchangeable for constraining a root's overflow: `hidden` makes the element an actual scroll container**, which can break `position: sticky`
+descendants inside it — worth knowing before reaching for the more familiar of the two.
+**Local:** `overflow-x: hidden` is kept as a fallback for older Safari, in front of `clip`.
 
 ### How to measure it
 
-**Swipe, do not call `scrollTo`.** They answer different questions, and the difference is why
-this shipped:
+**Portable — several plausible ways to measure "does this scroll sideways" each answer a subtly
+different, wrong question; only simulating the actual user gesture (a swipe/wheel event, then
+reading the resulting position) answers the real one.** This generalizes past this specific
+measurement — whenever a metric is a *proxy* for user-observable behavior, verify the proxy
+against the real gesture at least once, rather than trusting that it's equivalent:
 
 | Measure | Says |
 | --- | --- |
@@ -4008,35 +4007,39 @@ this shipped:
 
 ### Tap targets
 
-WCAG 2.5.8 (AA) is **24×24 CSS px** — but with the exceptions, or the check is noise. A first
-pass reported 28 failures on the dashboard, every one a date link in a table cell that passes on
-spacing. The audit implements *inline* and *spacing* (a 24px circle centred on the target
-touching no other target).
+**Portable — WCAG 2.5.8's 24×24 CSS px floor has real, specific exceptions (inline targets
+within text, and a spacing exception for adjacent small targets) that a check has to implement,
+or it reports overwhelming, unusable noise instead of real findings.** A blunt implementation of a
+correct rule is functionally the same as a wrong rule — measure both the target and its context.
 
-Controls that exist only on touch get the **industry 44×44**, not the 24px floor: the drawer's
-open and close buttons are `size-11`. They were `p-1` and `p-2`, giving 22×32 and 32×32.
+**Portable — a control that only exists for touch interaction should meet the larger,
+touch-specific target size convention (commonly 44×44), not just the WCAG AA floor.** The WCAG
+minimum is a legal floor, not a recommendation for a touch-primary control.
 
 ### Row actions are not Turbo's
 
-`essentials_action_button` renders `data-turbo="false"`, so the browser submits the form itself.
-
-Row actions are `button_to` forms and the tables sit inside a results turbo-frame. Turbo's
-`elementIsNavigatable` returns true for anything inside a frame **even with Drive off**, which
-it is app-wide here — so Turbo intercepted the submission, fetched the redirect and had to
-promote it to a top-level visit because the frame carries `target="_top"`. About half the time
-that promotion did nothing: the confirm was accepted, the server handled the request, and the
-page never changed.
-
-A row action is a whole-page navigation ending in a redirect and a flash, not a frame update.
-**Anything that redirects out of a frame should opt out of Turbo rather than rely on
-`target="_top"` to rescue it.**
+**Portable — a control whose result is a full-page navigation (a redirect, typically) should
+opt out of a page's partial-update/AJAX-interception framework explicitly, rather than relying on
+a fallback/rescue mechanism to promote it correctly.** A framework's "recover and promote to a
+full navigation" path is a safety net, not a substitute for declaring intent — relying on it can
+silently fail in edge cases (here, roughly half the time) where the explicit opt-out wouldn't.
+**Local — this default:**
 
 ### Keyboard
 
-Audit with `pw bin/design/keyboard-audit.js`, at 1280 **and** at 375 — the two are different
-layouts and the drawer bug below only exists at one of them.
+**Portable — a keyboard/focus audit needs to run at every layout that behaves genuinely
+differently, not just one representative width** — a defect that only exists in one specific
+layout (an off-canvas drawer that only appears below a breakpoint, say) is invisible to a check
+run exclusively at the other.
 
-**An off-canvas panel must be `inert` when it is closed.** The sidebar below `lg` is moved out of
+**Portable — content that's visually hidden via a transform (moved off-screen rather than
+removed from layout) is still fully present to a keyboard and to assistive tech unless explicitly
+marked inert.** A closed off-canvas panel hidden purely by a transform leaves its contents in the
+tab order — a keyboard user tabs through an entire invisible navigation structure with no visual
+indication of where focus has gone. Removing the element from layout instead would fix this but
+breaks a sliding transition; marking the subtree `inert` (or the ARIA equivalent) removes it from
+both the tab order and the accessibility tree while leaving the transform and transition intact.
+**Local:** The sidebar below `lg` is moved out of
 sight with `-translate-x-full`, which hides it from the eye and from nobody else: closed, its 27
 links stayed in the tab order, so a keyboard user tabbed from "Skip to main content" through the
 entire navigation — invisible, with no way to know where focus had gone — before reaching the
@@ -4047,18 +4050,25 @@ subtree out of the tab order and the accessibility tree and leaves the transform
 because at `lg` the sidebar is a visible column and must not be inert whatever the drawer's last
 state was.
 
-**A scroll container needs `tabindex="0"`.** `.table-scroll` can be scrolled with a mouse and,
+**Portable — any independently scrollable region needs to be reachable by keyboard** — WCAG
+2.1.1 / the `scrollable-region-focusable` rule most automated scanners implement. This is easy to
+miss specifically when the region also happens to contain other focusable content (links), which
+gives it an incidental way into the tab order that masks the region itself not being one. `.table-scroll` can be scrolled with a mouse and,
 without a tab stop, by nothing else — axe's `scrollable-region-focusable`, WCAG 2.1.1. It only
 showed up on the historical trend tables because every other table in the app contains links,
 which give the region a way in by accident. A focusable region also needs a name and a role, and
 a visible focus ring like anything else that takes focus.
 
-**Decoration that happens to be clickable is not a control.** The drawer scrim and a `<dialog>`'s
+**Portable — an element that's clickable purely as a convenience (a backdrop/scrim that
+closes an overlay) is not thereby a control, and doesn't need a tab stop, as long as the same
+action is genuinely available through a real control (Escape, a close button).** Adding
+unnecessary tab stops for click-convenience elements clutters the tab order for every keyboard
+user to marginally help a pattern that already has a proper keyboard path. The drawer scrim and a `<dialog>`'s
 backdrop both close on click and are correctly *not* focusable: the scrim is `aria-hidden`, and
 both actions are also on Escape and on a real close button. Adding a tab stop would put an
 unnamed one in the way of everyone.
 
-**Never use a positive `tabindex`.** It takes an element out of document order and puts it in
+**Portable — never use a positive `tabindex`.** It takes an element out of document order and puts it in
 front of everything without one. The audit fails on any.
 
 ### select2 names nothing it builds
