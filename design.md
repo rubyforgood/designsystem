@@ -381,41 +381,50 @@ Measured over the backfill: **18 of 18 addresses compose back to exactly the str
 
 ### Iconography
 
-**Bootstrap Icons**, self-hosted, compiled into the Tailwind bundle. Font Awesome is gone —
-an `fa-*` class renders an empty element: no glyph, no error, just a gap.
+**Portable — one icon set, used consistently, self-hosted with no CDN request.** **Local — this
+default:** **Bootstrap Icons**, compiled into the Tailwind bundle. Font Awesome is gone — an
+`fa-*` class now renders an empty element: no glyph, no error, just a gap, which is itself worth
+knowing before swapping icon sets: removing one without a build-time check for stale references
+leaves silent gaps, not errors.
 
 ```erb
 <i class="bi-plus-lg" aria-hidden="true"></i>
 ```
 
-Rules:
+Rules — **all Portable**, and independent of which icon set or component library implements them:
 
-- An icon that sits beside its own label is decorative and is `aria-hidden="true"`.
-- A control with **only** an icon carries its own `aria-label`. There is no third option.
-- **An icon-only control is a `<button>`, never an anchor with `role="button"`.** A native anchor
-  fires on Enter and ignores Space; the ARIA button pattern requires both, so an anchor that
-  *announces* itself as a button and then ignores Space fails **WCAG 4.1.2**. `add_element_button`
-  and `remove_element_button` were both built that way, and it was measured rather than reviewed:
-  Enter removed a line item, Space did nothing. **axe cannot catch this** — it reads markup, not
-  behaviour — so the keyboard audit and a real key press are the only things that will. Inside a
-  form, `type: "button"` is not optional: a button defaults to submit.
-- **Icon-only is for a repeating row action, not for a one-off.** The row gives the context the
-  label would: sixteen "Remove this item" buttons down a column read as a column of removes, and
-  the item beside each one says which. A single destructive action in a page header gets its
-  words. That is why the line item rows are glyphs and the page actions are not.
-- `IconHelper#fa_icon` still exists and still takes Font Awesome names, because ~40 call
-  sites use it; it maps them to Bootstrap Icons and always sets `aria-hidden`. New code
-  should write the `<i class="bi-…">` directly or pass `icon:` to a component helper.
-- Icons are aligned once, in `@layer base`, rather than with per-call-site margins.
+- An icon that sits beside its own label is decorative and hidden from assistive tech. There is
+  no third option between "decorative" and "carries the accessible name" — an icon is always one
+  or the other.
+- A control with **only** an icon carries its own accessible name (an `aria-label` or equivalent).
+- **An icon-only control is a real `<button>`, never an anchor styled to look like one.** A native
+  anchor fires on Enter and ignores Space; the ARIA button pattern requires both, so an anchor that
+  *announces* itself as a button and then ignores Space fails **WCAG 4.1.2** — a real behavioral
+  bug, not a style nitpick, and one automated accessibility scanning **cannot catch**, because it
+  reads markup, not keyboard behaviour. Inside a form, an explicit non-submit button type is not
+  optional — a bare `<button>` defaults to submit.
+- **Icon-only is for a repeating row action, not a one-off.** Repetition supplies the context a
+  label would: many identical "remove" icons down a column read as a column of removes, with the
+  item beside each one saying which. A single, non-repeated destructive action (in a page header,
+  say) gets its words — that's the dividing line, not "icon vs. text" as a blanket preference.
+- Icons are aligned once, in one shared place, rather than with per-call-site margins that drift.
+
+**Local — this default's legacy shim:** `IconHelper#fa_icon` still exists and takes the old
+icon set's names for ~40 remaining call sites, mapping them to the new set and always setting
+the decorative attribute. New code writes the new icon set directly.
 
 <a id="one-glyph-one-meaning"></a>
 #### One glyph, one meaning
 
-The rules above say how to *mark up* an icon. They never said **which glyph means what**, and seven
-disagreements went through that gap. The lexicon is `bin/design/icon-lexicon.json`, which
-`bin/design/icon-audit.js` and `spec/system/button_icons_system_spec.rb` both read, so this table
-and the app cannot drift apart. Adding a glyph to the app means adding it there first: the audit
-fails on any glyph it does not recognise, which makes a one-off a decision rather than a reflex.
+**Portable — the rules above say how to *mark up* an icon; they don't say which glyph means
+what, and that's a separate, equally necessary discipline.** A team can follow every markup rule
+correctly and still ship the same glyph meaning two different things on two different screens.
+**Portable — machine-check the vocabulary, not just the markup:** a lexicon mapping meaning to
+glyph, read by both the audit and the test suite, so the table and the app cannot drift apart, and
+adding a new glyph means declaring it first rather than picking one by reflex. **Local — this
+default's implementation and vocabulary:** `bin/design/icon-lexicon.json`, checked by
+`bin/design/icon-audit.js` and a system spec. Seven real disagreements existed before this
+existed. The table itself is entirely this app's own glyph choices:
 
 | Meaning | Glyph | | Meaning | Glyph |
 | --- | --- | --- | --- | --- |
@@ -435,7 +444,7 @@ fails on any glyph it does not recognise, which makes a one-off a decision rathe
 | adjust an allocation | `bi-sliders` | | total something up | `bi-calculator` |
 | a child | `bi-person-arms-up` | | | |
 
-**Import points in, export points out** — because import and export are movements in and out of a
+**Portable — pick one frame of reference for a set of directional glyphs and hold it consistently; do not mix two.** Import/export and upload/download are two different frames (the app's boundary vs. the server), and mixing their glyphs in one row inverts half of them regardless of which frame the reader assumes. **Local — this default's choice:** import points in, export points out, because import and export are movements in and out of a
 box, and the box is the app. This app had them the other way round for the length of the migration:
 `/donation_sites` shipped **Import wearing an arrow that leaves a tray and Export wearing one that
 enters it**, and it was reported as the icons looking swapped, which they were.
@@ -450,7 +459,7 @@ Both were fetched and rasterised rather than recalled. `bi-download` stays in th
 means only what it says — the **Download example CSV** button in the import dialog, which is on the
 same page as an export and is the reason the two could not share a glyph.
 
-**A generic form verb carries no glyph.** *Save*, *Cancel*, *Submit*, *Continue*, *Close*, *Update*
+**Portable — a generic form verb (commit/abandon this form, not a specific action) carries no glyph**, because a glyph beside the one filled submit button on a page distinguishes it from nothing else on that page. **Local — measured:** *Save*, *Cancel*, *Submit*, *Continue*, *Close*, *Update*
 and a wizard's *Next* name no action — they say "commit this form" or "abandon it" — and a form has
 exactly one submit, which is the only filled button on the page, so a glyph beside it distinguishes
 it from nothing. Same argument this document already makes for [an icon repeated down a
@@ -459,13 +468,13 @@ the twelve forms built through `submit_button` and nothing on the twenty-nine bu
 `essentials_form_actions`, from a default argument no view mentioned. Measured after: **45 Save
 buttons, no glyph on any of them**, and `bi-save` — a floppy disk — is used nowhere.
 
-**A named action keeps its glyph wherever it sits**, including on a submit. The filter bar's
+**Portable — a named action keeps its glyph wherever it appears, including when it's also a form submit.** The dividing line is whether the word names a specific action or only means "commit this form" — not whether the control happens to be a submit button. The filter bar's
 *Filter* is a form submit and wears the funnel; the import dialog's *Import CSV* is a form submit
 and wears the import arrow. The line is between a word that names what happens and a word that only
 says "commit this form" — not between a button and a submit. The first draft of the audit drew it
 in the wrong place and flagged both of those.
 
-**One label, one glyph.** *Invite user* reached three pages wearing `bi-person-plus`, `bi-envelope`
+**Portable — one label, one glyph, checked by comparing a label's glyph across every screen that renders it — not just within one page.** *Invite user* reached three pages wearing `bi-person-plus`, `bi-envelope`
 and `bi-plus-lg` between them, because nothing said which was right. The audit compares a label's
 glyph across every page that renders it, and treats a menu trigger's trailing `bi-chevron-down` as
 the disclosure affordance rather than part of the action. The opposite — one glyph across many
@@ -480,28 +489,39 @@ indistinguishable from a bug:
 - **Reject request** — the label toggles to *Close request* while a glyph could not, so a fixed
   `bi-slash-circle` was wrong on every closure. It carries none.
 
-And a label that means two things is a labelling fault, not an icon one. `/requests` had a row
+**Portable — a label that means two different things on two different screens is a labelling fault, not an icon problem**, and no glyph choice fixes it. `/requests` had a row
 action called **Cancel**, which is the word this app uses on **122 pages** to mean "abandon this
 form", while here it destroyed a record. It says *Cancel request* now, as the show page already did.
 
 ### Accessibility
 
-Target is **WCAG 2.2 AA**. These are the rules this app has actually had to enforce:
+**Reading note.** Target is **WCAG 2.2 AA**. This is the most Portable section in the document by
+a wide margin — WCAG criteria and general accessibility mechanics don't belong to any framework —
+but it's still worth reading the tags: several items below mix a Portable requirement with a Local
+implementation of it (specific classes, specific helpers), and the two are worth being able to
+tell apart even here.
 
-- **Landmarks.** One `<main id="main-content">` per document. `<nav>` elements are labelled.
-  A page never has two of the same landmark with the same name.
-- **Skip link.** First focusable element on the app shells, visible on focus, `#222` on white
-  (15.9:1). It is deliberately not `.sr-only-focusable`: that pattern reveals the link with
-  `position: static`, which shifts the page as you tab into it.
-- **One `h1` per page**, and no skipped levels below it.
-- **Every control is named.** A field has a `<label for>`, or an `aria-label`, or an
-  `aria-labelledby`. A `<label>` with no `for` names nothing.
-- **A link cannot be disabled.** It stays focusable and clickable by keyboard and announces
-  nothing. `UiHelper` renders an unavailable link action as a non-interactive `<span>` with
-  `aria-disabled`, and an unavailable form action as a genuinely `disabled` `<button>`.
-- **Focus is always visible**: `focus-visible:outline-2 focus-visible:outline-offset-2`.
-  Nothing sets `outline: none` without replacing it.
-- **Every brand link is `.link-brand`, and colour is never the only signal.** The class carries the
+These are the rules this app has actually had to enforce:
+
+- **Portable.** One landmark of each kind per document, uniquely labelled if there's more than one
+  `<nav>` — never two landmarks of the same kind with the same accessible name.
+- **Portable — a skip link is the first focusable element, visible on focus, with real contrast.**
+  **Local — this default:** `#222` on white (15.9:1). Deliberately not built with a technique that
+  reveals the link via `position: static`, because that shifts the page layout as you tab into it
+  — a real, generically-true implementation gotcha, not just this app's preference.
+- **Portable.** One `h1` per page, no skipped heading levels below it.
+- **Portable.** Every control has a real accessible name — a properly associated label, or an
+  `aria-label`/`aria-labelledby`. A `<label>` with no `for` (or not wrapping its control) names
+  nothing, silently.
+- **Portable — a link cannot be `disabled`; the HTML attribute doesn't exist for anchors, and an
+  "unavailable" link still needs a real non-interactive treatment** (`aria-disabled` on a
+  non-interactive element, not a dimmed but still-clickable link). **Local — this default:**
+  `UiHelper` renders an unavailable link action as a `<span aria-disabled>` and an unavailable
+  form action as a genuinely `disabled` `<button>` — the two cases need different HTML because only
+  a real form control can take the `disabled` attribute at all.
+- **Portable.** Focus is always visible, on every focusable element, with no exceptions carved
+  out. Nothing removes the focus indicator without replacing it with an equally visible one.
+- **Portable — a link needs a non-colour cue (an underline, typically) on hover and focus at minimum, because colour alone often doesn't clear the contrast a link-identification technique requires against surrounding text.** **Local — this default:** one shared `.link-brand` class carries the colour and the cue consistently, rather than each call site hand-writing colour utilities that drift. The class carries the
   colour and an **underline on hover and on `:focus-visible`**. It carries no weight, because weight
   belongs to the context: a table cell is already `font-medium` and the link inherits it, a list of
   nineteen item names should not be medium on every line, and a link in a sentence adds it.
@@ -515,14 +535,14 @@ Target is **WCAG 2.2 AA**. These are the rules this app has actually had to enfo
   they were simply not *identifiable*. Before the class, 3 of 78 link strings had any hover cue and
   6 had any focus style.
 
-- **A link inside a sentence is underlined at rest as well.** `class: "link-brand font-medium
+- **Portable — a link inside running prose needs a permanent visual cue (not just hover/focus), because a reader scanning a paragraph has to recognize it as a link before pointing at it (WCAG 1.4.1).** A link that's its own visually distinct block (a table cell, a list item) doesn't need this — there's no adjacent body text to be confused with. **Local — this default:** `class: "link-brand font-medium
   underline"`. The hover cue is not enough inside prose: a reader scanning a paragraph has to know
   it is a link before pointing at it — WCAG 1.4.1, and axe reports it as `link-in-text-block`. A
   link that is its own block — a table cell, a list item, a card row — takes no *permanent*
   underline, because there is no adjacent body text to be confused with and a whole underlined
   column is noise; the hover and focus cue covers it.
 <a id="user-supplied-links"></a>
-- **A URL a user typed is never put straight into an `href`.** `essentials_external_link` for a
+- **Portable — user-supplied URLs are a real injection vector and need scheme validation *and* render-time sanitization, not one or the other.** A `javascript:` URL rendered through `link_to` executes in whoever views the page's session — this is a genuine, non-theoretical class of stored XSS, not a style rule. Validate at write time **and** guard at render time, because a row can reach the database by a path that skipped validation (import, console, a restored backup) — the render-time guard is what actually protects a reader. An unanchored scheme pattern (matching a substring rather than the whole value) is not real protection; it's defeated by a scheme prefix followed by a decoy. **Local — this default:** `essentials_external_link` for a
   link that is nothing but the URL, `essentials_safe_href` where the call site builds its own link
   and needs to keep its classes and accessible name. Both accept `http` and `https` and nothing
   else.
@@ -546,7 +566,7 @@ Target is **WCAG 2.2 AA**. These are the rules this app has actually had to enfo
   still see what the field holds — a bank looking at a nonsense URL is how it gets corrected.
 
 <a id="inert-on-arrival"></a>
-- **A control that leads nowhere is disabled only when pressing it would cost something.** Several
+- **Portable — a control that leads nowhere is disabled only when pressing it would cost something.** A no-op control (a calendar's "Today" when already on today) is a smaller cost than a disabled control someone has to reason about — but only when the state a press would have led to is already visible some other way; a no-op with no visible confirmation is worse than either option. Several
   can be pressed before they can do anything: Today on a calendar that opens on today, "Reset
   search" before a search, [pagination's ends](#pagination). The line is what the press actually
   does.
@@ -565,10 +585,10 @@ Target is **WCAG 2.2 AA**. These are the rules this app has actually had to enfo
   - **A no-op is only tolerable when the state it would take you to is visible.** Today is marked in
     all three calendar views now; it was marked in *none* of the list view, and fixing that mattered
     more than the button ever did.
-- **Disclosure state is announced**: `aria-expanded` plus `aria-controls` on anything that
-  opens or closes a region.
+- **Portable.** Disclosure state is announced — an expand/collapse control carries the ARIA state attributes that say what it currently controls and whether that's open.
 - **Colour is never the only signal** (see [Colour](#colour)).
-- `lang` is bound to `I18n.locale`, and the viewport tag does not lock zoom.
+- **Portable.** The document's language attribute is bound to whatever actually decides the
+  rendered language, not hardcoded — and the viewport meta tag never locks zoom.
 
 The browser audit (`bin/design/audit.js`) checks the mechanical half of this — heading order,
 unlabelled controls, nameless buttons, duplicate landmarks, leftover Bootstrap classes,
@@ -577,6 +597,13 @@ keyboard.
 
 <a id="wcag-coverage"></a>
 #### What is checked, and by what
+
+**Portable — the criteria themselves and the discipline of tracking coverage explicitly.** **Local
+— the "Verified by" column**, which names this project's own audit scripts. The criteria are WCAG
+2.2 itself, not this app's — the table transfers as a coverage-tracking template for any app
+targeting the same conformance level; what has to change per project is which tool verifies which
+row, and "Not applicable" rows need re-justifying against your own app's actual feature surface,
+not copied from this one's.
 
 **WCAG 2.2 AA is 55 success criteria.** This is all of them, and what verifies each — because the
 useful question about a suite reporting zero is not what it found but what it looked at.
@@ -644,6 +671,14 @@ in October 2023. A clean report is a statement about the questions asked.
 <a id="auditing-the-audits"></a>
 #### Every check is tested twice, and the second test is the one that matters
 
+**Portable, entirely — and already generalized.** This subsection is pure audit-writing
+methodology with no Human Essentials content in it at all. It's kept here as the place this
+project actually learned it, with this project's own real numbers, but the reusable version — the
+same positive/negative-control discipline, the same "vacuous pass," "wrong metric" and "no
+baseline" failure taxonomy — lives in this repo's `audit-suite` skill, already written for any
+project rather than this one. Read it there if you're building checks for a different app; read
+here for the evidence that it's not theoretical.
+
 Five checks reported failures the app did not have, in two days. Every one had been "verified" the
 usual way — plant the defect it is meant to catch, watch it fire — and every one passed that test.
 **A check that fires when it should not still fires when it should.** Planting a defect proves a
@@ -686,13 +721,14 @@ matched an href that only one of the three roles has.
 | Wrong metric | measures a real quantity that is not the one the rule is about |
 
 <a id="focus-not-obscured"></a>
-**Nothing scrolls a focused control under a fixed bar** — `scroll-padding`, on `html` for the scroll
-rail and on `.table-scroll` for the frozen columns. The browser scrolls a newly focused element only
-far enough to touch the edge of the viewport, and the rail is *at* that edge: measured on
-`/items/quantity_and_location` at 1280×900, a focused link at y=876 height 24, rail at y=876,
-entirely covered. Five screens. `scroll-padding` is the remedy the criterion's own understanding
-document names for a sticky bar, and the values are the rail's height and the two column widths the
-scroll controller already measures — so nothing can drift.
+**Portable — a page with any fixed/sticky chrome (a bottom bar, frozen table columns) needs to
+compensate the browser's own focus-scrolling behavior, or a focused control can land completely
+hidden underneath that chrome.** The browser scrolls a newly focused element only as far as the
+edge of the viewport, which is exactly where fixed chrome sits — CSS's `scroll-padding` is the
+general-purpose remedy WCAG 2.2's own understanding document names for this. **Local — this
+default's measurements:** applied on `html` for the scroll rail and on `.table-scroll` for the
+frozen columns, sized to this app's own rail height and column widths, discovered on
+`/items/quantity_and_location` where a focused link was measured completely covered.
 
 ## Components
 
