@@ -131,7 +131,10 @@ function settingsPage(role) {
         </div>
       </fieldset>
     </form>
-  `);
+    <!-- Deliberate copy-quality violations -- a positive control for bin/design/copy-audit.js,
+         same purpose as this file's icon buttons for tooltip-audit.js. Not a style mistake to
+         someday "fix"; removing it would just make the live-crawl proof untested again. -->
+    <p>Please contact support if you need help. <a href="/help">Click here</a> to learn more.</p>`);
 }
 
 function adminPage(role) {
