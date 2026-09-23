@@ -9,7 +9,7 @@
 // Run:           pw bin/design/wcag-audit.js [--json]
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets: allTargets, BASE } = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, BANK, PARTNER, ADMIN } = require("./targets");
 
 const AXE = "/tmp/axe/node_modules/axe-core/axe.min.js";
 const JSON_OUT = process.argv.includes("--json");
@@ -68,11 +68,20 @@ async function audit(page, label, path) {
       : t.controller.startsWith("admin") ? "super" : "bank") === role)
     .map((t) => [t.path, t.path]);
 
+  // Emails come from the seam's RUNS; the role-name classification just above is this audit's
+  // own (controller-based, not path-based like targets.js's PARTNER/ADMIN) and is left alone --
+  // unifying the two classification schemes is a separate concern from de-duplicating credentials.
+  const emailFor = {
+    bank: RUNS.find(([, p]) => p === BANK)[0],
+    super: RUNS.find(([, p]) => p === ADMIN)[0],
+    partner: RUNS.find(([, p]) => p === PARTNER)[0]
+  };
+
   for (const [email, pages] of [
     [null, SIGNED_OUT],
-    ["org_admin1@example.com", forRole("bank")],
-    ["superadmin@example.com", forRole("super")],
-    ["verified@example.com", forRole("partner")]
+    [emailFor.bank, forRole("bank")],
+    [emailFor.super, forRole("super")],
+    [emailFor.partner, forRole("partner")]
   ]) {
     const page = await browser.newPage({ viewportSize: { width: 1280, height: 900 } });
     if (email) await signIn(page, email);

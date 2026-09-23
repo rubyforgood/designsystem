@@ -18,8 +18,7 @@
 // nothing about the other hundred and forty. Widening the cheap checks took 2.4.2 from "0 failures
 // on 8 pages" to 14 on 92, which is the same lesson arriving early.
 const { chromium } = require("playwright");
-const { signIn, targets, BASE } = require("./targets");
-
+const { signIn, targets, BASE, RUNS: ROLES, PARTNER, ADMIN } = require("./targets");
 
 // The expensive checks -- reflow, zoom, text spacing, a full tab traverse -- resize the viewport
 // several times per page, so they run over a representative sample rather than the whole app: one
@@ -43,14 +42,6 @@ const PAGES = [
 // Every screen, for the checks that cost nothing.
 const ALL = process.argv.includes("--all");
 
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
-const ADMIN = (p) => p.startsWith("/admin");
-const ROLES = [
-  ["org_admin1@example.com", (p) => !ADMIN(p) && !PARTNER(p)],
-  ["verified@example.com", PARTNER],
-  ["superadmin@example.com", ADMIN]
-];
-
 // From the seam, which regenerates the list rather than returning nothing.
 //
 // This used to read /tmp/targets.json in a try/catch and fall back to `null`, which made the cheap
@@ -62,7 +53,6 @@ const ROLES = [
 // that property was protecting a case that does not arise: every audit here already needs the Rails
 // server up, because it drives it.
 const BROAD = targets();
-
 
 const fails = [];
 // The sink is swappable so `audit-selftest.js` can run one check in isolation and see exactly

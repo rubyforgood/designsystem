@@ -22,20 +22,12 @@
 // Usage: bin/rails runner bin/design/route-targets.rb > /tmp/targets.json && pw bin/design/address-audit.js
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets, BASE } = require("./targets");
+const { signIn, targets, BASE, RUNS } = require("./targets");
 
 // Targets come from the seam, which regenerates the list when it is older than the routes
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or
 // ENOENT on a machine that had never run another audit.
 const TARGETS = targets();
-
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
-const ADMIN = (p) => p.startsWith("/admin");
-const RUNS = [
-  ["org_admin1@example.com", (p) => !ADMIN(p) && !PARTNER(p)],
-  ["verified@example.com", PARTNER],
-  ["superadmin@example.com", ADMIN]
-];
 
 // What the app calls each part of an address, and the token a browser fills it from. The single
 // source of truth is `AddressHelper::ADDRESS_FIELDS`; this is the same table, and the spec
@@ -53,7 +45,6 @@ const ROLES = {
   // is here so that is noticed the day it happens rather than a year later.
   whole: { label: "Address", token: "street-address", obsolete: true }
 };
-
 
 const COLLECT = () => [...document.querySelectorAll("main input, main select, main textarea")]
   .filter((el) => el.type !== "hidden")

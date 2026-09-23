@@ -1,6 +1,6 @@
 // AUDIT-READS: RENDER
 const { chromium } = require("playwright");
-const { signIn, targets: allTargets, BASE } = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, BANK, PARTNER } = require("./targets");
 
 // Every screen must be reachable *and* leavable. A page that is not in the sidebar and has no
 // breadcrumb has one way out: the browser's back button. The five report pages were all like that,
@@ -23,11 +23,11 @@ const NO_CHROME = [
   /^\/account_requests\//, /^\/users\/invitation\//, /^\/admin$/
 ];
 
-const ROLES = {
-  super: process.env.SUPER_EMAIL || "superadmin@example.com",
-  bank: process.env.BANK_EMAIL || "org_admin1@example.com",
-  partner: process.env.PARTNER_EMAIL || "verified@example.com"
-};
+// Derived from the seam's RUNS, not hardcoded -- see targets.js. Matches predicates rather than
+// trusting RUNS' order, so it stays correct if the seam's role list is ever reordered.
+const ROLES = Object.fromEntries(
+  RUNS.map(([email, p]) => [p === BANK ? "bank" : p === PARTNER ? "partner" : "super", email])
+);
 
 
 (async () => {

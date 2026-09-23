@@ -20,16 +20,12 @@
 // Run against a seeded development server: bin/start, then `pw bin/design/confirm-audit.js`.
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets, BASE } = require("./targets");
+const { signIn, targets, BASE, RUNS: runs } = require("./targets");
 
 // Targets come from the seam, which regenerates the list when it is older than the routes
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or
 // ENOENT on a machine that had never run another audit.
 const TARGETS = targets();
-
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
-const ADMIN = (p) => p.startsWith("/admin");
-
 
 // What is on the page that will ask for a confirmation, and how to reach it again after a reload.
 //
@@ -132,12 +128,6 @@ const MARK = ({ text, aria, inPanel }) => {
     if (item.tone === "danger" && !styled.danger) return { ...item, path, verdict: "destructive, but the confirm button is not the danger tone" };
     return null;
   }
-
-  const runs = [
-    ["org_admin1@example.com", (p) => !ADMIN(p) && !PARTNER(p)],
-    ["verified@example.com", PARTNER],
-    ["superadmin@example.com", ADMIN]
-  ];
 
   for (const [email, wants] of runs) {
     await signIn(page, email);

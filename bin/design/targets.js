@@ -77,10 +77,14 @@ const ADMIN = (p) => p.startsWith("/admin");
 const BANK = (p) => !ADMIN(p) && !PARTNER(p);
 
 // The three passes an audit makes if it wants to see the whole app.
+//
+// Env overrides (`BANK_EMAIL`, `PARTNER_EMAIL`, `SUPER_EMAIL`) exist because several audits had
+// independently invented them before this was centralized -- consolidating the duplicates without
+// keeping the overrides would have been a silent behaviour change for anyone using them.
 const RUNS = [
-  ["org_admin1@example.com", BANK],
-  ["verified@example.com", PARTNER],
-  ["superadmin@example.com", ADMIN]
+  [process.env.BANK_EMAIL || "org_admin1@example.com", BANK],
+  [process.env.PARTNER_EMAIL || "verified@example.com", PARTNER],
+  [process.env.SUPER_EMAIL || "superadmin@example.com", ADMIN]
 ];
 
 /*

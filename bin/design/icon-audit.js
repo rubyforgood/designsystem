@@ -25,7 +25,7 @@
 const { chromium } = require("playwright");
 const fs = require("fs");
 const nodePath = require("path");
-const { signIn, targets, BASE } = require("./targets");
+const { signIn, targets, BASE, RUNS: runs } = require("./targets");
 
 const LIST = process.argv.includes("--list");
 const LEXICON = JSON.parse(fs.readFileSync(nodePath.join(__dirname, "icon-lexicon.json"), "utf8"));
@@ -35,9 +35,6 @@ const LEXICON = JSON.parse(fs.readFileSync(nodePath.join(__dirname, "icon-lexico
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or
 // ENOENT on a machine that had never run another audit.
 const TARGETS = targets();
-
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
-const ADMIN = (p) => p.startsWith("/admin");
 
 // Which arrow a name draws, and which way it points. Read off the glyphs themselves -- rasterised
 // from the font at 80px -- rather than inferred from the name, since the names are the thing that
@@ -53,7 +50,6 @@ const WORD = [
   [/\bimports?\b/i, "in"], [/\bexports?\b/i, "out"],
   [/\buploads?\b/i, "out"], [/\bdownloads?\b/i, "in"]
 ];
-
 
 async function collect(page, path) {
   const res = await page.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 25000 });
@@ -134,12 +130,6 @@ const SKIP_LABEL = /^More actions for /; // named after the row, so every one is
     const w = v.get(vkey).where;
     if (!w.includes(`${path} [${b.place}]`)) w.push(`${path} [${b.place}]`);
   };
-
-  const runs = [
-    ["org_admin1@example.com", (p) => !ADMIN(p) && !PARTNER(p)],
-    ["verified@example.com", PARTNER],
-    ["superadmin@example.com", ADMIN]
-  ];
 
   let visited = 0;
   for (const [email, wants] of runs) {

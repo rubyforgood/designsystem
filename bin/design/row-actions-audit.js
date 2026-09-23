@@ -18,14 +18,16 @@
 // Usage: pw bin/design/row-actions-audit.js
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets: allTargets, BASE } = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, BANK, ADMIN } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
-const ROLES = {
-  bank: process.env.BANK_EMAIL || "org_admin1@example.com",
-  super: process.env.SUPER_EMAIL || "superadmin@example.com"
-};
+// This audit only needs two of the seam's three roles -- derived from RUNS rather than
+// hardcoded, so it stays correct if the seam's emails or env overrides ever change.
+const ROLES = Object.fromEntries(
+  RUNS.filter(([, p]) => p === BANK || p === ADMIN)
+    .map(([email, p]) => [p === BANK ? "bank" : "super", email])
+);
 
 
 // Reads one table's actions column: how many controls each row shows, whether there is a menu

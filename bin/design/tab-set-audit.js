@@ -19,7 +19,7 @@
 //
 // Usage: pw bin/design/tab-set-audit.js
 const { chromium } = require("playwright");
-const { targets, signIn, visit, BANK, BASE } = require("./targets");
+const { targets, signIn, visit, BANK, BASE, RUNS } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
@@ -72,7 +72,7 @@ const MEASURE = () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
-  await signIn(page, process.env.BANK_EMAIL || "org_admin1@example.com");
+  await signIn(page, RUNS.find(([, p]) => p === BANK)[0]);
 
   const findings = [];
   let checked = 0;

@@ -23,16 +23,13 @@
 // Usage: bin/rails runner bin/design/route-targets.rb > /tmp/targets.json && pw bin/design/wcag22-audit.js
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets, BASE } = require("./targets");
+const { signIn, targets, BASE, RUNS: runs, BANK } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Targets come from the seam, which regenerates the list when it is older than the routes
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or
 // ENOENT on a machine that had never run another audit.
 const TARGETS = targets();
-
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
-const ADMIN = (p) => p.startsWith("/admin");
 
 /*
  * How many things each check actually looked at.
@@ -58,7 +55,6 @@ const findings = [];
 let sink = (criterion, where, detail) => findings.push({ criterion, where, detail });
 const record = (...args) => sink(...args);
 const captureInto = (fn) => { sink = fn; };
-
 
 async function visit(page, path) {
   const res = await page.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 60000 })
@@ -345,12 +341,6 @@ if (require.main === module) {
 (async () => {
   const browser = await chromium.launch();
 
-  const runs = [
-    ["org_admin1@example.com", (p) => !ADMIN(p) && !PARTNER(p)],
-    ["verified@example.com", PARTNER],
-    ["superadmin@example.com", ADMIN]
-  ];
-
   const helpSpots = [];
   const processes = [];
   let visited = 0, railed = 0;
@@ -389,7 +379,7 @@ if (require.main === module) {
 
   const bankCtx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const bankPage = await bankCtx.newPage();
-  await signIn(bankPage, "org_admin1@example.com");
+  await signIn(bankPage, runs.find(([, p]) => p === BANK)[0]);
   await redundantEntry(bankPage, processes);
   await bankCtx.close();
 

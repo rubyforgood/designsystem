@@ -112,3 +112,53 @@ own declarations via grep, then removed (~72 lines). This is exactly the failure
 also 57 HE-domain route strings (`/broadcast_announcements`, `/admin/ndbn_members`, etc.) that
 had no business surviving into a generic system anyway. One less thing Phase 4 would've had to
 notice and strip later.
+
+## A third, larger gap found while building toward Phase 2: `RUNS`/role duplication
+
+Before starting Phase 2's second adapter, a sweep for what would actually break against a
+different app turned up something bigger than the two gaps above. `seam-check.rb` only measures
+duplicated `signIn` *functions* — it says nothing about duplicated **credentials or role logic**,
+and it turns out the two drifted independently.
+
+**16 of the 21 seam-importing JS audits hardcoded their own copy of the three role emails
+(`org_admin1@example.com`, `verified@example.com`, `superadmin@example.com`) and/or the
+`/partners/`, `/admin` path-prefix predicates that `targets.js` already exports as `RUNS`,
+`BANK`, `PARTNER`, `ADMIN`.** They correctly imported `signIn`/`targets`/`visit` from the seam —
+so `seam-check.rb` read them as fully migrated — while independently re-deriving who to sign in
+as. Three distinct shapes, all fixed the same session:
+
+| Shape | Files | Fix |
+| --- | --- | --- |
+| Byte-identical `RUNS` array + local `PARTNER`/`ADMIN` predicates | `address-audit.js`, `confirm-audit.js`, `icon-audit.js`, `tooltip-audit.js`, `wcag-manual.js`, `wcag22-audit.js` | Import `RUNS` from the seam (aliased to each file's existing local name); delete the local predicates |
+| `users`/`ROLES` object keyed by role name, built from the same three emails | `keyboard-audit.js`, `form-validation-audit.js`, `route-sweep.js`, `responsive-audit.js`, `layout-shift-audit.js`, `wayfinding-audit.js` | Derive the object from `RUNS` by matching each pair's predicate against `BANK`/`PARTNER`/`ADMIN`, instead of retyping the emails |
+| A 2-role subset (`row-actions-audit.js`) or a single hardcoded `signIn` call (`audit-selftest.js`, `tab-set-audit.js`, one call inside `wcag22-audit.js`) | 4 files | Same derivation, filtered or reduced to the one email needed |
+
+`wcag-audit.js` was a fourth, distinct shape — its own `forRole()` classifies by **controller
+name** (`t.controller.startsWith("partners/")`), not by **path** like `targets.js`'s canonical
+`PARTNER`/`ADMIN`. That's not just duplicated logic, it's a *second, independently-invented*
+role-classification scheme, and the two are not obviously equivalent — `targets.js`'s `PARTNER`
+predicate explicitly excludes `/partners/:id` as "a bank user looking at a partner record," and
+it's not clear the controller-based version draws that same line. Fixed only the credential
+sourcing (now pulled from `RUNS`) and left the classification logic alone, flagged in a comment —
+unifying two role-classification schemes that might disagree on edge cases is a correctness
+question, not a dedup, and not one to guess at without a live app to check against.
+
+`button-audit.js` was the one file already doing this right: `const PASSES = [...RUNS, ["user_1@example.com", BANK]]` —
+builds on the real `RUNS` import and adds one documented extra pass, rather than re-deriving the
+whole thing. Left unchanged; it's the model the others now follow.
+
+**Also centralized:** the `BANK_EMAIL`/`PARTNER_EMAIL`/`SUPER_EMAIL` env-var override capability
+that four of the duplicated blocks had independently invented is now built into `targets.js`'s
+`RUNS` itself, so consolidating the duplicates didn't silently drop functionality some of them had
+and others didn't.
+
+**Why this matters for Phase 2 specifically:** none of this would have been visible by just
+swapping `targets.js` for a second adapter and seeing what breaks — it would have looked like a
+break in the *audit's rule logic* (wrong page visited, wrong role) when the actual cause was a
+credential the audit never got from the adapter at all. Finding it now, by grep rather than by a
+confusing failure against an unfamiliar second app, is the cheaper way to have found it.
+
+Verified: `node --check` on all 22 JS files, and `ruby bin/design/seam-check.rb` still reports
+baseline (0 duplicated `signIn`). No live app exists in this repo to run the audits end-to-end
+against, so this is verified at the syntax/static level, not by executing a full audit run — that
+executable verification is exactly what Phase 2's second adapter is for.
