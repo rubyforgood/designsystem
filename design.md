@@ -66,13 +66,14 @@ carrying design system markup, 30 Stimulus controllers, and no undefined legacy 
 
 ### Typography
 
-**Figtree**, self-hosted from `public/vendor/` and declared once in `@theme`:
+**Portable — one typeface, self-hosted, no CDN request.** The rule is about not shipping two font
+stacks and not taking a network dependency to render text — not about which face.
 
-```css
---font-sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-```
+**Local — this default:** **Figtree**, self-hosted from `public/vendor/` and declared once in
+`tokens/theme.css`. Every layout sets `font-sans` on `<body>`. There is no second typeface.
 
-Every layout sets `font-sans` on `<body>`. There is no second typeface and no CDN request.
+**Portable — each text role gets one consistent treatment, applied system-wide, not decided per
+page.** **Local — this default's roles:**
 
 | Role | Classes | Notes |
 | --- | --- | --- |
@@ -84,20 +85,28 @@ Every layout sets `font-sans` on `<body>`. There is no second typeface and no CD
 | Meta | `text-xs text-slate-500` | Timestamps, hints, counts. |
 | Field label | `block text-sm font-medium text-slate-700` | Supplied by the simple_form wrapper. |
 
-Heading level is document structure, not size. AdminLTE used `<h5>`/`<h6>` as "small and
-bold", which left pages jumping from `h1` to `h5` and gave screen-reader users a broken
-outline. Size is a class; the level says where you are in the document.
+**Portable — heading level is document structure, not size.** Using a heading tag for its visual
+size rather than its outline position (a smaller-looking heading dropped two levels because it
+"looked right") breaks the document outline a screen reader relies on. Size is a class; level says
+where you are in the document.
 
 <a id="buttons"></a>
-**A destructive action with no fill is `ghost_danger`, and it is `slate-600` at rest.** Rose comes
-on hover and focus only. It was rose at rest, and a form with eight rows then carried eight red
-marks down its edge, none of them louder than the others — the word "Remove" and the trash glyph
-already say what the control does, and colour saying it a third time on every row says nothing at
-all. The same argument that took the inline error message grey. Do **not** reach for `ghost` plus
-`extra: "text-rose-700"`: two colour utilities in one class attribute are resolved by the cascade,
-not by attribute order, and the rose loses.
+**Portable — a repeated destructive control shouldn't shout at rest.** A destructive action that
+appears many times on one screen (a row of "Remove" buttons down a form) loses its signal if every
+instance is loud — the word and the icon already say what the control does, and colour repeating
+that on every row says nothing at all. **Local — this default:** a destructive action with no fill
+is `ghost_danger`, `slate-600` at rest, rose on hover and focus only. Do not compose `ghost` with
+an ad hoc rose text colour: two colour utilities in one class attribute are resolved by the
+cascade, not by attribute order, and the rose silently loses.
 
 ### Sentence case
+
+**Local — this default's convention.** design.md's own tagging pass
+(`docs/portability/design-md-tagging.md`) calls this out explicitly: picking **a** case
+convention and enforcing it consistently is Portable practice; *sentence case specifically*, over
+Title Case, is a defensible house-style choice, not a rule that generalizes. Kept as this
+project's actual default rather than genericized away — see that tagging doc's "doesn't fit
+cleanly" notes for the reasoning.
 
 **Sentence case for everything a person reads**: headings, buttons, labels, table headers,
 nav items, flash messages, empty states.
@@ -108,44 +117,44 @@ Not `New Donation`, `Print Unfulfilled Picklists`, `FMV`. Proper nouns keep thei
 (NDBN, Human Essentials, a partner's name). This is the house style across Ruby for Good and
 it is the single most common review note on UI PRs here.
 
-**A cross-reference that goes nowhere is checked too.** `page-audit.rb` resolves every `](#...)`
-in `design.md` and `docs/*.md` against the headings and `<a id>` anchors of the file it points at,
-and reports the ones that miss. Seven had accumulated here, every one a section that had been
-*renamed* rather than never written — `#target-size` became "Tap targets", `#pills` became "Status
-pills" — plus three written as bare fragments while pointing at a heading in another document.
+**Portable — a documentation cross-reference that goes nowhere should be caught mechanically, not
+by a reader stumbling on it.** `bin/design/doc-link-audit.rb` resolves every `](#...)` in
+`design.md` and `docs/**/*.md` against the headings and `<a id>` anchors of the file it points at,
+and reports the ones that miss. (This lived inside `page-audit.rb` until it was extracted as its
+own fully portable script — see `docs/portability/phase-3-source-audits.md` — since it has no
+Rails dependency at all.) Seven had accumulated here at the time this rule was written, every one
+a section that had been *renamed* rather than never written.
 
-**`page-audit.rb` enforces this on headings *and* labels.** It checked headings only until
-2026-09-04, which is precisely how **52 Title Case labels** survived the whole migration on the
-partner profile forms and two other screens: the rule existed, nothing measured it, and a rule with
-no audit is a suggestion. The check reports any capitalised word that is not the first word of the
-label, and holds two allow-lists — `PROPER_NOUNS` for headings and `LABEL_PROPER_NOUNS` for labels,
-the latter carrying ethnicity and nationality terms (`African American`, `Pacific Islander`) and
-`Form 990`. All-caps tokens are skipped, because an acronym is not Title Case: `% at FPL or below`
-passes.
+**Local — measured evidence for the case rule specifically:** the enforcement had to cover
+headings *and* labels, not headings alone — it checked headings only until a specific date, which
+is precisely how 52 Title Case labels survived the whole migration on a handful of screens: the
+rule existed, nothing measured it, and **a rule with no audit is a suggestion.** The check reports
+any capitalised word that is not the first word of the label, and holds two allow-lists for proper
+nouns (one for headings, one for labels, the latter carrying ethnicity/nationality terms and a
+form name). All-caps tokens are skipped, because an acronym is not Title Case.
 
-**Field names appear in more places than the form.** Fixing the labels alone would have left the
-same fields Title Case where they are *read back*: the partner profile has a read-only `show/` tree
-and the bank sees the same profile through `profiles/_show.html.erb`, both rendering the names as
-`<dt>` terms rather than labels. That was another **54** terms. When you rename a field, search for
-the string, not for the construct.
+**Portable — when you rename a field, search for the string it produces, not just the form
+construct that names it.** A label fix alone can miss the same field rendered read-only elsewhere
+(a show page, an export) under a different code path. **Local — measured:** fixing the form labels
+left another 54 terms Title Case where the same fields were read back on two other screens.
 
-**A CSV export header is not a UI label.** `export_partners_csv_service.rb` holds `"Year Founded"`,
-`"Agency Age"` and the rest as literals, independent of the views, and they were deliberately left
-alone. Sentence case is a rule about what a person reads on a screen; an export header is an
-interchange format that something downstream may key on.
+**Portable — an interchange format's header is not UI copy, and the two should be allowed to
+diverge deliberately.** A CSV export header is read by whatever downstream tooling keys on it, not
+by a person browsing the app — applying a UI copy convention to it can break integrations for no
+reader-facing benefit. **Local:** this app's CSV export headers were deliberately left alone,
+independent of the views' case convention.
 
-**That includes `uppercase`, which is how it keeps coming back.** Sentence case is about what the
-reader sees, so a `text-transform` breaks the rule exactly as much as typing the capitals would.
-The only `text-transform` in the stylesheet is `.data-table thead th { text-transform: none }`,
-set deliberately. Uppercase also removes word shape, which is the thing you scan a column of
-headings by.
+**Portable — a case rule is about what the reader sees, so it has to be enforced at the
+presentation layer, not just in the source text.** A `text-transform: uppercase` breaks a
+sentence-case rule exactly as much as typing the capitals directly would; enforcement has to check
+computed presentation, not just literal strings, or the rule can be silently defeated by CSS.
+**Local:** the one `text-transform` in this app's stylesheet is a deliberate `none`, overriding a
+browser or library default that would otherwise reintroduce it.
 
-**A column heading is `text-xs font-semibold text-slate-500`** and nothing else — no
-`uppercase`, no `tracking-wide`. That is what `.data-table thead th` renders, and anything
-outside a `<table>` that heads a column has to match it by hand: at the time of writing the only
-one is the line item grid's heading row, which reintroduced the uppercase eyebrow and had to be
-put back. The `uppercase` utility appears nowhere in `app/views` or `app/helpers`; if a grep
-finds one, that is the regression.
+**Local — this default's column heading treatment:** `text-xs font-semibold text-slate-500`, no
+`uppercase`, no `tracking-wide`. Anything outside a `<table>` that heads a column has to match it
+by hand, which is exactly the kind of duplication the portable rule above (enforce at presentation,
+not just in source) exists to catch when it drifts.
 
 ### Colour
 
@@ -227,8 +236,11 @@ worked example of the hairline-over-shadow rule above.
 <a id="a-value-is-not-a-style"></a>
 ### A value is not a style
 
-**A view carries no `style` attribute, with one exception: a CSS custom property.** Presentation
-lives in a class; `page-audit.rb` fails a view that declares any of it inline.
+**Portable — presentation lives in a class; markup carries a value, never a declaration**, with
+exactly one exception: a CSS custom property, because a custom property alone cannot style
+anything — some rule elsewhere has to pick it up, which is what keeps this a narrow, checkable
+exception rather than a loophole. **Local — this project's enforcement:** `page-audit.rb` fails a
+view that declares presentation inline.
 
 The exception exists because two things on screen have a length only the server knows, and neither
 can be a class. A share bar's fill is a continuous percentage computed per row, and Tailwind only
@@ -267,9 +279,18 @@ audit stops being read.
 <a id="address-fields"></a>
 ### Address fields
 
-**An address is asked for the same way on every screen, from `address_field`.** The helper supplies
-the label, the state list, the ZIP pattern and the `autocomplete` token; a form that writes its own
-`label:` for a part of an address has already drifted.
+**Reading note.** Unusually for this document, most of what follows is Portable — address input
+is governed by WHATWG's `autocomplete` token spec and WCAG 1.3.5, neither of which are Rails or
+Tailwind concepts, so the underlying rules transfer almost unchanged. What's Local is the specific
+helper (`address_field`) that implements them and, in the second half of this section, this
+project's own migration history away from freeform address strings — a fact about this codebase,
+not a UI rule.
+
+**Portable — an address is asked for the same way on every screen**, from one shared
+implementation rather than each form writing its own labels and validation. **Local — this
+default's mechanism:** the `address_field` helper supplies the label, the state list, the ZIP
+pattern and the `autocomplete` token; a form that writes its own `label:` for a part of an address
+has already drifted.
 
 ```erb
 <%= f.input :street,  **address_field(:street) %>
@@ -286,7 +307,7 @@ the label, the state list, the ZIP pattern and the `autocomplete` token; a form 
 | State | State — a list of the 51, never a text box | `address-level1` |
 | ZIP | ZIP code | `postal-code` |
 
-**Every address field carries `autocomplete`.** WCAG 1.3.5 Identify Input Purpose is a AA criterion
+**Portable — every address field carries `autocomplete`.** WCAG 1.3.5 Identify Input Purpose is a AA criterion
 and the app was failing it everywhere: **17 address inputs measured across the 7 screens that
 collect one, and not a single `autocomplete` attribute between them**. (The audit counts 50: it
 visits the `new` and `edit` variants of the same forms, and the four freeform boxes have since
@@ -297,21 +318,21 @@ they are not interchangeable — `street-address` is defined as a *multi-line* w
 form with two street lines uses `address-line1` and `address-line2` instead, and city and state are
 `address-level2`/`address-level1`, named by administrative level rather than by American words.
 
-**A ZIP is text with `inputmode="numeric"`, never `type="number"`.** A number input drops the
+**Portable — a postal code is text with a numeric input hint, never a number input.** A number input drops the
 leading zero from every ZIP in MA, RI, NH, ME, VT, CT, NJ and Puerto Rico, refuses ZIP+4 outright,
 and puts a spinner on a field nobody increments. `partner_profiles.program_zip_code` was an integer
 *column*, which is where its `type="number"` came from — two of the five values in the seed database
 had already lost their leading zero. **A ZIP is an identifier, not a quantity.**
 
-**`third_party: true` for an address that is not the filler's own.** A partner typing a client's ZIP
-is entering someone else's, and autofilling the caseworker's own address into a family record would
-be worse than not filling it — so it becomes `autocomplete="off"`, which says that out loud. Leaving
-the attribute off entirely says nothing, and nothing is indistinguishable from an oversight.
-
-**A label may be qualified, but the words for the part are the app's.** *Guardian ZIP code* is right
-because it says whose; *Zip code*, *Zipcode* and *Zip Code* were three spellings of one word. `ZIP`
-is an acronym — Zone Improvement Plan — so it is capitalised even in sentence case, and the copy
-audit already knows it.
+**Portable — mark explicitly, not by omission, when a field is entering someone else's
+information.** A caseworker typing a client's ZIP is entering someone else's address, and
+autofilling the caseworker's own address into that record would be actively worse than not
+filling it — so the field declares `autocomplete="off"` deliberately, rather than leaving the
+attribute off and having that read as an oversight (this default calls the option `third_party:
+true`). **Portable — one spelling per concept, consistently**, and an acronym stays capitalised
+even under a sentence-case convention (`ZIP` here). **Local:** *Guardian ZIP code* is this app's
+qualified-label pattern; *Zip code*, *Zipcode* and *Zip Code* were three competing spellings of the
+same word before the copy audit caught them.
 
 `pw bin/design/address-audit.js` checks all of it across every screen `route-targets.rb` knows
 about, reading each field's role off its **name** rather than from a list of pages — the lesson from
@@ -323,6 +344,11 @@ model stores an address that way any more, so one appearing again means a form h
 shape the app moved away from, and that should be noticed the day it happens.
 
 <a id="one-box-or-four"></a>
+**Local from here on.** The rest of this section is Human Essentials' own migration history away
+from freeform address strings — a real decision, with real measurement, but a fact about this
+codebase's data model rather than a UI rule with a portable shape. Kept as a worked example of
+what an evidenced backfill and its edge cases actually look like, not as something to reimplement.
+
 **All seven screens store an address as parts. There is no freeform address box left.**
 
 `Vendor`, `DonationSite`, `ProductDriveParticipant` and `StorageLocation` each kept a single
