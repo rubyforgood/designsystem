@@ -2974,7 +2974,14 @@ filled in.
 
 ### Tables
 
-`.data-table` is a **component class**, not a utility string:
+**Portable — a repeated composite pattern gets one definition, not a class string copy-pasted at
+every call site.** Composing a table's markup from raw utilities at each call site means a
+twelve-class string duplicated across every table in the app, and it drifts the first time one
+copy is edited and the others aren't. One definition is what keeps two different tables looking
+like part of the same system.
+
+**Local — this default's implementation:** `.data-table` is a component class, not a utility
+string:
 
 ```erb
 <div class="table-scroll">
@@ -2992,12 +2999,12 @@ filled in.
 </div>
 ```
 
-Composing these from utilities at each call site would mean a twelve-class string copy-pasted
-across ~78 tables in 393 views, and it would drift on the first hurried PR. One definition is
-what keeps a donations table and an audit table looking like the same app.
+Measured here: ~78 tables across 393 views would each have carried that twelve-class string
+without it.
 
-Column semantics reuse the class names the app already used under Bootstrap, so a table keeps
-its meaning instead of re-deciding alignment cell by cell:
+**Portable — give repeated column *types* (a number, a date, free text) a stable semantic
+treatment, rather than re-deciding alignment and wrapping per table.** **Local — this default's
+class names:**
 
 | Class | Effect |
 | --- | --- |
@@ -3005,48 +3012,47 @@ its meaning instead of re-deciding alignment cell by cell:
 | `.notes` | Free text of unbounded length: clipped to one line at 16rem |
 | `.date` | No wrapping |
 
-Every table gets a `<caption>` (visually hidden) saying what it lists. `.table-scroll` is the
-horizontal scroll container — a wide table scrolls, it does not squeeze.
+**Portable — every table gets a caption** (visually hidden is fine) naming what it lists — this is
+a WCAG/semantics requirement, not a style choice. **Portable — a table that doesn't fit its
+container scrolls; it is never squeezed** until its content is unreadable (WCAG 1.4.10 is the
+relevant exemption for data tables specifically). `.table-scroll` is this default's scroll
+container implementation.
 
 <a id="column-of-links"></a>
-**A column of links shows the first three, then "+N more".** `.notes` clipping is not available to
-a cell of links: clipping leaves focusable anchors invisible, which is a keyboard trap rather than a
-tidy column. `/item_categories` printed every item in a category — **19 links, 710 characters and a
-439px row**, and three categories made the table 979px tall. Three names say what kind of category
-it is; the link carries the rest. Measured after: **127px** a row.
-
-The count is `EssentialsUiHelper::ITEM_CATEGORY_PREVIEW_COUNT`. **The "+N more" link must lead
-somewhere that actually lists them** — a truncation pointing at a page that does not show the
-remainder is a broken promise, so the category page grew an "Items in this category" card before
-the index was allowed to stop printing everything.
+**Portable — clipping text is not available to a cell of links.** CSS text-clipping hides overflow
+visually but leaves a clipped anchor fully present and focusable — a sighted mouse user sees a
+tidy column while a keyboard user tabs through links they cannot read, which is a keyboard trap
+dressed as a layout fix, not a tidy column. **Local — this default's answer:** a column of links
+shows the first three, then "+N more" to a page that actually lists the rest — a truncation
+pointing nowhere is a broken promise, so the linked-to page grew a card listing the remainder
+before the index was allowed to stop printing everything. Measured on `/item_categories`: printing
+every link ran to **19 links, 710 characters and a 439px row**; truncated to three, **127px** a
+row.
 
 <a id="badge-the-exception"></a>
-**In a two-state column, badge the affirmative and leave the other as text.** A badge marks the
-exception; a neutral pill on the ordinary row is decoration that makes every row look flagged.
-`/partner_groups` pilled both states of "Send reminders?" — `Yes` in success with a bell, `No` in
-neutral with a struck bell. `No` is now plain `text-sm text-slate-500`. The affirmative keeps its
-pill *and its icon*, which is what makes the column scannable at a glance.
-
-This does not contradict a **status** column whose values genuinely vary — `/partners` badges every
-row across five distinct statuses, and that is right. The test is whether the values divide into
-"normal" and "worth noticing", not how many rows carry a badge.
+**Portable — in a column whose values genuinely divide into "normal" and "worth noticing," badge
+only the exception.** A badge marks a state worth flagging; a neutral pill on every ordinary row is
+decoration that makes the whole column look flagged, which defeats the reason to have a badge at
+all. This doesn't apply to a column whose values are all equally informative (a **status** column
+with five genuinely distinct states, say) — the test is whether the values split into "normal" vs.
+"exceptional," not how many rows happen to carry a badge. **Local — measured:** a two-state
+"Send reminders?" column here pilled both `Yes` and `No`; `No` is now plain muted text, and the
+affirmative keeps its pill and icon.
 
 <a id="columns-worth-scanning"></a>
-**A column earns its width by being worth scanning, not by being worth recording.** When a table
-does not fit, the question is which columns someone reads *down a list* — not which data matters.
-`/distributions` was **1,521px against 1,118px** and scrolled by 403px with the actions column
-already down to 76px, so the remainder had to come out of data. Dropped: **source inventory**
-(202px), **shipping cost** (108px) and **comments** (146px) — 456px, and the table now fits exactly
-at 1,118px.
-
-Each is still on the distribution's own page, and **all three remain in the CSV export**. Shipping
-cost applies to only one of three delivery methods, so it was blank on most rows; comments is free
-text that is usually empty and never scannable in a column. Deleting a column from an index is not
-deleting the data, and the export is what makes that true — check it before dropping anything.
+**Portable — a column earns its place in an index by being worth scanning down a list, which is a
+different test from whether the data matters.** When a table doesn't fit its container, decide what
+to cut by that test, not by data importance — and keep cut data reachable (a detail page, an
+export), because dropping a column from an index view is not the same as deleting the data. **Local
+— measured:** this app's widest table was 1,521px against a 1,118px budget; three low-scan columns
+(source inventory, shipping cost, comments — often blank or free text, never scannable in a
+column) were dropped from the index, remain on the record's own page, and remain in the CSV export.
 
 <a id="selection"></a>
-**Selection, where a batch action genuinely exists.** Freezing the actions column removed the
-*travel* to a row's actions; selection removes the *repetition*.
+**Portable — selection (checkboxes + a batch action) solves a different problem than pinning the
+actions column does.** Freezing the actions column removes the *travel* to reach a row's controls;
+selection removes the *repetition* of doing the same action to many rows one at a time. Reach for
+selection only where a genuine batch action exists — it's not a substitute for the first problem.
 
 ```erb
 <div data-controller="table-selection">
@@ -4740,46 +4746,66 @@ screen reader and not printable in colour.
 
 Three layouts. All of them load `tailwind.css` and nothing else.
 
+**Reading note.** The two shell-specific subsections below (Bank shell, Partner shell) are almost
+entirely Local — they describe Human Essentials' own navigation, its own 36 destinations, its own
+audience split. That's expected: an app shell is *supposed* to encode this app's specific
+information architecture, and there's no generic substitute for "figure out your own app's
+navigation." Sidebar rules, below, is more evenly split — it's genuinely two things at once: a set
+of consistency disciplines that hold for any nav rail, and this app's specific numbers and classes
+expressing them.
+
 ### Sidebar rules
 
 Four rules, and the first three exist because breaking any one of them was reported as
 "the nav looks busy".
 
-1. **Icons mark the top level, and only the top level.** A standalone rail item, a group
-   header, a pinned item: icon. Anything nested inside a group: no icon, indented instead.
-   Icons on both levels give the eye two columns of glyphs and stop either one meaning
-   anything. `NavItem` takes an optional `icon:` for this; sub-items omit it.
-2. **Sentence case, including group headers.** Uppercase is a convention for a static section
-   *label*. These headers are buttons the same size as the destinations beneath them, and
-   uppercase removes word shape, which is what you scan a rail by.
-3. **One glyph, one meaning, across the whole app.** A circled question mark means "this needs
-   your attention" on a status, so it cannot also mean "help" in the top bar. The user guide is
-   `bi-book`; in-app help is `bi-life-preserver`.
-4. **A group holds at most about seven items.** Past that it is a menu inside a menu and wants
-   a landing page instead. `Reporting` held 15 and became the reports hub for exactly this reason.
-5. **Weight follows the level, not the behaviour.** Every top-level item is
-   `font-semibold text-slate-700`, whether it expands or not; every nested item is
-   `font-medium text-slate-600`. The chevron says "this opens"; type says how deep you are.
+1. **Portable — icons mark exactly one level of the hierarchy, consistently, never more than
+   one.** Mixing icon and no-icon within the same level, or using icons at two different levels,
+   gives the eye multiple columns of glyphs and stops any of them meaning anything. **Local — this
+   default:** the top level (a standalone rail item, a group header, a pinned item) gets an icon;
+   anything nested inside a group is indented instead. `NavItem` takes an optional `icon:` for
+   this; sub-items omit it.
+2. **Portable — a convention reserved for static labels (e.g. all-caps) shouldn't be applied to
+   something that's actually interactive**, because it changes what the visual convention means
+   elsewhere. **Local — this default:** group headers here are buttons the same size as the
+   destinations beneath them, so they use sentence case rather than the uppercase-static-label
+   convention — uppercase removes the word shape a rail is scanned by, and these headers aren't
+   static labels.
+3. **Portable — one glyph, one meaning, across the entire app**, not just within one screen. A
+   symbol used for one thing in the nav can't be reused for something else in a toolbar. **Local —
+   this default:** a circled question mark means "needs your attention" on a status, so it can't
+   also mean "help"; the user guide and in-app help use two different glyphs for exactly this
+   reason.
+4. **Portable — a navigational group has a practical size limit before it stops being a group and
+   becomes a menu inside a menu**, at which point it wants its own landing page instead. **Local —
+   this default's number:** about seven items. A group here held fifteen and became its own hub
+   page for exactly this reason — pick your own threshold, but have one.
+5. **Portable — visual weight should track structural depth, not behavior.** Whether an item
+   expands or navigates directly is a different axis from how deep it sits in the hierarchy, and
+   conflating the two reads as a broken hierarchy. **Local — this default:** every top-level item
+   gets one weight regardless of whether it expands; every nested item gets a lighter one. A
+   chevron signals "this opens"; type weight signals depth — the two signals stay independent.
 
 Groups collapse and the one containing the current page opens on load.
 
-Rule 5 was added after Dashboard, Reports and My organization were found sitting at the *child*
-weight beside Operations and Inventory at the parent weight — all four at the same indent. A
-top-level destination read as a child that had lost its parent, which is what "the nav looks odd"
-turned out to mean. GitHub, Linear, Notion, Jira, Stripe and Vercel are each observed
-marking disclosure by an affordance and hierarchy by type. What decides it is the defect above: four
-destinations at one indent, two of them children and two not.
+Rule 5 was added after three top-level destinations were found sitting at the same visual weight
+as nested children, at the same indent as genuine parent items — a top-level destination read as
+a child that had lost its parent. GitHub, Linear, Notion, Jira, Stripe and Vercel are each
+observed marking disclosure by an affordance and hierarchy by type, corroborating the fix rather
+than motivating it — the defect (destinations at one indent, some children and some not) is what
+actually decided it.
 
-**Ordering.** Home first; then the work, grouped by the thing it acts on; then read-only views of
-that work; then the pinned account item. Stripe, Shopify, Xero and QuickBooks are each observed ordering a
-rail this way. The reason is frequency, which stands without them: you visit a report about what you
-did less often than you do the thing. So: *Dashboard*, the three working groups, *Reports*, and *My organization* pinned.
+**Portable — order a nav by frequency of use: the most-visited destination first, then working
+groups by what they act on, then read-only/reporting views of that same work, then account-level
+items last.** Stripe, Shopify, Xero and QuickBooks are each observed ordering a rail this way; the
+underlying reason — you consult a report about your own work less often than you do the work
+itself — holds independent of what any of them do. **Local — this default's order:** Dashboard
+first, then the working groups, then Reports, then the account item pinned at the bottom.
 
-**Spacing follows the same idea as weight.** One `space-y-4` between every top-level entry —
-group or lone destination — and `space-y-0.5` between items inside a group, `mt-1` under a group
-header. *Dashboard* and *Reports* used to share a list at the inner spacing, so they clustered at
-2px while everything else sat 16px apart. A section is a meaningful grouping, not "the leaves that
-happen to be adjacent": each of those two is a section of one.
+**Portable — treat a section as a meaningful grouping with its own consistent internal spacing,
+not as whichever leaves happen to sit next to each other.** Two unrelated single-item "sections"
+sharing one list's inner spacing will visually cluster as if they were one group. **Local — this
+default's values:**
 
 | | Gap |
 | --- | --- |
@@ -4787,11 +4813,10 @@ happen to be adjacent": each of those two is a section of one.
 | Group header to its first item | 4px |
 | Between items in a group | 2px |
 
-**The bottom strip.** The rail's pinned item and the page footer are both `h-14` with a full-bleed
-top border, so their rules meet at the same height and run into the rail's own `border-r` as one
-line across the screen. They were 12px apart, which reads as a mistake rather than a separation.
-The two carry different type on purpose — the rail item is a destination at `text-sm`, the footer
-is a colophon at `text-xs` — but they share a baseline grid.
+**Local — the bottom strip.** The rail's pinned item and the page footer share a fixed height and
+a full-bleed top border, so their rules meet and run into the rail's own border as one continuous
+line — a shared baseline grid across two elements that carry different type sizes on purpose (a
+destination vs. a colophon).
 
 ### Bank shell — `layouts/essentials_app.html.erb`
 
@@ -4831,8 +4856,9 @@ their own organization's name in the top bar, never the bank's internal navigati
 Split: brand panel on the left at `lg`, form column on the right, single centred column below
 that. Used by every Devise view and the account request flow, wired in `config/application.rb`.
 
-No skip link here, deliberately: there is no repeated navigation block ahead of the content to
-skip past, and a skip link that jumps two elements forward is noise in the tab order.
+**Portable — a skip link exists to skip something real.** No skip link here, deliberately: there
+is no repeated navigation block ahead of the content to skip past, and a skip link that jumps two
+elements forward is noise in the tab order rather than the accessibility aid it's meant to be.
 
 ## Key patterns
 
@@ -4874,6 +4900,12 @@ no tenant on it is a screen you can act on by mistake.
 rely on the browser's print stylesheet; there is no separate print layout.
 
 ## Build
+
+**Reading note.** Entirely Local — per `docs/portability/design-md-tagging.md`'s tagging pass,
+0% Portable. This section is Human Essentials' specific Rails/Tailwind/Propshaft toolchain and its
+gotchas, not a set of rules with a portable shape underneath. Kept here as reference for anyone
+adopting or adapting this exact toolchain; a different stack needs its own equivalent build notes,
+not a genericized version of these.
 
 Tailwind v4.3.3 through the **`tailwindcss-rails`** gem — the standalone CLI, no Node, no
 `package.json`. This app has no Node in its deploy path, and `docs/code_standards.md` is
