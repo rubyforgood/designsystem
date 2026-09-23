@@ -493,6 +493,32 @@ indistinguishable from a bug:
 action called **Cancel**, which is the word this app uses on **122 pages** to mean "abandon this
 form", while here it destroyed a record. It says *Cancel request* now, as the show page already did.
 
+<a id="icon-helper-aria-defaults"></a>
+**Portable — an icon-rendering helper's default accessibility behaviour needs to be known and
+stated explicitly, not assumed.** A helper that wraps an icon library commonly defaults to
+`aria-hidden` on every glyph it renders, which is correct for a decorative icon and silently wrong
+for an icon-only control — the control ends up with no accessible name at all, and `title` is not
+a reliable substitute since it isn't announced on keyboard focus. Check what your icon helper
+actually does by default before relying on it, and say so in your own iconography rules rather
+than leaving the next person to discover it by testing a screen reader against a real button.
+
+<a id="icon-contrast-has-no-automated-check"></a>
+**Portable — icon contrast (WCAG 1.4.11) has essentially no automated tooling coverage, so a
+clean axe/scanner report says nothing about it.** A decorative-looking icon can fail the 3:1
+non-text contrast minimum on a page that otherwise reports zero violations, because general-purpose
+accessibility scanners are built around text contrast and don't reliably evaluate icon fills or
+strokes at all. One reliable structural fix, not a per-icon verification burden: an icon inside a
+banner, alert or callout inherits the surrounding text's colour (`currentColor`) rather than
+setting its own — that locks the icon to whatever ratio the copy beside it is already being
+checked against, so one verification covers both instead of needing a second, manual one.
+
+**Portable — the same colour token can be simultaneously safe as a decorative icon (clearing 3:1)
+and unsafe as body text (failing 4.5:1) against the same background — watch specifically for a
+wrapper component that colours both an icon and its adjacent text as one unit.** A shared "this
+element is `tone-600`" pattern applied uniformly can pass for the icon inside it and fail for the
+text beside it in the same breath, and neither an icon-contrast nor a text-contrast check alone
+catches the combination — checking both together, on the same real component, is what does.
+
 ### Accessibility
 
 **Reading note.** Target is **WCAG 2.2 AA**. This is the most Portable section in the document by
@@ -512,7 +538,14 @@ These are the rules this app has actually had to enforce:
 - **Portable.** One `h1` per page, no skipped heading levels below it.
 - **Portable.** Every control has a real accessible name — a properly associated label, or an
   `aria-label`/`aria-labelledby`. A `<label>` with no `for` (or not wrapping its control) names
-  nothing, silently.
+  nothing, silently. **`<label for>` also names nothing on a custom element** (a Web Component, or
+  anything using an ARIA input role rather than a native form control) — native label association
+  is a browser behaviour tied to real form elements, and a custom one needs `aria-label` set
+  directly. A second, sharper case for the same fix: a control whose checked/selected state is set
+  by script after an async action (a save that completes later, say) should use `aria-label`
+  rather than a native label too, even on a real form element — a native label's click-to-toggle
+  behaviour can race the script-driven state change and leave the two disagreeing about what's
+  actually checked.
 - **Portable — a link cannot be `disabled`; the HTML attribute doesn't exist for anchors, and an
   "unavailable" link still needs a real non-interactive treatment** (`aria-disabled` on a
   non-interactive element, not a dimmed but still-clickable link). **Local — this default:**
@@ -521,6 +554,12 @@ These are the rules this app has actually had to enforce:
   a real form control can take the `disabled` attribute at all.
 - **Portable.** Focus is always visible, on every focusable element, with no exceptions carved
   out. Nothing removes the focus indicator without replacing it with an equally visible one.
+  **A focus ring utility with no explicit colour set can inherit a fallback that renders
+  invisible** — Tailwind v4's ring utilities fall back to `currentColor` when no colour is
+  specified, so `focus-visible:ring-2` alone can render a same-colour-as-text ring that's
+  effectively invisible against a matching background, depending on what's inherited at that
+  point in the page. Something this load-bearing for accessibility should never depend on an
+  implicit fallback — set the colour explicitly every time.
 - **Portable — a link needs a non-colour cue (an underline, typically) on hover and focus at minimum, because colour alone often doesn't clear the contrast a link-identification technique requires against surrounding text.** **Local — this default:** one shared `.link-brand` class carries the colour and the cue consistently, rather than each call site hand-writing colour utilities that drift. The class carries the
   colour and an **underline on hover and on `:focus-visible`**. It carries no weight, because weight
   belongs to the context: a table cell is already `font-medium` and the link inherits it, a list of
@@ -587,6 +626,17 @@ These are the rules this app has actually had to enforce:
     more than the button ever did.
 - **Portable.** Disclosure state is announced — an expand/collapse control carries the ARIA state attributes that say what it currently controls and whether that's open.
 - **Colour is never the only signal** (see [Colour](#colour)).
+- **Portable — WCAG 1.4.11's 3:1 non-text contrast minimum applies to a UI component's boundary
+  only when that boundary is the *sole* signal identifying it as a control** — it is not a blanket
+  "every border needs 3:1" rule, and over-applying it produces false findings against controls
+  that are already identifiable another way. A bare input or checkbox with nothing but a hairline
+  border needs that border at 3:1, because the border is the only thing saying "this is
+  interactive." An outlined button doesn't need its border alone to clear it — the label, padding
+  and shape already identify it as a control, so the border is redundant reinforcement rather than
+  the sole signal. A filled button has no border requirement at all, since its fill does the
+  identifying. A card or table divider isn't a UI component in the criterion's sense to begin with,
+  so 1.4.11 doesn't apply to it. Check what's actually doing the identifying before flagging (or
+  clearing) a border on this criterion.
 - **Portable.** The document's language attribute is bound to whatever actually decides the
   rendered language, not hardcoded — and the viewport meta tag never locks zoom.
 
