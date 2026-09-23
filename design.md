@@ -3146,11 +3146,11 @@ native `<input type="date">` fields on the other. No calendar widget and no thir
 dependency: it is built from the same `FILTER_CONTROL_CLASSES` as every other filter, so it
 matches the rest of the bar by construction rather than by being re-themed.
 
-**No Apply button.** The dates apply themselves. An Apply is a second click for something the
-user has already said. Stripe, Shopify, Linear and Notion are observed committing on selection, and
-Google Analytics is the counter-example that proves it is a choice rather than a law — it keeps an
-Apply, and is the one people complain about. Three things make that
-work with two fields rather than a calendar:
+**Portable — commit on selection rather than requiring a separate Apply, when what the control
+needs is already unambiguous.** An Apply button is a second click for something the user has
+already said. This is a genuine choice, not a law — a counter-example exists and is the one people
+complain about — but three specific things have to be true for commit-on-selection to actually
+work well with a two-field range rather than a calendar:
 
 - **The panel stays open** while custom dates are edited, so the range can be adjusted without
   reopening it. Only choosing a preset closes it — a preset is a complete answer.
@@ -3161,14 +3161,15 @@ work with two fields rather than a calendar:
   carrying the *previous* range and then a second with the new one. Measured: three requests
   became one.
 
-**An end before a start is reordered, not refused.** Google Flights, Airbnb and Material's range
-picker all reorder. This used to show *"The end date must be on or after the start date."* and do
-nothing until the user corrected it; there is no error state left in the control.
+**Portable — prefer silently correcting an unambiguous input inversion over blocking with an
+error.** An end date before a start date has exactly one sensible interpretation (swap them); an
+error state that requires the user to notice and manually fix an inversion the system could
+resolve itself is friction with no corresponding benefit.
 
-**The trigger shows US short dates** — `6/19/2026 – 9/19/2026`. Spelled out it read
-*"June 19, 2026 to September 19, 2026"*, which needed 233px inside a 223px button and was
-truncated: the one thing the control exists to tell you was the thing cut off. The wire format
-below is unchanged; `:date_picker_short` is display only.
+**Portable — the one thing a control exists to communicate is the last thing that should get
+truncated.** A trigger whose entire job is showing the current state needs a format that reliably
+fits its available space — check this explicitly rather than discovering it truncated in
+production. **Local:**
 
 The presets come from `DateRangeHelper#date_range_presets` and are computed **server-side**, in
 `Time.zone`. They are ordered shortest window to longest with the catch-alls last, and named in
@@ -3185,10 +3186,10 @@ The `date-range` Stimulus controller exists only to keep that hidden field in st
 visible controls. It does no date arithmetic — the server hands it the preset dates — and it
 writes two formats: `:date_picker` for the wire and `:date_picker_short` for the trigger.
 
-**Say the period in words as well as in the control.** `date_range_label` returns a phrase
-built to be appended to a noun — `"13 distributions #{date_range_label}"` — so every branch
-carries its own preposition: *over the last 30 days*, *in the prior year*, *since June 19,
-2026*. It is always used mid-sentence, so it stays lower case.
+**Portable — restate an active filter/control's state in words somewhere nearby, not only in
+the control itself.** A visual-only representation of state (a picker's current selection) is
+easy to miss or misread; a plain-language restatement nearby removes the ambiguity for very
+little cost. **Local:**
 
 Two places use it, and a third deliberately does not:
 
@@ -3205,10 +3206,12 @@ Every preset in `date_range_presets` needs a clause in `date_range_label`. Witho
 through to `selected_range_described` and gets described by its dates instead of its name;
 `spec/helpers/date_range_helper_spec.rb` fails if a preset is added without one.
 
-Which option is selected on load is decided by **matching the dates**, not by trusting
-`filters[date_range_label]`. Nothing guarantees a hand-edited or bookmarked URL carries a label
-that describes its range; a range matching no preset reads as *Custom*, with the two dates
-filled in.
+**Portable — recompute derived UI state from the actual source of truth, never trust a
+denormalized copy of it that arrived over the wire.** A URL parameter that names which preset is
+selected can drift from the actual date values if the URL was hand-edited, bookmarked from an
+older version, or constructed by something else entirely — decide the selected state by examining
+the real values, and treat anything that doesn't match a known preset as a legitimate custom
+state rather than an error.
 
 ### Tables
 
@@ -3424,9 +3427,11 @@ the wrapper mappings explicitly.
 - `required: true` sets the HTML5 `required` attribute regardless of `browser_validations`.
   Conditional validators are *not* inferred as required — mark them explicitly or not at all.
 <a id="field-width"></a>
-- **A field takes the width of its grid column. Narrow it only where there is a column of fields
-  to narrow it inside.** Two rules from industry collide here and both are right about different
-  situations. Carbon, Material, Polaris and Fluent fill the cell: the grid is the discipline, and
+- **Portable — a field takes the width of its grid column by default; narrow it only where it
+  sits in a visual column of other fields sharing that width.** Two real, both-correct industry
+  approaches collide here, reconciled by one test: does the field have vertically-stacked
+  neighbours sharing its left edge? If yes, a shared narrow width reads as deliberate rhythm; if
+  the field stands alone in its own band, a narrow width just reads as unfinished. Carbon, Material, Polaris and Fluent fill the cell: the grid is the discipline, and
   a right edge lands on a line by construction. GOV.UK and USWDS ship fixed width classes
   (`govuk-input--width-10`, `--width-20`) for short values of known length, on the reasoning that
   width tells you how much is wanted, and accept a ragged right edge as the cost.
@@ -3450,6 +3455,10 @@ the wrapper mappings explicitly.
 
 ### Rich text editor
 
+**Reading note.** A narrow, mostly Local case study in restyling a specific third-party widget
+(Trix) to match a design system — most of its value is in the two portable gotchas tagged below,
+not in the widget-specific pixel values.
+
 Four screens have one: organization settings (two), the admin organization form, and the admin
 question editor. It is Action Text on Trix.
 
@@ -3467,16 +3476,21 @@ radius against the app's 8, `1.5vw` group margins, **42x26** buttons with no rad
 | Icons | 14 SVG data-URIs | **Bootstrap Icons** |
 | Below 768px | shrinks to 19px wide | 32px, row scrolls |
 
-**The icons were a second icon set.** Trix draws each button with an SVG data-URI background image.
-This app retired Font Awesome specifically so it would have one icon set, and then carried fourteen
-icons from another one on four screens. They are Bootstrap Icons now, added as `bi-*` classes by
+**Portable — a vendored widget's own default icon set is still a second icon set, and the
+one-glyph-one-meaning rule under [Iconography](#iconography) applies to it exactly as it would to
+hand-written markup.** A widget shipping its own icons is easy to overlook precisely because
+nobody wrote that markup directly. **Local:** Trix draws each button with an SVG data-URI
+background image; this app retired Font Awesome specifically to have one icon set, and had
+carried fourteen icons from a third one on four screens without anyone deciding to. They are Bootstrap Icons now, added as `bi-*` classes by
 `trix_toolbar_controller.js` rather than written as CSS `content` codepoints — so the name is the
 same one any view would write, and a missing glyph fails the way it would anywhere else instead of
 silently drawing nothing. The toolbar does not exist until Trix has run, so nothing is lost by
 doing it in JavaScript.
 
 <a id="toolbar-buttons-shrink"></a>
-**The phone bug was flex, not width.** Below 768px Trix narrows the buttons with
+**Portable — before overriding a property to fix unwanted shrinking/growing, confirm which layout
+mechanism is actually responsible** (a flex/grid sizing behavior can override an explicit width
+entirely, silently). **Local — the phone bug was flex, not width:** Below 768px Trix narrows the buttons with
 `max-width: calc(0.8em + 3.5vw)` — about 22px at 375, under [2.5.8](#tap-targets)'s 24. Overriding
 the width changed nothing, because width was never what was being ignored: the buttons are flex
 children of `.trix-button-group` inside `.trix-button-row`, and fourteen 32px buttons do not fit a
@@ -3490,9 +3504,10 @@ within — because Trix ships all fourteen buttons as `tabindex="-1"`.
 
 ### Line item rows
 
-A repeating collection of items with a quantity each — the body of "Items in this donation" and
-its six siblings. **This is a table, not a stack of forms.** Every one of the seven forms that
-takes line items renders one partial:
+**Portable — a repeating collection of structurally identical rows, each with several fields, is
+a table, conceptually, regardless of whether it's marked up as a literal `<table>` — treat it as
+one component with one definition, rendered by everything that needs it, not as N independent
+hand-assembled forms.** **Local — this default's implementation:**
 
 ```erb
 <%= render "shared/essentials/card", title: "Items in this donation", padded: false do %>
@@ -3503,34 +3518,38 @@ takes line items renders one partial:
 
 Four rules, all of which the hand-assembled version broke:
 
-- **Label the columns once, in a heading row.** Not once per control per row. Three labels on a
+- **Portable — label repeating columns once, in a shared heading row, never once per control
+  per row.** Not once per control per row. Three labels on a
   three-row form, not nine. The controls carry the same words as `aria-label`, because a control
   with no visible label still needs a name — and the heading row is `aria-hidden`, so it is not
   announced twice. Use the `:essentials_cell` / `:essentials_cell_select` wrappers: no label, no
   bottom margin, error still under the control.
-- **One scan field per card, not one per row.** A barcode field belongs to the *document* being
-  built, not to a line of it — Square, Zoho Inventory, Odoo and Amazon Seller all put one at the
-  top of a receiving screen, and scanning appends a row or adds to the row that item is already
-  on. Repeating it per row gave a ten-line donation ten barcode fields and ten "or"s.
+- **Portable — an input that adds/finds an item within a collection belongs to the collection
+  as a whole, not to each individual row of it.** Duplicating an entry-point control per row
+  multiplies it by the row count for no benefit, and several real inventory/receiving products
+  independently converge on exactly one entry point per collection.
 - **The remove control is `remove_element_button`, the same one every other repeating row uses**
   — the trash glyph *and* the word, `ghost_danger`. It was icon-only here, which made this the one
   place in the app where the control had no label, while the partner request form — the same
   shape, a repeating row of item and quantity — rendered the words two screens away. Five call
   sites, one rendering. See [buttons](#buttons) for why `ghost_danger` is slate at rest.
-- **The card has an empty state.** Remove the last row and the column headings go with it, because
-  there are no columns left to head; `line_item_total_controller` swaps them for a `:cold_start`
-  state. It offers no action, deliberately: the footer's **Add another item** is 60px below it,
-  and two buttons doing one job is the thing the tab-actions pass removed.
+- **Portable — an empty collection needs its own explicit state, and a heading row for zero
+  columns is itself wrong and should disappear with the last row.** Don't duplicate an
+  already-visible "add" affordance inside the empty state just because the state looks bare — one
+  control doing a job is enough; a second one nearby doing the identical job is clutter, not help.
 - **The footer carries a running total.** "2 items · 36 units", from `line_item_total_controller`.
   Every inventory app has one; this card had none, so a long donation could not be checked without
   adding it up by hand.
-- **No divider between rows.** A divider separates rows of *text*; between rows of *controls* it
-  is redundant, because every cell already draws its own box, and it puts a second horizontal line
-  between each pair. Four rows drew **7** card-wide rules and now draw **4**. Xero, Stripe and
-  Shopify all draw none between editable line items. The rules that stay are the ones separating
-  **bands** — under the scan bar, under the headings, above the footer — because those mark a
-  change of kind. Index tables keep their row dividers: there the rows *are* text.
-- **One spacing number: 20px.** `py-2.5` on the rows container and `py-2.5` on each row puts 20px
+- **Portable — a divider separates rows of *text*; between rows of *interactive controls* it's
+  usually redundant**, because each control already draws its own visible boundary (a border, a
+  filled surface). Keep dividers that separate *bands* — a genuine change of kind (a heading strip
+  from its content, content from a footer) — and drop the ones that would otherwise duplicate a
+  boundary a control already provides. This doesn't apply to a table of plain text rows, where the
+  rows genuinely are text and a divider is the only boundary that exists at all.
+- **Portable — inter-row spacing should exceed intra-row (within-a-row) spacing, consistently,
+  and a band's edge padding should match the inter-row gap rather than being smaller** — a
+  boundary tighter than the rhythm it's supposed to bound reads as attachment to the wrong
+  neighbour. **Local — this default's number:** `py-2.5` on the rows container and `py-2.5` on each row puts 20px
   between every pair of controls *and* 20px from either band border to the nearest one. The band
   edges must not be smaller than the gap between rows — at 12px against 20px the first row read as
   attached to the heading strip rather than as the first of a set, which is the grouping the
@@ -3563,18 +3582,29 @@ deprecated in axe-core 4.9.
 
 Two traps, both of which produced a defect here:
 
-- **A `MutationObserver` must not observe what its callback writes.** Assigning `textContent`
+- **Portable — a `MutationObserver`'s callback must never itself trigger the exact class of
+  mutation the observer is watching for, on the observed subtree, or it becomes an infinite
+  loop.** This is a general hazard of any observer/callback pair over the same tree, not specific
+  to this implementation. Assigning `textContent`
   replaces a text node, which is a childList mutation like any other, so a summary inside the
   observed subtree is an unbroken loop. The total observes the *rows* container and guards the
   write; the first version did neither and hung the tab on the first scan.
-- **`.val()` and `.trigger()` are jQuery's, and a native listener does not see either.** jQuery
+- **Portable — a value set through one JS abstraction (jQuery, a framework's reactive state)
+  and an event listener registered through a different, lower-level mechanism (native
+  `addEventListener`) can silently fail to see each other.** Setting a DOM property directly does
+  not fire the events a library's own API would have dispatched alongside it — this bites anyone
+  mixing libraries or migrating off one, not just this specific pairing. jQuery
   sets the property and runs its own handler list. Anything bound with `addEventListener` — every
   Stimulus controller — needs a real `dispatchEvent`, which is why the running total sat one scan
   behind the quantity it was adding up.
 
 ### Modals
 
-Native `<dialog>`, opened with `showModal()`.
+**Portable — prefer the platform's native modal dialog element over reimplementing one**, when
+your target environment supports it — a native implementation gives focus trapping, Escape
+handling, background inertness and top-layer stacking for free, all of which hand-rolled versions
+tend to get partially wrong. **Local — this default:** native `<dialog>`, opened with
+`showModal()`.
 
 ```erb
 <button type="button" data-action="click->dialog#open" data-dialog-id-param="csv-import-modal">
@@ -3594,8 +3624,10 @@ adds backdrop-click closing and restores focus to whatever opened it.
 A trigger names its dialog with `data-dialog-id-param`. A trigger that names nothing is a
 trigger that does nothing.
 
-**Two things the browser does that preflight undoes**, both restored in `@layer base` on
-`dialog:modal`:
+**Portable — a global CSS reset can silently undo native browser behavior you're relying on**
+(a reset that zeroes all margins removes the native centering a `<dialog>` gets from its own
+default `margin: auto`) — anything a reset touches needs to be checked against what you actually
+depend on from browser defaults, not assumed neutral. **Local — this default's two restorations:**
 
 | | Why it matters |
 | --- | --- |
@@ -3609,8 +3641,10 @@ scrolls rather than the whole dialog, so the header and footer stay put, and it 
 
 ### Popovers
 
-An anchored floating panel — the account menu, the date range filter. `popover_controller.js`
-owns all of them.
+**Portable — a component's every instance should share one implementation of its interaction
+contract, rather than each call site (re)implementing focus/Escape/outside-click handling.**
+**Local — this default:** an anchored floating panel — the account menu, the date range filter —
+all owned by one controller.
 
 ```erb
 <div class="relative" data-controller="popover">
@@ -3623,41 +3657,50 @@ owns all of them.
 </div>
 ```
 
-**A popover is not a modal**, and the difference is deliberate: it must not trap focus or make the
-page inert, because you are meant to see what you are filtering while you filter it. What it does
-share is the rest of the contract, and every part of it is a thing hand-rolled versions get wrong:
+**Portable — a popover is not a modal, and the distinction is deliberate and functional, not
+just visual: a popover must not trap focus or make the rest of the page inert**, because its
+whole purpose is usually to stay in context with what it's acting on (filtering a list you can
+still see, say) — trapping focus the way a modal correctly does would defeat that purpose. What a
+popover *does* share with a modal is the rest of the interaction contract, and every part of it is
+something a hand-rolled implementation tends to get wrong:
 
-- **Escape closes it and focus returns to the trigger**, so the keyboard never ends up somewhere
-  invisible.
-- **A click outside closes it; a click inside does not** — otherwise choosing two dates would be
-  impossible. Closing by outside click does *not* pull focus back, because the click has already
-  put focus where the user meant it.
-- **`aria-expanded` on the trigger** tracks the state, and the panel is `hidden` while closed, so
-  it is out of the accessibility tree rather than merely invisible.
-- **It flips above the trigger** when there is no room below, and shifts left rather than leaving
-  the viewport. Measured from the trigger's rectangle: CSS anchor positioning is still Chrome-only.
+- **Portable.** Escape closes it and returns focus to the trigger, so keyboard focus never ends
+  up somewhere no longer visible.
+- **Portable.** A click outside closes it; a click inside does not — necessary for any popover
+  whose content itself needs multiple sequential interactions (choosing two dates, say). Closing
+  via outside click should *not* forcibly move focus, since the click that closed it already put
+  focus wherever the user meant it to go.
+- **Portable.** The trigger's expanded/collapsed state is tracked in a real ARIA state attribute,
+  and the panel is actually removed from the accessibility tree while closed (not just visually
+  hidden) — a merely-invisible-but-still-present panel can still be reachable by assistive tech
+  navigation.
+- **Portable.** The panel repositions (flips, shifts) to stay within the viewport rather than
+  extending past its edge, computed from the trigger's actual position at open time.
 
-**One elevation for anything above the page.** `POPOVER_SURFACE_CLASSES` is the same surface as a
-dialog — `rounded-2xl border-slate-200 bg-white shadow-xl`. The scale has two steps on purpose:
-`shadow-sm` for things in the page, `shadow-xl` for things over it. The account menus used
-`shadow-lg`, a third step nothing else shared.
+**Portable — everything visually "above" the page shares one elevation treatment, distinct from
+everything that's "in" the page** — the [two-step elevation scale](#spacing-radius-elevation)
+established under Foundations, applied consistently here rather than accumulating a third,
+unshared step.
 
-**Open one in a test.** `bin/design/overlay-audit.js` opens every dialog and popover and checks
-centring, viewport fit, accessible name, Escape, focus return and surface, and runs axe on the
-opened overlay. It exists because the dialog centring bug survived both other audits: one reads
-markup and the other scans the page as loaded, and **neither had ever opened anything**.
+**Portable — a check for an interactive overlay's behavior has to actually open it, not just
+read its closed markup or scan the page as initially loaded.** A defect in open/interaction
+behavior is invisible to any audit that never triggers the interaction — this generalizes past
+overlays to any UI whose correctness only exists in a state a static scan never reaches.
 
 ### Flash messages
+
+**Portable — a transient status message's severity decides its ARIA role: informational messages
+use a role that announces politely, warning/error messages use one that interrupts** — so a
+screen reader only interrupts the user when something has actually gone wrong, matching how a
+sighted user would triage the same messages by visual weight. **Local — this default:**
 
 ```erb
 <%= render "shared/essentials/flash" %>
 ```
 
 Rendered by the shells inside a `turbo_frame_tag "flash"`, so a Turbo response can replace
-it. A message bar gets a **plain glyph**, never an icon tile: a soft `-50` tile on a `-50`
-surface is invisible, and a filled one shouts and adds height. `role="status"` for
-informational tones and `role="alert"` for warning and danger, so a screen reader interrupts
-only when something actually went wrong.
+it. A message bar gets a plain glyph, never an icon tile: a soft `-50` tile on a `-50`
+surface is invisible, and a filled one shouts and adds height.
 
 Keys map `success → :success`, `error → :danger`, `alert → :warning`, anything else `→ :info`.
 
