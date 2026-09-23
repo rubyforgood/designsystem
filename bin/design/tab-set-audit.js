@@ -72,7 +72,7 @@ const MEASURE = () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
-  await signIn(page, RUNS.find(([, p]) => p === BANK)[0]);
+  await signIn(page, RUNS.find(([, p]) => p === BANK)?.[0]);
 
   const findings = [];
   let checked = 0;

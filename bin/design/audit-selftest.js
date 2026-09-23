@@ -306,7 +306,7 @@ const CONTROLS = [
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: VIEWPORT });
   const page = await ctx.newPage();
-  await signIn(page, RUNS.find(([, p]) => p === BANK)[0]);
+  await signIn(page, RUNS.find(([, p]) => p === BANK)?.[0]);
 
   const wrong = [];
   let ran = 0;

@@ -1,0 +1,8 @@
+{
+  "name": "designsystem",
+  "private": true,
+  "description": "Audit tooling dependencies for bin/design.",
+  "devDependencies": {
+    "playwright": "^1.55.0"
+  }
+}

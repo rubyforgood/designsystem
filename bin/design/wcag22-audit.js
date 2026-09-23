@@ -379,7 +379,7 @@ if (require.main === module) {
 
   const bankCtx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const bankPage = await bankCtx.newPage();
-  await signIn(bankPage, runs.find(([, p]) => p === BANK)[0]);
+  await signIn(bankPage, runs.find(([, p]) => p === BANK)?.[0]);
   await redundantEntry(bankPage, processes);
   await bankCtx.close();
 
