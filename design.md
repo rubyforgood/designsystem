@@ -5043,8 +5043,12 @@ started the whole document swiping sideways at 1440 — which it had not done be
 
 ### Empty states
 
-Never render bare empty table chrome. Three flavours, and every screen picks one
-deliberately:
+**Portable — never render bare empty collection chrome** (an empty table with headers and
+nothing else). **Portable — distinguish the actual causes of emptiness and message each
+deliberately**: nothing exists yet (offer to create), a filter matched nothing (offer to clear
+it), versus genuinely nothing to do (offer reassurance, not an action) — one generic "no results"
+message conflates three situations that call for three different next steps. **Local — this
+default's three flavours:**
 
 | `kind:` | Means | Offers |
 | --- | --- | --- |
@@ -5052,13 +5056,18 @@ deliberately:
 | `:no_results` | A filter matched nothing | Clearing the filter |
 | `:all_clear` | Genuinely nothing to do | Reassurance |
 
-**`cold_start` offers the create action unless one is already on screen.** Eighteen of them offer
+**Portable — an empty state's own call-to-action should be suppressed when an equivalent one
+is already visible elsewhere on screen** (a card's own footer button, say) — two controls doing
+the identical job is clutter, not redundant safety. Eighteen of them offer
 none, and that is right in two situations: a nested list on a detail page where creating happens
 elsewhere, and a card whose footer already carries the button — the line item card's state sits
 60px above **Add another item**, and two buttons doing one job is what the tab-actions pass
 removed.
 
-**A collection-driven table needs one, and the check is whether the collection can be empty.** A
+**Portable — audit for a missing empty state based on whether the collection can actually be
+empty, not by assuming every list needs one** — a nested list scoped to a record that's validated
+to always have at least one item genuinely doesn't need empty-state handling, and building it
+anyway is speculative code for a state that can't occur. A
 sweep of `app/views` for a `<tbody>` driven by a `.each` with no empty state found sixteen; nine
 were reachable-empty and were built, and the other seven show the line items of a *saved* record
 whose model validates it has at least one. Those are listed in [todo.md](docs/todo.md) so the next
@@ -5078,20 +5087,23 @@ the audits index started returning 500s.
 
 ### Tabs
 
+**Portable — the ARIA tablist pattern's full keyboard contract: roving tabindex (only the
+selected tab is a normal tab stop; arrow keys move selection within the set), Home/End jump to
+the first/last tab, and selection state plus panel association are both wired programmatically**
+— implementing only the visual look without this keyboard behavior produces something that
+merely resembles a tablist rather than behaving like one. **Local:**
+
 ```erb
 <%= render "shared/essentials/tabs", tabs: [{id: "open", label: "Open"}, {id: "closed", label: "Closed"}] %>
 ```
 
-Real `role="tablist"` semantics with roving `tabindex`: arrow keys move between tabs, Home and
-End jump to the ends, `aria-selected` and `aria-controls` are wired to the panels. Panels
-carry `data-tabs-target="panel"` in the same order as the tabs.
-
 <a id="pagination"></a>
 ### Pagination
 
-**Every index table is paginated.** A table whose row count grows with use and has no pager is
-a page that gets longer forever. The tables still without one are bounded by something outside
-the software, and each is listed with its reason in `docs/migration-map.md`.
+**Portable — an unbounded, growing collection gets pagination; a table whose row count grows
+with use and has no pager is a page that gets longer forever.** This is the same bounded/unbounded
+distinction already established under [reports don't paginate](#reports-do-not-paginate) — an
+index/ledger is the unbounded case that needs it.
 
 Go through the helper, never the partial directly:
 
@@ -5100,9 +5112,10 @@ Go through the helper, never the partial directly:
       footer: essentials_pagination_footer(@paginated_donations) do %>
 ```
 
-**The strip renders for every table that has rows**, including one that fits on a single page.
-The count is the point, and a card that gains and loses a footer depending on how much data
-happens to be in it is a card of no fixed shape. The helper returns `nil` only when the
+**Portable — a pagination/count strip renders for every non-empty collection, including one
+that fits on a single page** — the count itself is valuable information independent of whether
+paging controls are needed, and a component whose shape changes based on how much data happens to
+be in it is a component with no fixed, predictable shape. The helper returns `nil` only when the
 collection is empty, so an empty state is not followed by a strip reading "0 of 0".
 
 Call sites used to do `capture { concat(render(...)) }` and let the card test the result for
@@ -5130,10 +5143,10 @@ visit and throwing away the scroll position.
 
 #### The label states the range, not the page
 
-**"Showing 31–45 of 272 requests"**, from `essentials_pagination_summary` — never "Page 3 of
-19". A page number is a proxy: it changes meaning whenever the page size does, and it does not
-answer the question the filter bar above it raises, which is how big the result set is. Someone
-reading "Page 3 of 19" cannot tell whether the filter matched 140 records or 1,400.
+**Portable — state the actual range and total ("showing 31–45 of 272"), never just a page
+number ("page 3 of 19").** A page number is a proxy whose meaning changes with page size and
+answers a different question than the one worth answering — how big the actual result set is,
+which is exactly the question a filter above it raises.
 
 The range and the total are `font-medium text-slate-900` inside `text-sm text-slate-600`, so
 the numbers carry the emphasis and the words around them recede. The noun comes from Kaminari's
@@ -5142,10 +5155,11 @@ the numbers carry the emphasis and the words around them recede. The noun comes 
 
 #### The control set does not change width
 
-`‹ Prev` and `Next ›` are **always drawn**, disabled when they lead nowhere. They used not to be
-rendered at all at the ends, which meant the row of buttons changed width as you paged —
-`/requests` was 7 controls on page 1, 14 on page 5 and 8 on page 10, so a target moved out from
-under the cursor of the person using it.
+**Portable — a control set a user interacts with repeatedly (paging forward/back) should keep a
+stable width/layout across every state, including its disabled/inactive states** — omitting a
+control entirely when it would lead nowhere (rather than rendering it disabled) changes the whole
+row's width and layout, moving every other target out from under a hand that's about to click the
+same spot again.
 
 `« First` and `Last »` are the exception: on a table that fits on one page they do not name
 anything, so they are not drawn. On a longer table they are, disabled at the ends. Keeping them
@@ -5153,10 +5167,11 @@ at all is deliberate — jumping to the oldest record is a real task on the audi
 tables, and a page number that moves as the result set changes is a worse target than a button
 that does not.
 
-Disabled means `<span aria-disabled="true">`, never a disabled link: an `<a>` cannot be
-disabled, it stays focusable and announces nothing. This is the same treatment every
-unavailable action gets here (`ui_helper.rb`). The styling hangs off the attribute, so markup
-and appearance cannot disagree:
+**Portable — an unavailable link-shaped control is marked `aria-disabled` on a
+non-interactive element, never left as a disabled-looking-but-still-functional anchor** — a link
+element has no real disabled state; leaving it as an `<a>` means it stays focusable and
+functional regardless of how it's styled. Hang the visual styling off the same attribute that
+marks the state, so markup and appearance can never disagree:
 
 ```css
 .pagination-link[aria-disabled="true"] { opacity: 0.6; cursor: not-allowed; }
@@ -5173,7 +5188,10 @@ from `app/views/kaminari/`.
 
 #### Page size: three bands
 
-One number does not fit every table, because the rows are not the same height. Measured at
+**Portable — page size (rows per page) should be chosen from the actual measured row height for
+that specific content, not applied as one global default everywhere.** Rows of very different
+heights (a dense short row vs. one that wraps to several lines) produce wildly different total
+page lengths at the same row count. Measured at
 1440×900 in this app, a row on `/users` is 45px and a row on `/purchases` is 205px — a 4.5×
 spread. `Pagination` (`app/models/pagination.rb`) names three bands, and an index states
 which one it is:
@@ -5193,18 +5211,25 @@ feels like reading one page rather than paging by hand. Pick the band by measuri
 not by guessing: `/broadcast_announcements` looks dense and is 85px, because the message body
 wraps, and 50 of those is 4.7 screens.
 
-Name a band even where the Kaminari default would do the same thing. That default is
-`Pagination::MEDIUM`, written out as `25` in `config/initializers/kaminari_config.rb` because
-an initializer runs before autoloading.
+**Portable — state a configuration value explicitly even where it happens to match the
+framework's own default.** An unstated value that happens to coincide with a default is
+indistinguishable from an oversight, and silently breaks the moment the framework's default
+changes out from under it — explicit is a real decision that survives that change; implicit is
+an accident.
 
-When a controller also exports CSV, paginate into a **separate** `@paginated_*` ivar and leave
-the full collection for the export — otherwise "Export" quietly means "export this page".
+**Portable — pagination scope and export scope are different concerns and must be kept in
+genuinely separate variables/queries, never sharing the same paginated collection** — otherwise an
+"export" action silently and non-obviously means "export only the current page," which is a data
+loss bug hiding behind a feature that appears to work correctly in every manual test that doesn't
+specifically check row counts.
 
 ### Charts
 
-Highcharts, through `shared/_highcharts`. A chart is never the only representation of the
-data — the table it summarises is on the same page, because a chart is not readable by a
-screen reader and not printable in colour.
+**Portable — a chart is never the only representation of its data; the table it summarises
+belongs on the same page** — a chart is not readable by a screen reader, not printable in colour
+reliably, and not scannable for an exact value the way a table cell is. This is the same
+[chart-answers-one-question](#a-chart-answers-one-question) principle from Row actions, restated
+as the section-level rule it actually is. **Local:** Highcharts, through `shared/_highcharts`.
 
 ## App shell
 
