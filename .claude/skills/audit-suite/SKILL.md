@@ -47,6 +47,24 @@ bare name, so a filter meant for one controller's internal endpoint also hid a r
 another — and *every* audit built on it inherited the gap. Filter by fully qualified identifier,
 never by a name fragment.
 
+**A route list is not the same claim as "every screen a real user reaches."** A page gated behind
+a feature flag or a permission check is a real route, present in the enumeration, and an audit
+that follows the redirect it produces (to a 404, a dashboard, wherever the gate sends an
+unauthorized visitor) silently records that as "visited" rather than as "skipped, gated." Two
+apps' route sweeps have hit exactly this: the enumerator was honest about what routes exist, and
+still produced a report that never once exercised the page behind the flag. Check where a "visit"
+actually landed, not just whether the request returned 200.
+
+**A repeating region with nothing in it is not the same claim as "this region has no defects."**
+An empty collection — a table with zero rows, a list with nothing to show — audits clean by
+construction: there's nothing there for a check to find anything wrong with. If the actual defect
+lives *inside* a row (an unlabelled checkbox, a status chip missing its accessible name), an audit
+run against unseeded or freshly-reset data never sees it, and a clean report says nothing about
+whether the per-row markup is correct. Seed at least one row of every repeating region the audit
+claims to cover before trusting a clean scan — this is the same "vacuous pass" shape as an empty
+region entirely, one level more specific: the container exists and is correctly structured, it's
+what's supposed to repeat inside it that was never exercised.
+
 **Widening what a check reads can require widening what it discounts.** An audit that finds dead
 CSS classes read the templates and not the helpers, and reported zero for an entire migration while
 a live page rendered three classes the stylesheet did not define. Adding the helpers to its file
@@ -91,6 +109,15 @@ of three user roles because its selector only matched the third.
 **A thing that errors is a finding, not a skip.** An audit that skips anything returning 500 means
 breaking something hides it from the audit. Ask that of your own code: what does this do with input
 it cannot handle, and does the run get quieter or louder?
+
+**A crash page has its own false-positive signature, worth recognizing on sight.** If a check does
+audit whatever a 500 (or any bare framework error page) actually renders, the findings it produces
+have a recognizable shape: a missing document title, no `lang` attribute, no main landmark, no
+region — the generic scaffolding a real page would supply and a crash page skips entirely, all
+firing together. Seeing that specific cluster is a strong signal you're auditing an error page, not
+a real design defect, and worth checking before spending time on any one of those findings
+individually. This doesn't replace fixing whatever produced the crash — it's a way to recognize
+fast that the four violations in front of you are one problem, not four.
 
 **When a count flickers, stop comparing counts.** Four attempts at one non-deterministic audit
 failed while comparing "8 findings" against "9 findings". The fix was to make it print the *names*

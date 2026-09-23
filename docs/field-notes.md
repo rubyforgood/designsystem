@@ -50,6 +50,28 @@ If you're adopting this design system and want to cite one of these numbers as e
 decision on a different app: don't. Measure your own app, the way this one was measured — that's
 the actual methodology, and `evidence-discipline` covers how.
 
+## Corroboration from a sibling project isn't independent confirmation
+
+A natural way to upgrade a Local tag toward Portable is finding that a second, unrelated project
+reached the same conclusion on its own. Watch for the "unrelated" doing real work in that sentence.
+
+[CASA](https://github.com/rubyforgood/casa), another Ruby for Good Rails app, has its own
+`design.md` built with what reads as the same authoring methodology as this one — the same
+rule-then-evidence-then-industry-citation structure, the same "measured, not eyeballed" phrasing,
+the same section skeleton. A comparison pass against it (2026-09) found real, useful things: a
+genuine bug in one of this document's own rules (see the `dt`/`dd` fix in `design.md`'s "A
+record's details" section), several rules worth porting over, and a handful of places both
+documents independently landed on the same answer (icon-tile-vs-avatar disjointness, at-most-one
+primary CTA, opening an overlay before trusting an accessibility scan against it).
+
+That last category is weaker evidence than it looks. Two Rails apps built by the same underlying
+methodology converging on the same Foundations choices (Figtree, indigo, slate, Bootstrap Icons,
+WCAG AA, a 4px scale) is evidence the *methodology reliably reproduces itself* — a real and useful
+thing to know — not evidence that indigo-and-Figtree is independently the right default the way
+two genuinely unrelated teams agreeing would be. Before citing a match with a sibling project as
+the reason to upgrade a tag, check whether it's actually a second data point or the same process
+running twice.
+
 ## Related, not migration-specific
 
 Two more documents in `docs/` describe the Human Essentials *application* rather than the
