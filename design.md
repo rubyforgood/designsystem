@@ -5494,40 +5494,52 @@ can stop the count growing while nobody is looking.
 
 ## Building or changing a page
 
-1. **Start from the partials.** Page header, card, table, empty state, pagination. If you are
-   writing a twelve-class string that already exists in a partial, use the partial.
-2. **One `h1`**, from the page header. Card titles are `h2`. Do not skip levels.
-3. **Sentence case.** Every string.
-4. **Give the table a `<caption>`** and use `.numeric` / `.quantity` / `.date` on the columns
-   that need them.
-5. **Pick an empty state deliberately** — cold start, no results, or all clear.
-6. **Name every control.** If a control has no visible label, it needs `aria-label`.
-7. **Colour is never the only signal.** Pair it with a word.
-8. **A thing that changes state is a button, not a link.**
-9. **Run the audit**: `pw bin/design/audit.js /your/path`. It catches heading skips, unnamed
-   controls, duplicate landmarks and leftover Bootstrap classes that specs pass straight over.
-10. **Run the specs, including the system specs for the area you touched.** Request specs do
-    not load JavaScript and will not notice a page that renders but cannot be used. Three
-    classes of defect in this migration were visible only to the system specs: markup that a
-    browser reparses into a different shape, Stimulus controllers toggling classes that no
-    longer exist, and forms whose fields had ended up outside the form.
+**This checklist is almost entirely Portable in shape** — reuse existing definitions rather than
+duplicating them, correct heading structure, one consistent case convention, table captions,
+deliberate empty states, named controls, colour paired with a word, state-changing controls as
+real buttons, and testing with something that actually loads JavaScript rather than only a
+request-level test — regardless of which specific component/helper/script a given project uses to
+enforce each one. **Local:** the specific partials, scripts and commands named below.
+
+1. Start from existing shared components (page header, card, table, empty state, pagination) —
+   reach for the existing definition before writing markup that duplicates one.
+2. One `h1` per page; consistent, non-skipping heading levels below it.
+3. One consistent case convention, applied to every string.
+4. Every table gets a caption; give columns that need it a semantic treatment for their content
+   type (numeric, date, etc.).
+5. Pick an empty state deliberately, distinguishing why the collection is empty.
+6. Name every control — a control with no visible label needs a real accessible name.
+7. Colour is never the only signal — pair it with a word.
+8. A control that changes state is a real button, never a link.
+9. **Run an automated audit against the actual rendered page** — heading skips, unnamed controls,
+   duplicate landmarks and leftover legacy classes are exactly the class of defect a spec that
+   only checks response codes or DOM presence passes straight over. **Local:**
+   `pw bin/design/audit.js /your/path`.
+10. **Run tests that actually load JavaScript for whatever you touched, not just request-level
+    tests.** A request spec never loads a browser and will not notice a page that renders
+    successfully but cannot actually be used — malformed markup a real browser reparses
+    differently, a script toggling a class that no longer exists, a form whose fields ended up
+    outside it. All three classes of defect were, in this project's own migration, visible only to
+    browser-driven tests.
 
 ### When the system does not cover it
 
-Use industry best practice, keep it consistent with the tokens above, and **write down what
-you decided and why** in [`docs/design-decisions.md`](docs/design-decisions.md). That file is
-the running log; this file is the settled system. Anything in the log that turns out to be
-general gets promoted into here.
+**Portable — when a decision isn't covered by the existing spec, research what's established
+elsewhere, keep the result consistent with your own tokens, and write down what was decided and
+why in a running decision log separate from the settled system itself** — the settled document and
+the decision log answer different questions (what's true now, vs. why it became true), and a
+decision that turns out to generalize gets promoted from the log into the settled document.
+**Local:**
 
-Record the change itself in [`docs/changelog.md`](docs/changelog.md) in the same commit. The two
-files answer different questions and both get asked: the log says why you chose this, the change
-log says when it arrived and what to blame.
+Record the change itself in [`docs/changelog.md`](docs/changelog.md) in the same commit — a third,
+distinct question again (when it arrived, what to blame), also worth asking separately.
 
 ### A summary belongs on the page that holds the data
 
-**Do not build a page whose job is to total another page.** Filters at the top, the figures
-those filters produce directly beneath them, the table under that. One page, one set of filters,
-one export. Nobody should navigate to see the total of what they are already looking at.
+**Portable — don't build a separate page whose only job is summarizing another page's data.**
+One page, one set of filters, driving both the summary figures and the detailed table beneath
+them together — nobody should have to navigate away from data they're looking at just to see its
+total.
 
 Four "summary reports" were removed for this reason. Each had fewer filters than the index it
 summarised, no full table, and the same totals — `/distributions` has seven filters and thirteen
@@ -5535,47 +5547,60 @@ columns against the report's one filter and a preview list — and then linked b
 was a copy of. Their figures now sit at the top of the index, driven by the same filters as the
 rows.
 
-Retired URLs redirect rather than 404. A report link may be in someone's bookmarks or in an email
-to a funder.
+**Portable — a retired page redirects to its replacement rather than 404ing.** A link to it may
+exist somewhere outside your control (a bookmark, an old email, an external reference) that you
+have no way to update.
 
 ### Cards in a grid
 
-**Equal cards need a uniform unit.** Six subject cards holding lists of one to four reports ran
+**Portable — a uniform grid of cards needs cards built from a uniform *unit*, not just an
+equalized container.** Stretching mismatched content to fill an equal-height container only
+equalizes a single row against itself, not the whole grid — cards with wildly different content
+volumes need a shared unit of content (one line per entry, say) rather than shared height alone. Six subject cards holding lists of one to four reports ran
 143px to 378px, and stretching only ever equalises a row against itself. Fifteen tiles, one per
 report, were uniform and pushed everything below the fold. What works is the middle: a card per
 subject, `auto-rows-fr` so the grid equalises them, and inside it one line per report plus a
 short qualifier.
 
-**A qualifier, not a sentence.** "Itemized · by item and partner", not a full description. A hub
-is a menu; a sentence per entry turns a menu into reading.
+**Portable — a navigation hub's entries get a short qualifier, not a full descriptive
+sentence.** A hub functions as a menu; a full sentence per entry turns scanning a menu into
+reading prose, which is a different, slower cognitive task than the hub is meant to support.
 
 **One icon per card, not one per row.** The icon marks the subject. Repeating it down every row
 gives the eye a second column of glyphs to skip and marks nothing out. This is not a rule about
 grids — it is the general one under [Icon tiles and avatars](#icon-tiles-and-avatars), and it was
 written here first, which is most of why the dashboard's announcement cards went on breaking it.
 
-**A drill-through link names its destination.** Not "See more…" — it went from the distributions
-*report* to the distributions *table*, which is a different page about different things.
-"View all distributions" says where it goes.
+**Portable — a link between two genuinely different pages names its actual destination,
+never a generic "see more."** This is the same [link says where it goes](#copy) rule from Copy,
+applied specifically to the hub/drill-through case, where a generic label is especially tempting
+because the two pages look related.
 
 ### Figures in a band
 
-`dollar_value` blanks a zero, which is right in a table column where zeros are noise and wrong in
-a stat band where the figure is the content — an empty figure reads as broken rather than as
-nought. Use `dollar_presentation` for a stat.
+**Portable — the same underlying value can need different presentation depending on its
+context: a table cell where a zero is noise (many rows, one is unremarkable) versus a stat band
+where the value *is* the content and a blank reads as broken rather than as an actual zero.**
+Don't assume one formatting helper is correct everywhere just because it's correct in its
+original context. **Local:**
 
 ### Building a form page
 
-Every form page renders `page_header` with a `back:` link, then one
-`shared/essentials/card`, then fields through `f.input` so the `:essentials` wrapper owns the
-label, the spacing and the error message.
+**Local — this default's form-page skeleton:** every form page renders `page_header` with a
+`back:` link, then one `shared/essentials/card`, then fields through `f.input` so the
+`:essentials` wrapper owns the label, the spacing and the error message.
 
-- **Never pass `class:` to `f.input`.** simple_form ignores it; the field is then styled by
-  whatever the wrapper happens to do. `input_html: {class: …}` is the argument that works.
-- **A radio or checkbox group is a `<fieldset>` with a `<legend>`.** A label followed by `<br>`
-  and a run of `&nbsp;` announces the question once and connects nothing to it.
-- **Load the page when you are done.** Two assertions catch the whole class of unbalanced
-  markup, and a class-name audit catches none of it:
+- **Portable — passing a raw class override to a form-framework field helper that doesn't
+  actually support it silently does nothing** — the field renders styled entirely by whatever the
+  wrapper does by default, with no error, which can look like a working customization until
+  compared side by side. Use the real extension point the framework actually provides.
+- **Portable — a radio or checkbox group is a real fieldset/legend, not a label visually
+  followed by options with no structural grouping.** A label with no structural association to
+  its group announces the question once and connects it to nothing.
+- **Portable — verify structural correctness (every field genuinely inside its form, the submit
+  button genuinely inside the form it submits) by actually loading the page and checking DOM
+  containment, not by a class-name or markup-pattern audit**, which cannot see this class of
+  defect at all:
 
   ```js
   form.contains(submitButton)                              // must be true
@@ -5586,7 +5611,13 @@ label, the spacing and the error message.
   worked, because the HTML parser splits malformed markup into two forms and re-associates the
   button — which is exactly why nobody noticed.
 
-**And compile the templates.** `bin/rails runner bin/design/template-compile-audit.rb`, or the spec
+**Portable — actually compile every template, don't just lint its tags for well-formedness.**
+A linter checking that template tags are syntactically well-formed does not compile the code
+inside them — a stray character inside an interpolation can pass linting, pass a type/style
+checker that doesn't read templates at all, and pass the full test suite if the specific template
+happens not to be exercised by any test's actual data (a partial rendered through a collection
+that's empty in every fixture, say) — and still 500 the moment real data reaches it in production.
+**Local:** `bin/rails runner bin/design/template-compile-audit.rb`, or the spec
 that runs it. `erb_lint` checks that ERB *tags* are well formed and does not compile the Ruby inside
 them; `rubocop` does not read templates at all. A stray character in a `<%= %>` therefore passes both
 — and passes the suite too if the partial is rendered through `collection:` and the collection is
@@ -5598,6 +5629,11 @@ that returned 200 until a pick-up existed.
 It cannot check the two assertions above.
 
 ## Backlog
+
+**Reading note.** Entirely Local, and correctly so — this is Human Essentials' own remaining
+debt, not a template. A generic design system adopting this document starts with its own empty
+backlog, not this one's. Kept as the closing half of the evidence this document's methodology
+works: not just a spec, but an honest, dated account of what in it is still unfinished.
 
 Known gaps, in rough priority order:
 
