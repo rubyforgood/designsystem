@@ -3869,17 +3869,26 @@ surface is invisible, and a filled one shouts and adds height.
 Keys map `success → :success`, `error → :danger`, `alert → :warning`, anything else `→ :info`.
 
 <a id="flash-auto-dismiss-timing"></a>
-**Portable — an auto-dismissing message's timer pauses on hover and on focus, and only a
-success/informational tone auto-dismisses at all.** WCAG 2.2.1 (Timing Adjustable) is the reason:
-content that disappears on a fixed timer with no way to extend it fails the criterion outright for
-anyone who hasn't finished reading when it fires, and hover/focus pausing is the low-cost way to
-give a reader that control without adding a dismiss button to every message. A warning or an error
-never auto-dismisses — the reader needs to act on it, or at minimum decide it doesn't apply,
-before it goes. (This is a different exemption from the session-timeout case in the
+**Portable — an auto-dismissing message's timer pauses on hover and on focus.** WCAG 2.2.1
+(Timing Adjustable) is the reason: content that disappears on a fixed timer with no way to extend
+it fails the criterion outright for anyone who hasn't finished reading when it fires, and
+hover/focus pausing is the low-cost way to give a reader that control without adding a dismiss
+button to every message. (This is a different exemption from the session-timeout case in the
 [WCAG coverage table](#wcag-coverage) above — that one is exempt outright under 2.2.1's own
 20-hour carve-out; a flash message has no such exemption and needs the real accommodation.) Removal
 itself stays silent — a message disappearing is not new information worth interrupting anyone for,
 only its arrival was.
+
+**Portable — the test for whether a message may auto-dismiss is whether its *content* stays
+needed for as long as the timer runs, not its tone.** Severity (success/warning/danger) is a
+reasonable first approximation — an error usually does need to stay until acted on — but it's not
+the actual rule, and treating tone as the rule misses the case tone doesn't cover: a "success"
+message can carry information that exists nowhere else and cannot be recovered once it's gone (a
+one-time generated credential delivered only via the flash, say). That message must not
+auto-dismiss regardless of its tone, because the thing that matters isn't whether it's good news,
+it's whether the reader has another way to get what it's telling them if they miss it. Ask what
+happens if this specific message disappears unread before deciding its timer, rather than deciding
+by tone alone.
 
 ## Copy
 
@@ -4149,6 +4158,25 @@ merely ugly: content clipped with no ellipsis to say so, a nav drawer that canno
 below `lg`, and fixed chrome covering more than half a short viewport. `overlay-audit.js` opens
 every dialog and popover at **320×640 as well as 1360×900** — an overlay that fits on a desktop
 tells you nothing about a phone, and that is where a 26rem panel runs out of room.
+
+<a id="accessibility-scan-is-blind-at-other-viewports"></a>
+**Portable — an accessibility scan run at one viewport is not merely *likely to miss* content
+that only exists at a different one, it is structurally incapable of seeing it at all.** Content
+hidden by a responsive utility (`md:hidden`, `lg:hidden`, or equivalent) below or above a given
+width simply isn't in the rendered DOM at the width the scanner is running — there's nothing there
+for it to evaluate, not a smaller chance of catching it. A desktop-only scan reporting clean says
+nothing about a mobile-only alternative view (a card-list layout standing in for a data table
+below a breakpoint, say) — that content needs its own scan, at the viewport it actually renders
+at, or it has simply never been checked.
+
+<a id="breakpoint-count-is-content-driven"></a>
+**Portable — pick the number of layout tiers from how many times your content's actual *shape*
+genuinely changes, not from a framework's default breakpoint count or habit.** A breakpoint that
+exists but corresponds to no real change in layout is a place for two component implementations to
+quietly drift apart from each other for no benefit — every additional tier is another version of
+the layout to keep in sync. If a design only actually reshapes once (a sidebar collapsing to a
+drawer, say), one breakpoint is the correct number, not however many a starter template ships by
+default.
 
 <a id="components-size-against-their-container"></a>
 ### Components size against their container
