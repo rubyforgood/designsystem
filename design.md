@@ -2852,7 +2852,12 @@ says nothing.
 
 ### Tabs
 
-Two components, and picking the wrong one is an accessibility bug rather than a style choice.
+**Portable — the ARIA tab pattern (`role="tab"`, a tablist) makes a specific promise to
+assistive tech: activating this swaps a panel in the current document. If a "tab" actually
+navigates to a new URL, using the ARIA tab pattern for it is an accessibility bug, not a style
+choice** — the tablist also intercepts arrow keys that a normal link list wouldn't. A tab that
+navigates should be a plain link with `aria-current="page"`, not an ARIA tab. **Local — this
+default's two components:**
 
 | | Use when | Component |
 | --- | --- | --- |
@@ -2864,13 +2869,16 @@ If the tab loads a page, that promise is false, and the tablist takes the arrow 
 browser on the way. Page tabs are a `<nav>` of links with `aria-current="page"` on the current
 one.
 
-**Prefer page tabs when a tab needs its own action.** The page header can only follow the tab
-if the tab is a URL — which is how "New partner group" stopped being a fourth button floating
-above a table. It is also how a tab becomes something you can link to, bookmark and go back
-from.
+**Portable — prefer URL-backed tabs when a tab needs its own page-level action or needs to be
+linkable/bookmarkable.** A panel-swap tab has no URL for the page header (or anything else) to
+follow, and nothing to link, bookmark, or return to via browser back.
 
 <a id="the-strip-does-not-move"></a>
-**The tab strip does not move between tabs, so its filters live under it.** A tab is a place, and a
+**Portable — a tab strip's position must not shift between tabs.** A tab is a place, and a place
+that moves when you arrive reads as broken, however small the shift — measured evidence in this
+case, but the principle holds regardless of the actual pixel amount. Structurally: put any
+per-tab furniture (filters) *inside* the frame that changes, never in a container that sits above
+or beside the strip, so the strip's own position is invariant across every tab in the set. A tab is a place, and a
 place that shifts when you arrive reads as broken. Reported on Partner agencies: *"the group tab
 does not have a filter so the card jumps up and down. It is very odd visual experience."* The filter
 bar sat **above** the card holding the strip, so a tab with filters put the strip at **y=228** and a
@@ -2883,22 +2891,27 @@ chrome and the content goes in the panel — and GitHub, Jira, Linear and Notion
 per-view controls below a fixed strip. The measurement is what decides it: a 54px jump between two
 tabs of the same set.
 
-- **Do not give every tab a filter for symmetry.** None of those systems does. Groups has 2 rows
-  and Item categories has 3 — measured — and a filter over three rows is furniture every reader
-  pays for. If one of them grows enough to need filtering it gets one on its own merits, and under
-  this arrangement adding it moves nothing.
-- **Do not reserve the space either.** A blank 54px band on a page whose job is to show a list pays
-  the cost permanently to hide the symptom.
+- **Portable — don't add a control to every tab in a set purely for symmetry.** Add it to the
+  one tab that actually needs it, on its own merits.
+- **Portable — don't reserve empty space to visually compensate for an inconsistency, either.**
+  A permanently blank band pays the cost of the problem forever instead of fixing the underlying
+  inconsistency once.
 
-**Nothing sits between a tab strip and the first row of its table except that table's own
-filters.** A filter earns the space because it changes the rows underneath it; an action does
-not, and an action there is the signal to use page tabs instead. A filter that lives there is
+**Portable — nothing sits between a tab strip and its content except controls that actually
+filter that content.** A filter earns the space because it changes what's rendered below it; an
+action doesn't change anything by existing there, and an action that seems to want that position
+is the signal that the tabs should be URL-backed page tabs instead, with the action living in the
+page header. A filter that lives there is
 still the `filter_bar` component, and it **must apply into a frame**: a full reload re-renders
 the tab strip with whichever tab the server marked selected, which throws away the tab the
 person was on.
 
 <a id="a-tab-keeps-the-rail-honest"></a>
-**A tab under a sidebar entry keeps that entry marked and its group open.** The rail decides both
+**Portable — every real destination behind a piece of persistent navigation chrome (a sidebar,
+a top nav) needs to actually mark that chrome as active while you're on it** — including every
+tab in a tabbed section, not just the first one a naive implementation happens to check. Missing
+one is invisible in testing unless every single tab is checked, and reads as the nav being
+actively wrong (collapsing, or claiming you're nowhere) rather than just visually inconsistent. The rail decides both
 from the current *controller*, and `active_on` listed only the first tab's — so `/partner_groups`
 and `/item_categories` had **nothing** active and the whole section shut underneath the reader,
 reported as *"when the user clicks on groups, it automatically collapses the side nav."* Every tab's
@@ -2927,7 +2940,9 @@ sent you. Render the strip there anyway, so the tab is a way back as well as a w
 <% end %>
 ```
 
-Filters submit with **GET**, so a filtered view stays a shareable, bookmarkable URL. A plain
+**Portable — filters submit as GET requests, so a filtered view is a real URL**: shareable,
+bookmarkable, and returned to correctly by the browser's back button. Submitting filter state any
+other way (a POST, client-only state) breaks that for no compensating benefit. **Local:** a plain
 (borderless) bar sits 16px above the table it filters; wrap it in a card only when it is a
 section in its own right.
 
@@ -2971,7 +2986,11 @@ padding missing above the checkbox. `filter_checkbox` is now the grid cell itsel
 a 38px row inside it, so it lands on its neighbour's centre line whatever the cell's height. Four
 views had been closing the gap with a hand-tuned `pb-2`; they no longer need it.
 
-**The bar is a grid, not a flex row**, and every cell is `min-w-0`:
+**Portable — reach for a grid, not a flex row, whenever cells need equal, breakpoint-driven
+widths rather than content-driven ones.** A flex item sizes to its own content (the longest option
+in a select, say), so a row of flex items produces as many different widths as there are
+different content lengths — a grid's columns are sized by the layout, not by what's inside them.
+**Local:**
 
 ```
 grid-cols-1 · sm:grid-cols-2 · lg:grid-cols-3 · xl:grid-cols-4
@@ -3020,7 +3039,11 @@ The date range counts as set only when it is not the range the page would have s
 select carries `data-default-value` to say which that is.
 
 <a id="a-filter-the-bar-cannot-see"></a>
-**A filter the bar cannot see is a filter the reader cannot reverse.** Some narrowings arrive by
+**Portable — every filter narrowing what's shown must be visible and reversible in the same UI
+that applies other filters, regardless of how it was triggered.** A narrowing applied by clicking
+something in the results (rather than choosing from an explicit filter control) is still a filter,
+and a reader has no way to know it's active or how to undo it unless it's represented the same way
+every other active filter is. Some narrowings arrive by
 clicking something in the results rather than by choosing from a menu — the funnel on a `/events`
 row, which shows one record's history. That one submitted `?eventable_id=…` as a bare param
 *outside* the bar's form, so nothing counted it, no chip appeared, *Clear all* could not undo it,
@@ -3034,9 +3057,10 @@ when the submitted value is an id (`eventable_id=12` chips as *Refers to: Adjust
 filter needs more than one field, `data-filter-group` clears the set as one thing and only one of
 them carries the label, so it is one chip rather than two.
 
-The server side has a matching trap: clearing the chip submits the field **empty**, and
-`params[:eventable_id]` is then `""` — truthy in Ruby. `/events` narrowed itself to the events of
-record `""`, which is none of them. Test these with `.present?`, never for bare truth.
+**Portable — an empty submitted value is not the same as an absent one, in any language where
+an empty string is truthy** (Ruby included) — clearing a field client-side produces an empty
+string, not `nil`, and code checking bare truthiness treats "cleared" as "still filtering by
+nothing," silently returning zero results. Check for actual presence, not truthiness.
 
 **Filters apply on change. There is no Filter button.** Pass `frame:` and the bar submits into
 that Turbo Frame, so only the results are replaced:
@@ -3074,20 +3098,22 @@ results moves everything below it under a cursor that is often already over a ro
 layout shift in response to an unrelated action is a hazard. A stale message describes something
 that did happen, and it clears on the next navigation.
 
-Applying in place is silent to a screen reader — nothing navigates, focus does not move — so the
-bar renders a `role="status"` region, **outside** the frame, and the controller writes the new
-result summary into it. A live region that is itself replaced does not announce its new contents.
-`turbo-frame[busy]` dims the results while a request is in flight, after a 150ms delay so a fast
-response never flickers.
+**Portable — any in-place content update with no navigation and no focus change is silent to a
+screen reader unless it's explicitly announced.** A live region needs updating *in place* (its
+text content changed) to announce anything — a live region that gets wholesale replaced along with
+the content around it announces nothing, because assistive tech never sees it persist to attach
+to. **Local:** a `role="status"` region outside the update boundary, written into by the
+controller on each result; a brief delay before showing a loading state so a fast response never
+visibly flickers.
 
 Text filters debounce at 400ms; selects, checkboxes and dates apply immediately. Choosing
 *Custom* in the date range does **not** fire a request — it only reveals the two date inputs, and
 the range has not changed yet.
 
-**In specs, call `wait_for_filters` after changing a control**, and `open_filters` before
-reaching a control on a bar that collapses. There is no longer a click to synchronise on. See
-`spec/support/filter_helpers.rb` for why it waits on network idle rather than on the frame's
-`busy` attribute, and why the quiet period is longer than the debounce.
+**Portable — a test driving an async UI needs to wait on the actual condition that signals
+completion, not on a proxy for it** (a fixed sleep, an attribute that can be set and unset faster
+than the test polls) — and the wait period needs to genuinely exceed any debounce the UI itself
+applies, or the test can observe a mid-debounce state as final.
 
 `FilterHelper` builds the controls (`filter_select`, `filter_text`, `filter_date`,
 `filter_checkbox`) and gives each one a UUID-suffixed id with a matching label, so a filter
