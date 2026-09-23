@@ -104,3 +104,13 @@ rm -f /tmp/reference-app-targets.json         # force a fresh route list
 cd bin/design/adapters/reference-app
 node keyboard-audit.js                        # etc.
 ```
+
+## Kept as a running regression check (Phase 6)
+
+The exact outcomes above — which audits run clean, which crash, which vacuously pass — are pinned
+in `bin/design/adapters/reference-app/known-outcomes.js` and run on every push/PR by
+`.github/workflows/checks.yml`. This isn't `audit-selftest.js` (the original control harness,
+per the `audit-suite` skill) — there's no Rails app in this repo for that harness to plant defects
+into — it's the closest equivalent this repo can actually run: proof that these documented
+findings haven't silently drifted, in either direction, rather than a one-time snapshot that goes
+stale the moment anyone touches `examples/reference-app` or the copied audits.

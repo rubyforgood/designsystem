@@ -1,0 +1,98 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  hygiene:
+    name: syntax, seam, doc links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax-check every JS audit
+        run: |
+          fail=0
+          for f in $(find bin/design examples -name "*.js"); do
+            node --check "$f" || fail=1
+          done
+          exit $fail
+
+      - name: Syntax-check every Ruby audit
+        run: |
+          fail=0
+          for f in $(find bin/design -name "*.rb"); do
+            ruby -c "$f" > /dev/null || fail=1
+          done
+          exit $fail
+
+      - name: Syntax-check every Python audit
+        run: |
+          fail=0
+          for f in $(find bin/design -name "*.py"); do
+            python3 -m py_compile "$f" || fail=1
+          done
+          exit $fail
+
+      # Ratchets duplicated signIn functions -- see bin/design/seam-check.rb's own header for why
+      # this needs to be its own check rather than trusted to code review.
+      - name: Seam check
+        run: ruby bin/design/seam-check.rb
+
+      # design.md and docs/**/*.md cross-reference each other with #anchor links; this catches a
+      # renamed heading or a typo'd fragment before a reader does.
+      - name: Doc link audit
+        run: ruby bin/design/doc-link-audit.rb
+
+  reference-app-control-harness:
+    name: reference-app audits match their documented outcome
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # wcag-audit.js's hardcoded path -- see the audit's own header. Not a repo-root install
+      # because the audit was written against a Rails app that isn't here; kept identical so the
+      # audit runs completely unmodified, which is the entire point of this exercise.
+      - name: Install axe-core at the path wcag-audit.js expects
+        run: npm install --no-save --prefix /tmp/axe axe-core
+
+      - name: Start the reference app
+        run: node examples/reference-app/server.js &
+        env:
+          PORT: 4100
+
+      - name: Wait for it
+        run: |
+          for i in $(seq 1 20); do
+            curl -sf http://127.0.0.1:4100/sign-in > /dev/null && exit 0
+            sleep 0.5
+          done
+          echo "reference app never came up"; exit 1
+
+      # See known-outcomes.js's own header: this is not audit-selftest.js (this repo has no Rails
+      # app for that harness to run against) -- it's the closest thing to a control harness this
+      # repo can actually run, verifying each audit's documented, measured behaviour against
+      # examples/reference-app hasn't silently drifted, in either direction.
+      - name: Run the known-outcomes harness
+        working-directory: bin/design/adapters/reference-app
+        run: node known-outcomes.js
