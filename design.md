@@ -4334,7 +4334,10 @@ specific error in the list is unchanged — only the negative one catches the re
 <a id="background-downloads"></a>
 ### A long export downloads in the background
 
-A big CSV used to look like a hung page — the browser sat on the request with nothing to show.
+**Portable — a slow synchronous download makes a page look hung, with nothing on screen to
+explain why; redirect immediately and trigger the download separately, so the page stays
+responsive.** **Local — this default:** a big CSV used to look like a hung page — the browser sat
+on the request with nothing to show.
 `handle_csv_export` redirects instead, with two things on the flash: a **notice**, which the flash
 strip draws like any other message, and **`trigger_csv_download`**, a boolean the layout's
 `shared/essentials/csv_download` partial turns into a hidden element that fetches the file and
@@ -4342,13 +4345,14 @@ saves it.
 
 Two rules fall out of that, both learned the hard way:
 
-- **A flash entry that is a flag, not a sentence, goes in `EssentialsUiHelper::NON_MESSAGE_FLASH_KEYS`.**
-  The strip renders every key it finds and `true` is not blank, so an ungated flag draws a message
-  bar reading *"true"*.
-- **An export link carrying a non-filter param must survive the filter rewrite.** `auto_submit`
-  rebuilds an export href from the filter form, which dropped `export_csv=true` — so the first
-  time anyone touched a filter, the export silently reverted to a foreground request. It now keeps
-  any param on the link that the form does not supply.
+- **Portable — a generic "render every message in this bucket" component needs an explicit
+  allow-list of what counts as a displayable message**, or a non-message value (a boolean flag used
+  for signalling, not display) gets rendered as if it were one — a flag is not blank, so a naive
+  "skip blank values" guard doesn't catch it.
+- **Portable — a URL that's programmatically rebuilt from a subset of known inputs (a form's own
+  fields) needs to explicitly preserve any parameter that subset doesn't know about**, or that
+  parameter silently disappears the first time the URL is rebuilt for any other reason — a
+  parameter can vanish long after the code that depends on it was written and reviewed correctly.
 
 The message is a flash rather than a pop-up **because there is no toast in this design system, and
 `toastr` has been removed.** If a transient pop-up is ever genuinely wanted, it needs building here
@@ -4357,35 +4361,42 @@ rather than importing — see below for what happened to the last one.
 <a id="messages-raised-after-load"></a>
 ### A message raised after the page loaded
 
-**Append it to `[data-flash-region]`, rendered from `shared/essentials/flash_message`.** That is the
-same partial the server-side strip renders each of its messages with, so a message raised by
-JavaScript is the same object as one that arrived with the page — same tint, same glyph, same
-`data-flash` hook a spec can find it by.
+**Portable — a message raised by client-side script after the page loads should render through
+the exact same component the server uses for its own messages**, not a separate client-side-only
+implementation — otherwise the two inevitably drift in appearance and behavior, and a reader
+learns two different visual languages for what is conceptually one kind of message. **Local:**
 
-**The strip is always in the DOM, and hides itself while empty.** `.flash-strip:not(:has([data-flash]))`
+**Portable — a container that's sometimes empty can hide itself via CSS based on its own
+actual contents, rather than needing a script to remember to toggle a class on/off as content is
+added and removed.** `.flash-strip:not(:has([data-flash]))`
 is `display: none`, so an empty strip costs no space and appending a message is all it takes to
 reveal it. CSS rather than a class the server toggles, so nothing has to remember to switch it back
 off when the last message goes.
 
-This exists because `barcode_items/create.js.erb` used `toastr.success(...)` and **nobody could see
-it.** The essentials layouts load only `tailwind.css`; measured on `/donations/new`, **zero toastr
+**A cautionary, still-portable-as-a-lesson example: a third-party notification library's UI
+depends on its own CSS actually being loaded** — silently rendering with no styling, no visible
+container, and no error, if that CSS isn't present. Verify a vendored UI library's visual
+dependencies are genuinely present in your actual build, not just assumed from having imported the
+JS. This exists because The essentials layouts load only `tailwind.css`; measured on `/donations/new`, **zero toastr
 CSS rules load**, so the container rendered `position: static` with no background or padding,
 appended at the foot of the document — **y=1284 on a 900px viewport**, below the fold. The scan
 worked and said nothing. `toastr` is gone from the importmap and from `application.js` now, that
 being its last caller.
 
-**Assert these by `[data-flash]`, not by text.** The spec covering that message passed the entire
-time it was invisible, because `have_content` finds text in the DOM whether or not it is on screen.
+**Portable — a test asserting on visible UI should assert through a mechanism that actually
+requires visibility, not merely presence in the DOM.** A test that finds text anywhere in the DOM
+passes identically whether that text is genuinely visible or invisible-but-present — exactly the
+gap that let this specific defect ship with full test coverage.
 
 <a id="detail-list"></a>
 <a id="a-records-details-are-a-dl"></a>
 ### A record's details are a `<dl>`, and long ones are banded
 
-**`essentials_detail` renders one field** — a `<dt>`/`<dd>` pair in a `<div>`, which is how HTML5
-groups them inside a `<dl>` — on a `grid gap-x-6 gap-y-4 sm:grid-cols-2`. **A blank value is the em
-dash**, which is why the helper takes the value rather than leaving each caller to write
-`presence ||`: "Not defined" reads as a sentence and makes an empty field look like it says
-something. `wide: true` spans both columns, for a paragraph, a list or an image.
+**Portable — a record's field/value pairs are a description-list relationship, semantically**
+(echoing the same rule already established for [Stats](#stats)), and a missing value should be
+rendered as an explicit, unambiguous placeholder (an em dash, or equivalent) from one shared
+helper rather than left for each call site to reinvent — a hand-written fallback string ("Not
+defined") risks reading as real content rather than as an absence. **Local:** `wide: true` spans both columns, for a paragraph, a list or an image.
 
 **Past a handful of fields, group them into bands** rather than one long list —
 `border-y border-slate-200 bg-slate-50 px-5 py-3` on the heading, `first:border-t-0` so the top one
@@ -4393,11 +4404,10 @@ does not double with the card header's rule. It is the line item card's band, ma
 kind, and it is the reason **a detail card needs no `<hr>` at all**.
 
 <a id="a-band-has-no-last-case"></a>
-**A band has no special case for the last one.** Every band is `px-5 py-4`, including the final one.
-The card is rendered `padded: false` so its body supplies no padding of its own, and a last band
-that drops to `pt-4` leaves its final field **1px** from the card's bottom edge against the 16px
-every band above it has. If a container's padding is the reason a child can skip its own, check
-that the container actually has some.
+**Portable — a repeated element's styling shouldn't special-case its last instance without
+verifying the container actually compensates.** A "the last one doesn't need this padding, the
+container will supply it" assumption is only correct if the container genuinely does — check that,
+rather than assuming it by symmetry with a different layout elsewhere in the app.
 
 ### Tag input
 
@@ -4412,21 +4422,25 @@ For a free-form list of short values — the custom request units are the one us
 and press **Enter**; comma and Tab also commit, and Backspace on an empty box removes the last chip.
 Duplicates are refused case-insensitively, so `Pack` cannot join `pack`.
 
-**The `<select multiple>` is the field.** It is what submits — a repeated `name[]` — and the
-controller keeps it in sync and draws the chips from it. Hiding it is gated on
-`[data-tag-input="ready"]`, which the controller sets only after the chips exist, so with no
-JavaScript the native multi-select is exactly the control it always was. Same arrangement as
-[the table rail](#the-rail).
+**Portable — the native form control remains the actual source of truth and the thing that
+submits; a richer visual layer (chips, a custom widget) only reflects and edits it, gated on its
+own readiness.** With no JavaScript, the underlying native control is exactly the control it
+always was — the same progressive-enhancement shape already established for
+[the table rail](#the-rail) and [conditional reveal](#render-the-state-do-not-correct-it).
+**Local:**
 
 <a id="tag-input-hide-rule"></a>
-**That hide rule lives outside `@layer components`,** with the third-party overrides. The select
-carries `block w-full` from `SELECT_CLASSES`, and **a utility beats a layered rule however specific
-the layered one is** — written in the components layer first, it did nothing at all and the select
-stayed visible underneath the chips.
+**Portable — in a cascade-layer-based CSS architecture, an unlayered utility class beats a
+layered rule regardless of the layered rule's specificity.** A hide/override rule targeting an
+element that also carries utility classes needs to live at the same "unlayered" priority as those
+utilities, or it silently loses despite looking more specific on paper. **Local:**
 
-It replaced select2 in free-tagging mode with `select2-hide-dropdown-value`, which was reported as
-not intuitive and was: it looked like a select, so the first thing anyone did was click it expecting
-a list, and nothing opened. Nothing on screen said the interaction was "type, then comma". Measured
+**Portable — a control that visually resembles a familiar pattern but behaves differently needs
+its own visible affordance saying so, or users will confidently perform the familiar (wrong)
+interaction with no feedback that anything went wrong.** It replaced select2 in free-tagging mode
+with a hidden dropdown, which was reported as not intuitive and was: it looked like a select, so
+the first thing anyone did was click it expecting a list, and nothing opened. Nothing on screen
+said the interaction was "type, then comma." Measured
 before: the remove target was **9&times;21** against [2.5.8](#tap-targets)'s 24&times;24, and the
 chips were select2's own `#aaa` border on `#e4e4e4`, which appear nowhere else here. Now a 24px
 button in a brand-50 chip. Options and reasoning in
@@ -4465,9 +4479,12 @@ looks unstylable — `display: block; width: 100%` makes it an ordinary block, a
 band. Both are in `.form-section`.
 
 <a id="shell-first-audit"></a>
-**`bin/design/shell-first-audit.rb` is the check for this.** Every other audit in `bin/design`
-answers *is anything from the old system still present?* — a shell-first page passes all of them.
-This one asks *is this built the way the new system builds things?* It looks for a `<table>` that is
+**Portable — "nothing from the old system is present" and "this is actually built the way the
+new system builds things" are different questions, and passing every check for the first doesn't
+answer the second.** A page can be shell-first — migrated chrome around unmigrated content — and
+pass every audit that only looks for legacy markers, since there are none left to find; a check
+built to answer the second question has to look for the *positive* shape of correct construction,
+not just the absence of the old one. **Local — this default's check:** It looks for a `<table>` that is
 not `.data-table`, a bare `<hr>`, `float-*`, a `<br>` standing in for a margin, four or more flat
 `<p>` label pairs where a `<dl>` belongs, a hand-written card header, a button's classes copied out
 instead of `essentials_button_classes`, and a Font Awesome icon.
@@ -4497,8 +4514,11 @@ place immediately: `"…px-5 py-4">\n<h2>"` in a single-quoted Ruby string is a 
 an `n`, not a newline, so the card-header detector was dead on arrival and said so.
 
 <a id="never-a-bare-hr"></a>
-**Never a bare `<hr>`.** Preflight sets `border-color: currentColor`, so an unstyled `<hr>` draws in
-the **text** colour. The organization page carried six of them and they rendered
+**Portable — a CSS reset can change an unstyled native element's default rendering in a way
+that's easy to miss until measured** (the same class of gotcha as the modal-centering and
+`abbr[title]` cases elsewhere in this document) — an unstyled `<hr>` under a reset that sets
+`border-color: currentColor` draws in the surrounding text colour rather than any default grey.
+**Local:** The organization page carried six of them and they rendered
 `oklch(0.208 0.042 265.755)` — **slate-900**, six near-black rules through a card whose every other
 divider is a slate-200 hairline. That page is the worked example for all of this: its shell was
 migrated and its 28 fields were not, so it passed every automated check — 200, no legacy class, no
