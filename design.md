@@ -3706,22 +3706,29 @@ Keys map `success → :success`, `error → :danger`, `alert → :warning`, anyt
 
 ## Copy
 
-The words are part of the design system. `bin/design/copy-audit.rb` checks the mechanical half of
-what follows; the rest is judgement.
+**Portable — the words are part of the design system, with mechanically checkable rules and
+judgement calls both.** `bin/design/copy-audit.rb` (and its rendered-output sibling,
+`bin/design/copy-audit.js` from Phase 3) checks the mechanical half of what follows; the rest is
+judgement.
 
-**Write the label, not the request.** No "please". GOV.UK, Mailchimp and Shopify all say the same
-thing and the reasoning is the same in each: in an instruction the reader has no choice about it
-is not really a courtesy, and it is a word on every screen. "Check your spam filter", not "Please
-check your spam filter". Forty-seven instances went in one pass and none of them read worse for it.
+**Local — this default's "no please" convention**, per this document's own tagging pass: the
+*practice* of having a house style and enforcing it is Portable; dropping "please" specifically is
+a defensible, not universal, choice — GOV.UK, Mailchimp and Shopify are cited as corroboration for
+this specific choice, not as proof it's the only reasonable one. Kept as this project's actual
+default rather than resolved away, consistent with [Sentence case](#sentence-case)'s note.
 
 <a id="button-labels"></a>
-**A button label is a verb and its object, and the page supplies the rest.** Two or three words:
+**Portable — a button label is a verb and its object; the surrounding page (a heading, a card
+title) supplies context the label doesn't need to repeat.** Two or three words:
 `New donation site`, `Promote to admin`, `Import storage locations`, `Invite user`. Measured across
 the app, **41 distinct button labels: 31 are one word, 26 are two, 12 are three, and two are four.**
 A create action is `New <noun>` — that is what nine of them say, so a tenth should not say
 `Add New Organization`.
 
-**Do not restate the context the button is sitting in.** `Invite user to this organization` was the
+**Portable — a label shouldn't restate context already visible on screen** (a page heading, a
+card title). WCAG 2.4.4's "in context" phrasing is specifically about the surrounding context
+counting toward a link's purpose — the heading and the card genuinely are that context, and
+repeating them in the label is pure redundancy, not extra safety. `Invite user to this organization` was the
 longest label in the app at five words, in the footer of a card titled **Users**, on a page whose
 `<h1>` is the organization's name — so three of its five words repeated what was already on screen
 twice. WCAG 2.4.4 is Link Purpose *In Context*, and the card and the heading **are** that context.
@@ -3736,7 +3743,8 @@ length of the migration. The check that finds them is a scan of the button helpe
 `submit_tag`, `button_tag` — not of `label:`, which belongs to form fields and is a separate
 question.
 
-**A link says where it goes** — WCAG 2.4.4. "Click here", "this link", "read more" and "here" are
+**Portable — a link says where it goes, on its own, without relying on surrounding prose** —
+WCAG 2.4.4. "Click here", "this link", "read more" and "here" are
 all the same failure: a screen reader can list every link on a page, and out of context those say
 nothing. Name the destination: "NDBN member spreadsheet", not "this link".
 
@@ -3746,26 +3754,32 @@ nothing. Name the destination: "NDBN member spreadsheet", not "this link".
   **WCAG 2.5.3 Label in Name**, which requires the visible text to be part of the accessible
   name. Replacing the words outright breaks 2.5.3 and voice control with it.
 
-**No instruction depends on where something is** — WCAG 1.3.3. "The list above", "the link below",
+**Portable — no instruction depends on the reader being able to perceive layout/position** —
+WCAG 1.3.3. "The list above", "the link below",
 "the button on the right" and "the green button" all fail for anyone who cannot see the layout,
 and they go stale the moment the layout reflows — which on this app is at every breakpoint. Say
 what the thing is called: "Confirm that this is what you want to distribute", not "confirm that
 the list above is".
 
-**Gendered and ableist wording.** No `he/she`, `s/he`, `chairman`, `manpower`; no `crazy`,
-`insane`, `lame`, `dummy`, `sanity check`, or `blind to`. The app was already clean on both when
-first audited — the value of the check is that it stays that way.
+**Portable — avoid gendered and ableist wording**, checked mechanically rather than relied on
+by memory. The value of an automated check here isn't catching a violation once — it's staying
+clean as new copy is added by people who never read this document.
 
-**Sentence case, and no shouting.** All-capital words are read out letter by letter by some screen
-readers, so emphasis is `font-semibold`, not `TEXT LIKE THIS`. Acronyms are fine and the audit
-keeps a list of the real ones — `FPL`, `NDBN`, `CSV`, `GTIN`. Adding a genuine one to `ACRONYMS`
-is the right fix; rewording around it is not.
+**Portable — an all-capital word is read out letter by letter by some screen readers, so visual
+emphasis needs a real styling mechanism, never literal capitalisation.** Acronyms are the
+exception — genuinely spelled letter by letter either way — and belong on an explicit allow-list
+rather than being worked around case by case.
 
-**Buttons take a verb**, and the verb is what will happen: "Save", "Add another item", "Remove
-this item". Not "OK", not "Submit".
+**Portable — a button's label is the verb naming what will actually happen when pressed**, not a
+generic acknowledgement word ("OK", "Submit") that names nothing about the specific action.
 
 <a id="person"></a>
-**The app speaks to the reader as "you".** Never "my", and never third person. Counted before this
+**Local — this default's second-person voice**, per this document's own tagging pass: *choosing a
+voice deliberately and applying it consistently* is Portable; "always second person, never first
+or third" as stated is a slight overclaim, since this document itself carves out legitimate
+exceptions below (a genuine letter, legal text, marketing copy) — the actually-portable rule is
+closer to "pick a voice on purpose, and know when a different one is genuinely warranted."
+**This default:** Counted before this
 rule existed: **49 strings second person, 8 first, one using both at once**, and no third person at
 all — which was correct rather than an omission, since third person ("the user should…") is
 documentation voice. GOV.UK's style guide, Shopify Polaris's content guidelines and Apple's Human
@@ -3782,7 +3796,11 @@ Three cases, because the eight outliers were not one problem:
 | The product or its maintainers | **Name the party, or drop it.** | "…and how to reach us" → **…and how to get in touch** |
 
 <a id="interface-has-no-speaker"></a>
-**An interface has no speaker; a letter does.** That is the line, and it is where the rule stops.
+**Portable — the underlying test for when a first-person "we" is warranted: does this
+communication have a genuine sender a reader would expect one from?** A transactional
+notification doesn't; a real letter, correspondence, or a legal document stating a commitment
+does. This is the actually-generalizable version of the "no we" rule above — a test, not a blanket
+ban.
 
 In the app, "we" is almost always filler in front of the actual news — "We're contacting you to
 notify you that your password has been changed" is "Your password has been changed" with eleven
@@ -3805,18 +3823,27 @@ is whether a reader would expect a sender: a notification has none, a welcome do
 in both its HTML and text parts, and had done since it was written; rewriting the sentence to drop
 "We are emailing you to notify you that" removed it. Copy nobody reads aloud is copy nobody proofs.
 
-**A title is a phrase, not a question.** "Need help?" was the only page title in the app that was a
+**Portable — a page title is a phrase naming what the page is, not a question.** A question
+reads naturally as something a specific *prompt or control* asks, not as a page-level label
+naming a destination — using both shapes for equivalent things (a page title here, a feature name
+there) produces two names for one thing. "Need help?" was the only page title in the app that was a
 question, and the same feature was already called **Help** on the bank side — two names for one
 thing, on both the page and the topbar link. A question is right in a *prompt*: the "Still need
 help?" card on that page asks something and stays.
 
-**Describe the whole control, not the half you were thinking about.** "Say how many of each item you
+**Portable — instructional copy needs to describe the whole control it sits above, not just
+the part that was top of mind while writing it.** Check the actual markup/form structure before
+writing the sentence that describes it — a description that only covers one of several fields in
+a compound control silently misleads about the rest. "Say how many of each item you
 need" sat above a form whose every row is *two* controls — a "Select an item" dropdown and a quantity
 — so it read as though the items were already chosen. It is "Choose the items you need, and how many
 of each." Check the form markup before writing the sentence over it.
 
 <a id="subtitles"></a>
-**A subtitle says something the title cannot.** "Requests" over "Essentials requested by partner
+**Portable — supporting text (a subtitle, a description) earns its place only by saying
+something the primary label genuinely doesn't already convey.** Test it directly: read the title,
+then the subtitle — if the subtitle adds nothing beyond what's already implied by the title, it's
+filler regardless of how reasonable it looked in isolation. "Requests" over "Essentials requested by partner
 agencies" is a heading and its own dictionary definition: anyone who can read the title already has
 it. Measured before this rule existed — **all 40 index pages carried a subtitle and about 20 defined
 their own heading**.
@@ -3830,19 +3857,27 @@ have, it is filler. By page kind:
 | **Show** | Which record this is — source and date, name, location and status. **Twelve already did this**, and none changed. |
 | **New and edit** | What submitting will do. "Record essentials coming in to X." |
 
-**Never the scope on an index page.** It is the obvious thing to reach for, and design.md says the
+**Portable — don't duplicate the same information across two nearby pieces of text just
+because each one is individually a reasonable place to put it** — if something else on the page
+already states the scope (a results count, a filter summary), a subtitle restating it is
+redundant, however natural it would be to add in isolation. It is the obvious thing to reach for, and design.md says the
 opposite for a *card* — "the title names the thing; the subtitle states the scope". A page is
 different because the [pagination line](#pagination) already says "Showing 1–15 of 119 requests" on
 every one of them. Two places saying overlapping things is worse than either alone, which is the
 same call that removed the `<tfoot>` totals from `/distributions`.
 
-**Where the noun is genuinely jargon, the sentence carries the gloss *and* the action** rather than
-only the gloss: "Items bundled to go out as one. Allocate a kit to change how many you have." This
+**Portable — where a UI uses genuinely domain-specific vocabulary, explanatory text should
+carry both the definition *and* the action, not the definition alone** — cutting the in-place
+explanation to save a line is a false economy for any reader who doesn't already know the term,
+and there's always a next reader who doesn't. "Items bundled to go out as one. Allocate a kit to change how many you have." This
 app is run by volunteers at 200+ non-profits, and "kit", "product drive", "inventory audit" and
 "base item" are not words anyone arrives knowing. Deleting the only in-place explanation to save a
 line is a false economy.
 
-**A subtitle that names an action has to be true.** Writing these found two of my own drafts were
+**Portable — any claim a UI makes about what a control does or what content contains has to be
+verified against the actual implementation, not assumed from how the sentence reads** — a
+plausible-sounding claim about behavior is not the same as a checked one, and writing the claim
+down is exactly the moment to check it. Writing these found two of my own drafts were
 not: "what each of them is allowed to do" for `/users`, whose table is only Name and Email, and a
 claim about vendors being required before a purchase. Check the view before describing it — six of
 the seven claims in these sentences were verified against the code that implements them, and the
@@ -3854,6 +3889,14 @@ says the purpose, and the four admin lists say which population they cover — s
 one-word titles cannot.
 
 ### Reviewing copy
+
+**Portable, throughout both of these subsections.** This is a specialized instance of the same
+review discipline `evidence-discipline` and `audit-suite` already state generically — prove a
+check actually examined your file (plant a violation, confirm it's caught, revert), verify a claim
+against the actual implementation rather than trusting how the sentence reads, an empty grep is
+not evidence of absence, and know precisely what a check does and doesn't cover so a human knows
+what's still their job. Kept here with this project's own real copy-review examples as a worked
+instance of general review methodology.
 
 Copy is reviewed like code, and in this order — the mechanical checks first, because they are free
 and they are the ones that catch what review misses.
