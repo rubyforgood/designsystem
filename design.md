@@ -149,9 +149,26 @@ finds one, that is the regression.
 
 ### Colour
 
-Brand is **indigo**, declared as a `--color-brand-*` scale in `@theme` so `bg-brand-600`,
-`text-brand-700` and friends work exactly like any built-in Tailwind colour. Neutrals are
-Tailwind's **slate**, not redeclared.
+Rules below are tagged **Portable** (hold for any app using this system) or **Local** (this
+project's own values — see `tokens/README.md` for the full split and how to retheme). Values
+throughout this section are bound through `tokens/theme.css`; a component rule names a role
+(`brand-600`, `--color-success`), never a hex code or a Tailwind colour name directly.
+
+**Portable — never colour alone.** Every coloured signal carries a word, and usually an icon
+too. A row that is below its minimum quantity says "Below minimum"; an audit's status says
+what it is; a partner's state is a pill with a label. This is WCAG 1.4.1, and it is also just
+readable — a red cell does not say *why* it is red.
+
+**Portable — semantic tones carry exactly one meaning each**, and four is the count that has
+held up in practice. Adding a fifth is a decision to write down, not a default to expect.
+
+**Portable — depth comes from a hairline border, not a shadow.** A card is a light surface with
+a 1px border in a slightly darker neutral; the shadow, where used at all, is a hint that
+something is raised, not the thing that defines its edge.
+
+**Local — this default's palette.** Brand is **indigo**, declared as a `--color-brand-*` scale
+in `tokens/theme.css` so `bg-brand-600`, `text-brand-700` and friends work exactly like any
+built-in Tailwind colour. Neutrals are Tailwind's **slate**, not redeclared.
 
 | Token | Use |
 | --- | --- |
@@ -165,7 +182,7 @@ Tailwind's **slate**, not redeclared.
 | `slate-100` | Dividers, hover fills |
 | `slate-50` | Page background, row hover |
 
-Semantic colour, one meaning each:
+**Local — this default's four semantic hues:**
 
 | Tone | Colour | Means |
 | --- | --- | --- |
@@ -174,18 +191,25 @@ Semantic colour, one meaning each:
 | danger | rose | Destructive, failed, below minimum |
 | info | sky | Neutral information, in progress |
 
-**Never colour alone.** Every coloured signal carries a word, and usually an icon too. A
-row that is below its minimum quantity says "Below minimum"; an audit's status says what it
-is; a partner's state is a pill with a label. This is WCAG 1.4.1, and it is also just
-readable — a red cell does not say *why* it is red.
-
 <a id="contrast"></a>
-Text tones use the **-700** step. `rose-600` is 4.51:1 on white, which passes 4.5:1 by a
-hair; -600 is only ever used as a border or a filled background with white text on it.
+**Portable — text and icon colour must clear WCAG AA (4.5:1) against its background.** This does
+not transfer as a number; it transfers as an obligation to measure your own palette against your
+own background, because a ratio that holds for one hue-and-surface pairing says nothing about
+another.
+
+**Local — measured for this default:** text tones use the **-700** step; `rose-600` is 4.51:1 on
+white, which passes 4.5:1 by a hair, so -600 is only ever used as a border or a filled background
+with white text on it, never as small text on white. A different hue, a dark background, or a
+different step needs its own measurement — see `evidence-discipline`.
 
 ### Spacing, radius, elevation
 
-Tailwind's 4px scale, unmodified. In practice:
+**Portable — one spacing scale, applied consistently**, rather than ad hoc pixel values chosen
+per component. **Portable — a small, named set of elevations** (this default uses two: surface
+and overlay) rather than an open-ended shadow scale — the discipline is that elevation means
+something specific, not the count of two itself.
+
+**Local — this default's scale:** Tailwind's 4px scale, unmodified. In practice:
 
 | Thing | Value |
 | --- | --- |
@@ -197,8 +221,8 @@ Tailwind's 4px scale, unmodified. In practice:
 | Radius | `rounded-2xl` cards and dialogs, `rounded-lg` controls, `rounded-full` pills and avatars |
 | Elevation | `shadow-sm` on cards, `shadow-xl` on dialogs. Nothing else has a shadow. |
 
-Depth is carried by the hairline border, not the shadow. A card is white on `slate-50` with
-`border-slate-200`; the shadow is a hint, not the edge.
+A card is white on `slate-50` with `border-slate-200`; the shadow is a hint, not the edge — the
+worked example of the hairline-over-shadow rule above.
 
 <a id="a-value-is-not-a-style"></a>
 ### A value is not a style
