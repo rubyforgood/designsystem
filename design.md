@@ -3548,6 +3548,75 @@ the wrapper mappings explicitly.
   Free text — a name, an address line, an item, a comment — has no known length and simply takes
   its column.
 
+<a id="button-to-nested-in-a-form"></a>
+**Portable — a form-generating button helper (Rails' `button_to` or any equivalent that renders a
+whole `<form>` for a single button) silently breaks when nested inside another form.** Two
+`<form>` elements cannot nest — it's invalid HTML — so the browser's parser drops the inner form's
+opening tag rather than raising anything, and the button ends up submitting to the *outer* form's
+action with the outer form's method instead of its own. This is invisible at every layer that
+would normally catch it: correct in the source, renders with no visible error, and even a
+controller test that POSTs directly to the intended route passes, because posting directly
+bypasses the browser's actual HTML parsing that produces the bug in the first place. Only a real
+browser rendering the real nested markup exposes it. Worth checking specifically anywhere a
+form-generating helper is used inside a `form_for`/`form_with` block or another helper's own form
+output — an empty-state action button inside a form-wrapped container is exactly the shape that
+hides this.
+
+### Autosave
+
+**Portable — save on blur, with a debounce timer as a backstop, never a timer alone.** A field
+committing only on a timer leaves a real window where an edit exists in the browser but not on the
+server — long enough for a separate, destructive action elsewhere on the page (a "finalize" or
+"submit" button acting on the record) to run against stale data. Saving on blur closes that
+window structurally: by the time focus leaves the field, the save has already been requested, and
+the timer exists only to catch the case of a reader who stops typing but never moves focus away at
+all (closing the tab, say).
+
+**Portable — bind the autosave listener once, on the form, never once per field.** A per-field
+listener means whichever field was edited most recently is the one whose change event fires — a
+different field's edit, made earlier and not yet submitted, is silently dropped from the request
+depending on which field the browser happens to serialize last. Binding to the form and reading
+its current full state on every save avoids the question of which field triggered it entirely.
+
+**Portable — keep the steady state visually quiet.** A save status that repaints on every
+successful save (a live-updating timestamp, a flashing "Saved") trains a reader to stop trusting
+their own eyes about what just happened, and re-announces to assistive tech on every single save
+even when nothing meaningful changed for the reader to know about. Show a transient "Saving…"
+state only past a short delay threshold (so a fast save never flickers one in at all), and only
+touch the text nodes that actually changed — both for the visible redraw and because an
+`aria-live` region announces whatever text content changes inside it, whether or not the change is
+one a reader actually needs to hear about.
+
+**Portable — replace a derived element by updating it in place (by id), never by replacing its
+whole container.** Replacing a container recreates every element inside it, including ones with
+focus or an active text selection mid-edit — a reader typing in one field while a *different*
+field's derived total updates should not lose their cursor position or selection because the
+update happened to touch a shared ancestor. "Derived" includes anything computed from the edited
+value, not just the obviously numeric — a contingent warning or validation message that depends on
+the field is just as much a derived element as a recalculated total, and auditing "everything
+derived from this field" (not just the one case that prompted the fix) is what catches the
+sibling cases a narrower fix would miss.
+
+**Portable — an autosave trigger must never be able to reach an irreversible action.** Autosave
+exists to remove the cost of losing unsaved work; wiring it, even indirectly, to something that
+can't be undone reintroduces a worse version of the risk it was built to remove.
+
+**Portable — a form is either fully autosaving or fully explicit-save, never a hybrid.** A form
+with autosave on some fields and an explicit Save button for others leaves a reader unable to
+predict, without testing it, whether leaving the page loses anything — a fully autosaving form
+drops the Save button and any "you have unsaved changes" warning entirely (there's never anything
+unsaved to warn about); a fully explicit-save form has no autosave on any field. The mixed state is
+the one to actively avoid, not a reasonable middle ground.
+
+**Portable — test an autosave by waiting for the settled status text, not a fixed sleep.** A test
+that sleeps a fixed duration and then asserts is either too short (flaky) or too long (slow) almost
+by construction; waiting for the UI's own "Saved" state to appear ties the test to the actual
+condition it cares about. Where the correct outcome is genuinely "nothing happens" (a validation
+failure that should *not* autosave, say), a bounded wait is the honest fallback — but verify that
+control the same way any negative control is verified: make the failure happen once on purpose and
+confirm the test actually catches it, or the wait is only proving that nothing happened to happen
+to fail within the timeout, which is a much weaker claim.
+
 ### Rich text editor
 
 **Reading note.** A narrow, mostly Local case study in restyling a specific third-party widget
