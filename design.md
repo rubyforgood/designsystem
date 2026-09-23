@@ -2607,8 +2607,9 @@ horizontal gap and nothing else.
 <a id="where-a-button-goes"></a>
 ### Where a button goes
 
-**Three kinds of button, and the test is what pressing it affects.** Not where it looks tidy — scope
-decides the home, and the three homes are already distinct components.
+**Portable — a button's placement is decided by what pressing it affects (its scope), never by
+where it looks visually tidy.** Three scopes cover almost every case: the page/record as a whole,
+one card's own contents, or the whole form. **Local — this default's three homes:**
 
 | If pressing it… | It belongs to | Where it goes |
 | --- | --- | --- |
@@ -2617,7 +2618,10 @@ decides the home, and the three homes are already distinct components.
 | **commits or abandons the whole form** — *Save*, *Cancel*, *Submit request* | the **form** | `essentials_form_actions`, **below the card**, no divider |
 
 <a id="form-actions"></a>
-**A form's buttons go below the card, not inside it.** `essentials_form_actions` renders the row:
+**Portable — a form's commit/abandon controls belong to the form's scope, not to whichever card
+happens to visually contain the last field.** A form can legitimately span several cards; putting
+its submit inside one of them attaches form-level meaning to a container that doesn't own it.
+**Local — this default:** `essentials_form_actions` renders the row:
 `mt-6`, left-aligned, and **no divider of any kind**. Off the surface, the card's own edge is the
 boundary; a rule under it would be a second mechanism for one job.
 
@@ -2638,7 +2642,11 @@ browser across 12 form pages: 0 orphaned controls, every submit inside its form 
 card.**
 
 <a id="buttons-inside-a-card"></a>
-**The caveat: a button may live inside a card when the card is its scope.** *Add another item* sits
+**Portable — the exception to the rule above is exactly what the rule predicts: a button lives
+inside a card when the card genuinely is its scope** (it changes what's in that card, not the
+whole form). **The test that generalizes: would pressing it be the last thing you do on the
+page?** If yes, it's a form action and belongs outside every card, at the form's own scope. If it
+only changes one card's contents, it stays in that card. **Local — this default's examples:** *Add another item* sits
 in the line item card's footer because it adds a row to that card. *View all users* sits in the
 admin dashboard card's footer because it expands that card's list. A pager sits in the table card's
 footer because it pages that table. These are right where they are, and they use the card's
@@ -2650,7 +2658,14 @@ you do on the page, it is a form action and it goes below.
 items* — and no submit, so the two rows never appear on one page arguing about which is primary.
 
 <a id="status-is-not-an-action"></a>
-**A status is not an action, and does not go in `actions:`.** That container is "at most three,
+**Portable — a status indicator is not an action and doesn't belong in a container reserved for
+actions** — visually mixing the two makes a status read as a disabled button. Where a status
+*does* go depends on whether the page's own heading already names the thing the status describes:
+if it does, the status can ride the title line; if the heading names a page rather than an entity
+(a dashboard, a section), there's no subject to attach the status to, and it needs a different
+treatment (a callout stating the consequence, or nothing, rather than a decorative pill repeating
+an enum value nobody asked to see every time they load their own dashboard). **Local — this
+default's application:** That container is "at most three,
 exactly one primary", which a status is none of, and a pill among buttons reads as a button that has
 been greyed out. Where it goes depends on whether the heading names the pill's subject:
 
@@ -2673,7 +2688,10 @@ it. `bin/design/button-audit.js` did not catch them, and could not: it counts `a
 is a `span`. `spec/system/page_header_status_system_spec.rb` counts spans in the container instead.
 
 <a id="counts-are-not-pills"></a>
-**The same applies to a card's `actions:`, and a count is not a status either.** The admin dashboard
+**Portable — the same reasoning applies at the card level, and a count is a third, distinct thing
+from both a status and an action.** A count belongs in explanatory text (a subtitle), and only
+earns its place there by saying something the content below it doesn't already show — a count
+that merely restates the length of the visible list is redundant. **Local — measured:** The admin dashboard
 put `essentials_status_pill("20 new users")` in two card headers' `actions:` slots. Three faults in
 one control: a count is not a status, a status is not an action, and **the number was wrong** —
 `@recent_users` is `.limit(20)`, and `.count` on a limited relation returns the *cap*, so the card
@@ -2690,8 +2708,11 @@ what "recently" meant), and states a total only where the list is truncated: **"
 `.limit` later forces the caller to say whether the number is the whole of it.
 
 <a id="primary-position"></a>
-**A primary sits at the row's alignment edge**, which is why the two rules below look opposite and
-are not. A page header's actions are right-aligned, so its primary is **last**. A form's action row
+**Portable — a primary action's position follows the row's own alignment edge, so two
+apparently-opposite placements (primary last in a right-aligned row, primary first in a
+left-aligned one) are actually the same rule applied consistently.** Getting this backwards is an
+easy, non-obvious mistake precisely because only one of the two directions tends to get written
+down explicitly. A page header's actions are right-aligned, so its primary is **last**. A form's action row
 is left-aligned, so its primary is **first** — `[Save] Cancel`, which is what every form in this app
 does: measured across twelve, the six carrying a primary and a secondary all read that way. Getting
 this backwards is easy, because the header rule is the one written down; the calendar profile form
@@ -2700,14 +2721,21 @@ shipped `Save progress` before `Save and review` for exactly that reason.
 `button-audit` checks the header rule only. The form rule holds by construction, since
 `essentials_form_for` renders the submit before anything a view appends.
 
-**At most three actions, at most one of them primary, primary last.** Everything else is
+**Portable — a bounded action count (roughly three), at most one primary, with overflow
+collapsing behind a named menu rather than growing the row indefinitely.** Name a collapsed menu
+after what's actually inside it, not with a generic label — a specific name tells the reader what
+they'll get before they click; a generic one only tells them something is there. Everything else is
 `:secondary` or `:ghost`. Past three, the least-used collapse behind a menu — and **name the
 menu after what is in it**. `/requests` had four, the only page in the app that did; its two
 outputs became one `Export` menu. "Export" says what is inside, "More actions" only says that
 something is.
 
 <a id="not-every-page-needs-a-primary"></a>
-**"At most one", not "exactly one" — a page without a main action should not invent one.** This
+**Portable — "at most one primary," never "exactly one." A page with no natural main action
+should not invent one just to satisfy the rule.** Forcing a primary onto a page that doesn't have
+one pushes some other, usually more consequential, action into the primary's visual slot by
+default — often the most destructive action on the page, arrived at by elimination rather than
+intent. This
 said *exactly* one for months and the app has never worked that way: measured across 101 bank
 pages, **63 have no header actions at all**, and of the 38 that do, **11 have no primary** — almost
 all of them record pages, whose job is to be read. Polaris's `primaryAction`, Material's FAB and
@@ -2718,7 +2746,10 @@ The cost of requiring one is concrete. `/product_drives/:id` had `[Export] [Make
 page sitting where the main one belongs. Reported as the buttons looking reversed, and it was.
 
 <a id="a-records-own-actions"></a>
-**A record's Edit and Delete go in the header's overflow**, from `essentials_record_actions`. They
+**Portable — actions that operate on a record as a whole belong to the page's scope, not to any
+one card or form on it** — but they still count against the same action-count limit as everything
+else in the page header, including a menu, which is one slot regardless of how many items it
+holds. **Local — this default's implementation:** They
 act on the record as a whole, so they belong to the page rather than to a card or a form — but not
 beside the primary, because a menu counts as one of the three and because the last slot is the
 primary's. Donations, purchases and distributions had them at the **foot of the page**, below the
@@ -2733,7 +2764,10 @@ last card, which is where a form's Save goes.
   beside the header's buttons instead of 28.
 
 <a id="edit-not-make-a-correction"></a>
-**The label is "Edit".** Thirty places in the app say so; four said *"Make a correction"*, which was
+**Portable — a control's label shouldn't imply something isn't true.** A label carried over
+unchanged from before a rewrite, without being re-examined for whether it still fits, can end up
+asserting something false about the record (that it needed "correcting," i.e. was wrong) when the
+actual action is more neutral. **Local:** Thirty places in the app say so; four said *"Make a correction"*, which was
 pre-migration wording carried through the migration rather than chosen. It is also a claim: a
 correction implies the record is **wrong**, when you may be adding a tag or fixing a date. Where a
 record genuinely cannot be changed, the callout says so in prose — and that prose follows the
@@ -2750,7 +2784,10 @@ that something else is wrong — usually a section of the page wanting an action
 not tuck it above a table; see the tabs rule below.
 
 <a id="import-and-export"></a>
-**Import is always offered; Export only when there is something to export.** The five index pages
+**Portable — an action that starts something (import, create) should be offered unconditionally;
+an action that operates on existing content (export) is conditional on that content existing.**
+Gating the starting action behind the presence of content it's meant to create makes it
+unreachable in exactly the state it's most needed — an empty list. The five index pages
 that take a CSV — vendors, donation sites, storage locations, product drive participants, partners —
 all carry `Import X`, `Export`, `New X` in that order, primary last.
 
@@ -2762,7 +2799,9 @@ Export stays conditional: an empty CSV is not a useful file, and the import moda
 template, so there is nothing an empty export would give you.
 
 <a id="menu-button"></a>
-**A menu of related actions is `shared/essentials/menu_button`.** A labelled trigger with a chevron,
+**Portable — a menu of related actions is one component with one definition of what a menu item
+is** (roles, tones, disabled-state handling), shared across every place a menu appears in the app,
+rather than redefined per menu. **Local — this default:** A labelled trigger with a chevron,
 `:secondary` at the normal control height, and a `role="menu"` panel — the page-level counterpart to
 [`row_actions`](#row-actions), which is a kebab because a table row has no room for a word. A page
 header has room, so it uses one.
@@ -2779,7 +2818,10 @@ it. Both menus render their items through `shared/essentials/menu_items`, so wha
 its roles, its tones, and the difference between a disabled link and a disabled form control — has
 one definition rather than two that drift.
 
-**One item is not a menu**, and the component knows it: given a single item it renders a plain
+**Portable — a menu that would only ever hold one item should collapse to a plain button
+instead.** A single-item menu costs an extra click to reach the one thing inside it, with that
+thing's actual label hidden behind a generic trigger word — strictly worse than just showing the
+button. **Local — the component knows it:** given a single item it renders a plain
 button instead. Menu contents are usually conditional — the picklist on `/requests` only exists
 while something is unfulfilled — so an organisation with requests but none outstanding would
 otherwise get a menu holding one entry, which is strictly worse than the button it replaced: a click
@@ -2800,7 +2842,9 @@ It is `popover-fixed-value`, so the panel is placed against the viewport and cla
 a page header's actions wrap, which puts the trigger near the left edge, and a panel right-aligned
 to a trigger there starts at a negative x. The overlay audit caught that at 320×640.
 
-**A summary of a table is not a page action.** "Show product totals" on `/requests` was the fourth
+**Portable — a control that only affects one card's contents is a card action, however
+page-header-worthy it looks, and the scope test from the top of this section still applies without
+exception.** **Local:** "Show product totals" on `/requests` was the fourth
 button in the page header, and it does not act on the page — it summarises the rows in the card
 below it. It sits on that card now, as `:secondary, size: :sm`, which is what a card action is
 everywhere else. No card title with it: the page `h1` is already "Requests", and a card repeating it
