@@ -4540,10 +4540,11 @@ argument for the rebuild is consistency and the broken markup — not height.
 <a id="callouts"></a>
 ### Callouts
 
-A notice that belongs to the **page** rather than to the request. The flash says "that worked";
-a callout says "this is how things are here" — the purchase is too old to edit, the kit cannot
-be recomposed once saved, this cannot be undone. It is rendered on every load, for as long as
-the condition holds.
+**Portable — distinguish a notice that belongs to a specific request/action (a flash: "that
+worked") from one that belongs to the page/record's persistent state (a callout: "this is how
+things are here").** A flash appears once, for one event; a callout renders on every load for as
+long as the condition holds — conflating the two mechanisms produces either a warning that
+disappears when it shouldn't, or a one-time confirmation that inexplicably persists.
 
 ```erb
 <%= render "shared/essentials/callout", tone: :warning do %>
@@ -4561,32 +4562,29 @@ warning and danger, `status` otherwise — and `role: nil` is honoured for a cal
 plain page furniture and wants no live region at all.
 
 <a id="callout-placement"></a>
-**Where it goes follows its scope, and the scope is the only question worth asking.**
+**Portable — a callout's placement follows its scope, and scope is the only question worth
+asking: a callout about an entire task/page goes before the content it qualifies, at the top; a
+callout about one section sits directly with that section, not aggregated elsewhere on the
+page.** A warning that arrives after the reader has already done the thing it warns about is not
+functioning as a warning, regardless of how correct its wording is.
 
-- **A callout about the whole task goes directly under the page header**, above the first card --
-  before the work it qualifies, not after it. Polaris says the same of banners: place them at the
-  top of the page or section they refer to.
-- **A callout about one section sits with that section.** The two reminder notices on the partner
-  and partner-group forms are correct where they are: both are hidden until a checkbox reveals
-  them, and both sit directly above the fields they describe.
+**Local — measured:** a new-kit form's warning sat below both cards, requiring a scroll past
+the very content being composed to reach a warning that it was final.
 
-The new-kit form had this wrong in the way that matters. Its warning -- *the items in a kit are
-fixed once you save* -- sat below both cards, measured at **y=922 on a 720px viewport**, 765px
-under the `h1`. You had to scroll past the thing you were composing to be told composing it was
-final. A warning that arrives after the decision is not a warning. Now y=205, 48px under the
-heading.
+**Portable — position alone doesn't decide whether a callout's placement is correct; scope
+does.** A callout that happens to sit below a card isn't necessarily misplaced — the deciding
+question is always what it's actually scoped to, checked per instance.
 
-Of 26 callouts in the app, four sat below a card and **one** was a defect; the other three are
-section-scoped. Position alone does not decide it.
+**Portable — a placement fixed by hand-editing one template survives exactly as long as that
+template does, and regresses silently the moment anything reverts or rebuilds it.** Pin the rule
+with an automated check (a system spec, an audit), not just a one-time template edit — this
+callout's correct placement was fixed once, silently reverted by an unrelated rollback, and
+shipped wrong a second time before a real check existed.
 
-`spec/system/callout_placement_system_spec.rb` pins both halves of the rule — the kit warning above
-its cards and above the fold, and the partner group's reminder note staying with the fields it
-describes. It exists because the kit callout was reported **twice**: fixed in `e3e12881d`, unpinned,
-and back at y=922 the moment the working tree was rolled back. **A placement fixed by editing one
-template survives exactly as long as the template does.**
-
-**`wrapper_class` is for the margin only.** A callout does not know where it sits, so spacing
-stays with the page that places it.
+**Portable — a reusable component shouldn't know or assume where it sits on the page; spacing
+relative to siblings stays the caller's responsibility, exposed as a narrow, explicit extension
+point** (a class/style prop reserved specifically for margin), not baked into the component
+itself.
 
 Before this existed there were 21 copies of the same twelve-class string across 20 files, each
 with its own margin baked in and no two agreeing on the role.
@@ -4603,6 +4601,87 @@ Do not put ERB tags inside an ERB comment. `<%# … %>` ends at the first `%>`, 
 becomes markup. The same mistake had already been made once in `_pagination.html.erb`.
 
 ### Disclosures
+
+**Reading note.** Only the first ~30 lines are actually about disclosures (accordions); the
+remaining ~330 are a deep responsive-table engineering case study — scroll signals, frozen
+columns, table-to-card stacking, and text truncation — much of it a more technical continuation of
+the scroll-rail material already covered under [Filters](#filters). Rather than re-derive rules
+already surfaced there, this synthesis block covers what's genuinely new here plus the disclosure
+component itself.
+
+**Portable, surfaced from this section:**
+
+- A disclosure's trigger is a real, focusable, toggleable control (a `<button>` with real ARIA
+  state), never a link with a fragment identifier pretending to navigate — it toggles content in
+  place, it doesn't navigate anywhere.
+- Actions that operate on a disclosed section's *item* (edit, delete) render as siblings beside
+  the trigger, never nested inside it — an interactive control inside another interactive control
+  is invalid HTML and gets announced as one confused unit.
+- A *set* of disclosures (several related, sibling accordions) should be individually navigable by
+  heading level when they form a genuine outline, not just tabbable one at a time — a single
+  standalone disclosure doesn't need this.
+- Passing an automated accessibility check and being usable are not the same claim, and different
+  checks cover different audiences: a check verifying a scrollable region has a name and is
+  keyboard-reachable says nothing about whether a mouse-only sighted user has any visual cue that
+  the region scrolls at all — those are genuinely different requirements, and a clean report on
+  one says nothing about the other.
+- A decorative visual technique (a fade/scrim indicating "there's more here") only works against
+  content whose color contrasts with the scrim's direction — a fade to white does nothing over a
+  white surface, and this isn't a tuning problem, it's the technique being inapplicable in that
+  context entirely.
+- When measuring whether a visual signal is perceptible, use the sharpest local contrast step, not
+  an average change over the whole affected area — an aggregate/mean metric systematically rewards
+  a broad, subtle smear and penalizes a small, sharp, genuinely visible line, which can rank the
+  more visible option as "imperceptible."
+- A decorative overlay effect sitting on top of real content must never be assumed not to degrade
+  that content's contrast — verify the *painted* result, because an automated contrast checker
+  that reads declared colors is blind to anything an overlay/gradient/pseudo-element paints on top
+  afterward.
+- Under certain real, common CSS combinations (a collapsed table border model, for one), a
+  `box-shadow` on a table cell silently fails to paint at all, with no error and no warning —
+  verify actual rendered pixels for any effect applied to a table cell, don't trust that a
+  property "should" work there.
+- A test/check that reads a declared CSS property (`getComputedStyle`, an attribute) is testing
+  *intent*, not *rendering* — the property can be correctly declared and still not visibly paint,
+  for reasons the declaration itself doesn't reveal. This is the same "declared vs. rendered" gap
+  as the box-shadow case above, generalized.
+- A decorative pseudo-element/overlay anchored to a scrolling element scrolls away with that
+  element's content — anchor it to a non-scrolling ancestor instead, when it needs to stay fixed
+  relative to the viewport/container rather than the content.
+- A decorative overlay positioned on top of interactive content (a table's actions column, say)
+  needs `pointer-events: none` explicitly, verified by actually hit-testing that the interactive
+  content underneath remains reachable.
+- Prefer a media query (evaluated before first paint) over JavaScript measuring a container after
+  render, whenever the condition genuinely maps to a viewport size — a JS-measured "paint as a
+  table, then measure, then repaint as cards" sequence produces the exact large layout shift the
+  media-query version entirely avoids by construction, for the same visual outcome.
+- Only lean on a spec/standard's stated exemption (WCAG 1.4.10's data-table reflow exemption, here)
+  as the actual right answer when you've genuinely evaluated the alternative — an exemption is
+  permission to do the simpler thing, not a recommendation that it's the best experience; know the
+  difference between "compliant" and "actually good" and choose deliberately.
+- When an element's `display` value changes such that the browser stops exposing its native
+  semantics (a table `display: none`-ing its own `<thead>` to restack as cards, say), those
+  semantics must be restored explicitly via ARIA roles, applied unconditionally rather than
+  attempting to apply them only in the affected state — there's often no way to apply a role
+  conditionally, and the safe default is redundant-but-correct rather than conditionally-correct
+  and fragile.
+- Long, unbounded free text in a tabular layout gets truncated to a fixed height/line count with
+  the full value reachable another way (a detail view, an expansion on interaction) — never let
+  one field's arbitrary-length content set every row's height, which breaks the "rows are
+  comparable at a glance" property a table exists to provide. This is a near-universal convergence
+  across major design systems, not an invented constraint.
+- Truncating text is only safe to do visually (CSS clipping) when the full text remains in the DOM
+  (so assistive tech still gets all of it) and is reachable through a genuine affordance (a detail
+  link, a reveal-on-interaction) — clipping that also removes content from the accessibility tree,
+  or that clips content with no way to ever read the rest, is data loss, not a space optimization.
+- Never visually truncate a collection of distinct interactive elements (a list of links) the way
+  you'd truncate a single text value — truncation hides focusable, individually-meaningful
+  controls rather than shortening one string, which is a fundamentally different (and much worse)
+  failure mode.
+
+The rest of this section is the Local, heavily-measured detail behind each of those, plus this
+app's own table-stacking breakpoints and truncation implementation — read on for the case study;
+read the list above for what travels.
 
 A card whose body opens and closes — the FAQ lists, and the partner profile accordion.
 
