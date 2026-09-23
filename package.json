@@ -1,7 +1,31 @@
 {
-  "name": "designsystem",
-  "private": true,
-  "description": "Audit tooling dependencies for bin/design.",
+  "name": "@rubyforgood/design-system",
+  "version": "0.1.0",
+  "description": "A portable design system extracted from Human Essentials: a normative spec tagged Portable/Local, Tailwind v4 design tokens, and an audit suite proven against a second, non-Rails adapter.",
+  "license": "MIT",
+  "homepage": "https://github.com/rubyforgood/design-system#readme",
+  "repository": {
+    "type": "git",
+    "url": "TODO: set once this repo has a real remote -- see the Phase 6 summary for why this is a placeholder"
+  },
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "accessibility",
+    "a11y",
+    "wcag",
+    "tailwindcss",
+    "audit"
+  ],
+  "files": [
+    "tokens/",
+    "bin/design/",
+    "examples/reference-app/",
+    "docs/portability/",
+    "docs/field-notes.md",
+    "design.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "playwright": "^1.55.0"
   }
