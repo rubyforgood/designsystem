@@ -1,5 +1,11 @@
 # Migration map: Bootstrap/AdminLTE to the design system
 
+> **Historical record, Human Essentials migration, 2026.** Describes one specific migration in
+> one specific Rails app. A generic adopter of this design system with no legacy framework to
+> retire has no equivalent document to write — see
+> [`design-system-migration`'s guidance on when this applies](../.claude/skills/design-system-migration/reference/retiring-a-legacy-system.md)
+> and [`docs/field-notes.md`](field-notes.md) for context on this file's role.
+
 Where everything went, what replaced what, and what to do when you meet the leftovers.
 
 Companion documents: [design.md](../design.md) is the specification for the system that

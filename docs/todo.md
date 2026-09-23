@@ -1,5 +1,10 @@
 # To do
 
+> **Historical record, Human Essentials migration, 2026.** See
+> [`docs/field-notes.md`](field-notes.md) for context. A generic adopter starts with their own
+> empty version of this file, the same way `design.md`'s own [Backlog](../design.md#backlog) is
+> HE's, not a template.
+
 Things found, verified, and deliberately not fixed at the time. Each one names what it is, why it
 was left, and what fixing it involves — so picking one up does not start with re-deriving it.
 

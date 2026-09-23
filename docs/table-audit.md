@@ -1,5 +1,9 @@
 # Table audit — row actions and status badges
 
+> **Historical record, Human Essentials migration, 2026.** Measured against one specific Rails
+> app on one specific date. See [`docs/field-notes.md`](field-notes.md) for how to read this
+> alongside the other evidence documents.
+
 Audited 2026-09-04 against the running app, signed in as an organization admin, a partner and a
 super admin. Counts are what a browser rendered, not what the source suggests.
 

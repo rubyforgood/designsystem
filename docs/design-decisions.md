@@ -1,5 +1,12 @@
 # Design decision log
 
+> **Historical record, Human Essentials migration, 2026.** This file is evidence that the
+> methodology in `docs/portability/` works — real decisions, reasoned and dated, from one real
+> migration — not a set of claims about a generic design system. See
+> [`docs/field-notes.md`](field-notes.md) for how to read this and the other evidence documents
+> in context. Nothing here should be cited as a current fact about this repo's generic system
+> without checking it still holds.
+
 Running log of UI decisions taken while bringing Human Essentials in line with
 [`design.md`](../design.md). One entry per decision that **was not already answered by
 `design.md`** — where the system was silent, the entry records what was chosen, what industry

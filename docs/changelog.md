@@ -1,5 +1,9 @@
 # Change log
 
+> **Historical record, Human Essentials migration, 2026.** See
+> [`docs/field-notes.md`](field-notes.md) for how to read this alongside the other evidence
+> documents from that migration.
+
 A running record of what changed, in order, with the commit that carries it. The companion
 documents answer different questions:
 
