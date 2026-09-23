@@ -1033,6 +1033,17 @@ At the cap the remaining boxes are disabled, in the browser *and* on the server,
 always a way out. A box that lets you tick a fifth and then silently drops it is worse than one that
 will not be ticked.
 
+<a id="marker-shape-is-a-third-channel"></a>
+**Portable — marker shape (circle, square, triangle, diamond) is a third channel, independent of
+both colour and dash pattern, worth reaching for before accepting a lower series cap.** Where dash
+pattern alone is close to its own limit (the four-pattern ceiling measured above), a distinct
+marker shape at each line's data points adds a second non-colour distinguisher layered on top of
+it rather than competing with it — the two are read differently (a dash pattern along the whole
+line versus a mark at discrete points) and so don't collide with each other the way two colours or
+two dash patterns would. Not yet measured against this app's own charts, so treat the cap above as
+what's proven and marker shape as the documented next lever, not as a claim that the cap becomes
+higher than four without checking.
+
 <a id="choosing-from-an-unbounded-list"></a>
 **A control for choosing from an unbounded list is a searchable popover, not a select.**
 `shared/category_picker` is the same shape as the date and month range pickers — trigger, panel,
@@ -2163,6 +2174,19 @@ word; pass an `icon:` when the pill is doing real signalling work rather than la
 never wrap; a wrapped pill leaves its icon centred across two lines, reading as misalignment
 rather than a wrap.
 
+<a id="no-emoji-as-status"></a>
+**Portable — a status is never a literal emoji character, only a real pill (or icon +
+word).** A tone-coloured pill and an accessible icon do everything a status emoji is reached for
+and get it right; a literal ✅/🕗/❌ or similar in a model method or a heading gets it wrong on
+every count at once: OS emoji render inconsistently across platforms and fonts (the same
+character can look meaningfully different, or fail to render at all, depending on the reader's
+system), a class-based audit that greps for design-system markup cannot see plain text and so
+never catches it, and an emoji alone carries exactly one signal — colour by another name — with
+no second channel the way an icon-with-`aria-hidden` beside real text has. Two independent
+sightings elsewhere of exactly this pattern (a status method returning a raw emoji character, a
+decorative emoji dropped into a heading) is what earns this its own callout rather than being
+folded into the icon rules above.
+
 ### Icon tiles and avatars
 
 ```erb
@@ -3253,6 +3277,27 @@ class names:**
 | `.notes` | Free text of unbounded length: clipped to one line at 16rem |
 | `.date` | No wrapping |
 
+<a id="cells-align-to-the-top"></a>
+**Portable — every table cell aligns to the top of its row, not the browser default centre.**
+`vertical-align: middle` is invisible while every cell in a row is exactly one line tall, and
+becomes a real, recurring defect the moment any cell in that row wraps to two lines: every
+single-line cell in the row (a checkbox, an icon-only action button) visibly floats relative to
+the wrapped one, off the baseline everything else in the row sits on. This is easy to miss in
+review because it only shows up on rows that happen to contain a wrapping cell, and it is worth
+setting unconditionally, table-wide, rather than fixing row by row as each one is noticed — the
+trailing actions cell is the one most often missed, since a hand-rolled actions `<td>` frequently
+skips whatever shared token would otherwise carry the rule.
+
+<a id="one-style-for-a-numeric-column"></a>
+**Portable — a numeric column gets exactly one visual treatment, applied uniformly, zeros
+included — no per-cell emphasis, and never a drill-through link on the figure itself.** The whole
+point of a numeric column is letting a reader compare magnitude down the list at a glance; any
+per-cell variation (a colour, an extra weight, turning some numbers into links and not others)
+introduces a second, competing signal in the one place a reader is scanning purely for size. Where
+a row genuinely needs a drill-through, it belongs on a row action or the row's other cells, never
+on the numeral — a number that's sometimes a link and sometimes isn't makes the reader check every
+cell to find out which.
+
 **Portable — every table gets a caption** (visually hidden is fine) naming what it lists — this is
 a WCAG/semantics requirement, not a style choice. **Portable — a table that doesn't fit its
 container scrolls; it is never squeezed** until its content is unreadable (WCAG 1.4.10 is the
@@ -3704,6 +3749,19 @@ surface is invisible, and a filled one shouts and adds height.
 
 Keys map `success → :success`, `error → :danger`, `alert → :warning`, anything else `→ :info`.
 
+<a id="flash-auto-dismiss-timing"></a>
+**Portable — an auto-dismissing message's timer pauses on hover and on focus, and only a
+success/informational tone auto-dismisses at all.** WCAG 2.2.1 (Timing Adjustable) is the reason:
+content that disappears on a fixed timer with no way to extend it fails the criterion outright for
+anyone who hasn't finished reading when it fires, and hover/focus pausing is the low-cost way to
+give a reader that control without adding a dismiss button to every message. A warning or an error
+never auto-dismisses — the reader needs to act on it, or at minimum decide it doesn't apply,
+before it goes. (This is a different exemption from the session-timeout case in the
+[WCAG coverage table](#wcag-coverage) above — that one is exempt outright under 2.2.1's own
+20-hour carve-out; a flash message has no such exemption and needs the real accommodation.) Removal
+itself stays silent — a message disappearing is not new information worth interrupting anyone for,
+only its arrival was.
+
 ## Copy
 
 **Portable — the words are part of the design system, with mechanically checkable rules and
@@ -4116,6 +4174,13 @@ removing the legend is a UX decision to make deliberately and record, not a defa
 underlying programmatic markers (a semantic `abbr[title]`, `aria-required`) stay regardless of
 whether the visual legend does.
 
+<a id="mark-optional-too"></a>
+**Portable — on a form that mixes required and optional fields, mark the optional ones too, not
+only the required ones.** A lone asterisk convention leaves every unmarked field ambiguous on a
+form where most fields happen to be required — is a given field optional, or simply not yet
+marked correctly? Marking both ends makes the split explicit per field rather than left for the
+reader to infer from a pattern that mostly, but not always, holds.
+
 **Portable — a visual convention that means something specific (a red asterisk = required) must
 not be reused, even superficially, for something else** (a hand-written asterisk in a different
 colour meaning a different, unstated thing) — the reader has no way to distinguish "the real
@@ -4393,10 +4458,21 @@ gap that let this specific defect ship with full test coverage.
 ### A record's details are a `<dl>`, and long ones are banded
 
 **Portable — a record's field/value pairs are a description-list relationship, semantically**
-(echoing the same rule already established for [Stats](#stats)), and a missing value should be
-rendered as an explicit, unambiguous placeholder (an em dash, or equivalent) from one shared
-helper rather than left for each call site to reinvent — a hand-written fallback string ("Not
-defined") risks reading as real content rather than as an absence. **Local:** `wide: true` spans both columns, for a paragraph, a list or an image.
+(echoing the same rule already established for [Stats](#stats)). **Local:** `wide: true` spans
+both columns, for a paragraph, a list or an image.
+
+<a id="unfilled-vs-not-applicable"></a>
+**Portable — distinguish "this field applies but hasn't been filled in" from "this field cannot
+apply to this record at all," and treat them differently.** The unfilled case gets an explicit,
+unambiguous placeholder (an em dash, or equivalent) from one shared helper rather than left for
+each call site to reinvent — a hand-written fallback string ("Not defined") risks reading as real
+content rather than as an absence. The cannot-apply case gets the whole `dt`/`dd` pair omitted
+entirely, not a placeholder: a label with a blank or dashed-out value beside it reads as a bug, not
+as an empty state, especially where an adjacent status already says why the field doesn't apply. A
+volunteer-assignment card that always printed `Unassigned:` with nothing after it on every
+*active* assignment — duplicating what a status pill right beside it already said — is the shape
+of the mistake this distinction prevents. A placeholder answers "what's here"; omission answers
+"is this even a field on this record," and conflating the two answers neither question cleanly.
 
 **Past a handful of fields, group them into bands** rather than one long list —
 `border-y border-slate-200 bg-slate-50 px-5 py-3` on the heading, `first:border-t-0` so the top one
@@ -4614,6 +4690,13 @@ component itself.
 - A disclosure's trigger is a real, focusable, toggleable control (a `<button>` with real ARIA
   state), never a link with a fragment identifier pretending to navigate — it toggles content in
   place, it doesn't navigate anywhere.
+- **A disclosure trigger's accessible name describes what it controls, never its current
+  action or state.** This is the WAI-ARIA APG disclosure pattern's own naming rule: `aria-expanded`
+  already carries open/closed state programmatically, so a label that toggles between something
+  like "Show"/"Hide" duplicates that state in words while describing nothing about what's actually
+  behind the trigger. `<button aria-expanded="false">More filters</button>`, not
+  `<button aria-expanded="false">Show</button>` — the label stays constant; the state attribute is
+  what changes.
 - Actions that operate on a disclosed section's *item* (edit, delete) render as siblings beside
   the trigger, never nested inside it — an interactive control inside another interactive control
   is invalid HTML and gets announced as one confused unit.
