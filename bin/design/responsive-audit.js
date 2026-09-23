@@ -1,0 +1,515 @@
+// AUDIT-READS: RENDER
+/*
+ * Every HTML screen, at every breakpoint the design system has.
+ *
+ * The existing reflow check in wcag-manual.js is sound but runs on eight pages. This runs the
+ * same idea over all of them, at the widths that matter, and adds the things that only go wrong
+ * when a layout is squeezed: controls that shrink below a usable tap target, text that stops
+ * being legible, and elements that end up on top of each other.
+ *
+ *   BASE_URL=http://127.0.0.1:3000 pw bin/design/responsive-audit.js
+ *   WIDTHS=320,768 pw bin/design/responsive-audit.js      # narrow it down while fixing
+ *   ONLY=/items,/donations pw bin/design/responsive-audit.js
+ *
+ * Widths are Tailwind's breakpoints plus the two that bracket them. 320 is not arbitrary: WCAG
+ * 1.4.10 Reflow is defined at 320 CSS px, which is also 1280px at 400% zoom.
+ */
+const { chromium } = require("playwright");
+const { execSync } = require("child_process");
+const { signIn, targets } = require("./targets");
+
+const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
+const PASSWORD = process.env.SEED_PASSWORD || "password!";
+// Tailwind's breakpoints, the two sides of each switch, and the ends. A layout that breaks
+// usually breaks *at* the boundary -- 639 and 641 are different layouts and only one of them
+// gets looked at by hand.
+const WIDTHS = (process.env.WIDTHS || "320,375,639,641,767,769,1023,1025,1280,1440").split(",").map(Number);
+// Landscape phone. Short viewports are where fixed and sticky chrome eats the screen.
+const SHORT = { width: 740, height: 360 };
+const ONLY = process.env.ONLY ? process.env.ONLY.split(",") : null;
+
+// Targets come from the seam, which regenerates the list when it is older than the routes
+// file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or
+// ENOENT on a machine that had never run another audit.
+const TARGETS = targets().filter((t) => !ONLY || ONLY.includes(t.path));
+
+
+/*
+ * Wait for the layout to stop moving after a viewport change, rather than sleeping.
+ *
+ * This was `waitForTimeout(350)`, chosen to clear the sidebar's `duration-200` slide -- measured
+ * mid-transition the sidebar is a full-height element part-way on screen, which reads as "the
+ * sidebar is on screen below lg". A fixed pause is the wrong tool twice over: too long on the
+ * common case, and too short on a loaded machine. It made this audit **non-deterministic** --
+ * three runs of the whole suite gave 9, 9 and 8 findings, the flicker being 50 tap targets on
+ * `/items/inventory` at 320px whose smallest measured 20x28 instead of its settled size. The page
+ * never reproduced it alone, only in a full run, which is the signature of a timing budget being
+ * eaten by everything before it.
+ *
+ * Two conditions, because either alone is insufficient:
+ *
+ *   1. **No transition still running.** `getAnimations()` covers CSS transitions, so this is the
+ *      sidebar slide asked about directly. Capped, because a page with a spinner never reaches
+ *      zero and waiting forever is worse than measuring.
+ *   2. **Geometry stable across two frames.** Transitions are not the only thing that moves a box:
+ *      a web font swapping in resizes text after the transition has finished. Comparing the
+ *      document height and the widest element twice catches that.
+ */
+async function settled(page) {
+  await page.waitForFunction(
+    () => document.getAnimations().every((a) => a.playState !== "running"),
+    { timeout: 2000 }
+  ).catch(() => {});
+  /*
+   * **Wait on the thing being measured, not on a proxy for it.** Document size stable across two
+   * frames is ~32ms, which is nothing: a font swapping in or a table reflowing after a 1440->320
+   * resize lands well outside it. The flicker this was written for is a *tap target count*, so that
+   * is what has to hold still.
+   *
+   * Three identical readings 120ms apart. 320px is the first width measured after navigation and
+   * the largest resize, so it has the least settled layout of any -- which is exactly why it was
+   * the only width that flickered.
+   */
+  await page.waitForFunction(() => {
+    const vis = (el) => {
+      const r = el.getBoundingClientRect();
+      return r.width && r.height && getComputedStyle(el).visibility !== "hidden";
+    };
+    const n = [...document.querySelectorAll(
+      "a[href], button, input:not([type=hidden]), select, textarea, [role=button]")]
+      .filter(vis)
+      .filter((e) => { const r = e.getBoundingClientRect(); return r.width < 24 || r.height < 24; })
+      .length;
+    const seen = (window.__settleProbe ||= []);
+    if (seen[seen.length - 1] !== n) { seen.length = 0; }
+    seen.push(n);
+    return seen.length >= 3;
+  }, { timeout: 4000, polling: 120 }).catch(() => {});
+  await page.evaluate(() => { delete window.__settleProbe; });
+}
+
+const measure = () => {
+  const vw = document.documentElement.clientWidth;
+
+  // Reachability, not geometry. An element inside a horizontal scroller can be scrolled to, and
+  // WCAG 1.4.10 excludes content that needs two-dimensional layout -- a data table is allowed to
+  // scroll sideways inside its own container. What must not happen is the *page* scrolling.
+  const inScroller = (el) => {
+    for (let a = el.parentElement; a && a !== document.body; a = a.parentElement) {
+      const ox = getComputedStyle(a).overflowX;
+      if (ox === "auto" || ox === "scroll" || ox === "hidden") return true;
+    }
+    return false;
+  };
+
+  const visible = (el) => {
+    const r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return false;
+    const cs = getComputedStyle(el);
+    return cs.visibility !== "hidden" && cs.display !== "none" && cs.opacity !== "0";
+  };
+
+  const spilling = [...document.querySelectorAll("main *")]
+    .filter((el) => visible(el) && el.getBoundingClientRect().right > vw + 2 && !inScroller(el))
+    .slice(0, 4)
+    .map((el) => el.tagName.toLowerCase() + "." + (el.className || "").toString().trim().split(/\s+/)[0]);
+
+  // WCAG 2.5.8 Target Size (Minimum), AA: 24x24 CSS px -- but with the exceptions applied, or the
+  // check is useless. A first version reported 28 findings on the dashboard, every one of them a
+  // date link in a table cell that passes on spacing. An audit that cries wolf gets ignored.
+  //
+  //   Inline    -- the target sits in a sentence, so its size is set by the line box.
+  //   Spacing   -- a 24px circle centred on the target touches no other target's box, and no
+  //                other undersized target's circle.
+  // select2 leaves the native <select> in the DOM at 1x1 and draws its own control beside it.
+  // The 1x1 box is not a target anyone can hit; the select2 container is, and it is measured
+  // on its own as a [role=button]-ish element.
+  const replacedBySelect2 = (el) =>
+    el.tagName === "SELECT" &&
+    (el.nextElementSibling?.classList?.contains("select2-container") ||
+     !!el.parentElement?.querySelector(":scope > .select2-container"));
+
+  // The target is the control *plus its label*: clicking a <label for> activates the control, so
+  // a 16x16 checkbox beside a 30x20 label is one target about 50x20, not a 16x16 one.
+  const targetRect = (el) => {
+    let r = el.getBoundingClientRect();
+    for (const l of el.labels || []) {
+      const lr = l.getBoundingClientRect();
+      if (!lr.width || !lr.height) continue;
+      r = { left: Math.min(r.left, lr.left), top: Math.min(r.top, lr.top),
+            right: Math.max(r.right, lr.right), bottom: Math.max(r.bottom, lr.bottom) };
+    }
+    return { left: r.left, top: r.top, right: r.right, bottom: r.bottom,
+             width: r.right - r.left, height: r.bottom - r.top };
+  };
+
+  const allTargets = [...document.querySelectorAll("a[href], button, input:not([type=hidden]), select, textarea, [role=button], [tabindex]:not([tabindex='-1'])")]
+    .filter(visible)
+    .filter((el) => !replacedBySelect2(el))
+    .map((el) => ({ el, r: targetRect(el) }));
+
+  const undersized = allTargets
+    .filter(({ el }) => !el.closest("p, li"))
+    .filter(({ r }) => r.width < 24 || r.height < 24);
+
+  const centre = (r) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  // A 24px-diameter circle -- radius 12 -- centred on the target's box.
+  const circleHitsBox = (c, r) => {
+    const nx = Math.max(r.left, Math.min(c.x, r.right));
+    const ny = Math.max(r.top, Math.min(c.y, r.bottom));
+    return Math.hypot(c.x - nx, c.y - ny) < 12;
+  };
+
+  /*
+   * **A target's own ancestor is not a neighbouring target.** The spacing exception asks whether a
+   * 24px circle on this target reaches *someone else's* hit area; a container that encloses the
+   * target is not someone else, and its box necessarily intersects the circle, so counting it makes
+   * the exception unpassable.
+   *
+   * This was the `/items/inventory` flicker, after five attempts. `clipped_text_controller` gives a
+   * truncated `<td>` `tabindex="0"` so a keyboard user can read its tooltip, which makes the cell
+   * match this check's target selector. On that page the clipped cell is the 40x28 one *wrapping*
+   * each row's 20x28 disclosure button, so all fifty buttons were reported -- and only when the cell
+   * happened to be marked, which is a resize-order bug in the app (see docs/todo.md). Hence a count
+   * that moved 133/183 in `allTargets` and 0/50 here while `undersized` sat at 52 throughout: the
+   * sizes never changed, the *population* did.
+   *
+   * Four attempts compared counts and a fifth compared positions. Neither could see it, because the
+   * number that moved was the number of *other* elements considered.
+   */
+  const separate = (a, b) => a !== b && !a.contains(b) && !b.contains(a);
+
+  const smallTargets = undersized.filter((t) => {
+    const c = centre(t.r);
+    return allTargets.some((o) => separate(o.el, t.el) && circleHitsBox(c, o.r)) ||
+           undersized.some((o) => separate(o.el, t.el) && Math.hypot(c.x - centre(o.r).x, c.y - centre(o.r).y) < 24);
+  });
+
+  const tiny = [...document.querySelectorAll("main p, main span, main td, main th, main li, main label")]
+    .filter(visible)
+    .filter((el) => el.textContent.trim() && parseFloat(getComputedStyle(el).fontSize) < 11).length;
+
+  // Text cut off with no way to see the rest. `truncate` and `line-clamp` are deliberate -- the
+  // title of a row is meant to end in an ellipsis -- so what is reported is content clipped by an
+  // ancestor's `overflow: hidden` with no ellipsis and no scrollbar: unreachable, and silent.
+  const clipped = [...document.querySelectorAll("main *")]
+    .filter(visible)
+    .filter((el) => {
+      if (!el.textContent.trim() || el.children.length) return false;
+      // An <option> is not clipped content. select2 leaves the native <select> at 1x1 while
+      // drawing its own control, so every option inside it looks like text overflowing a box.
+      if (el.closest("select, datalist")) return false;
+      const cs = getComputedStyle(el);
+      if (cs.textOverflow === "ellipsis" || cs.webkitLineClamp !== "none") return false;
+      const p = el.parentElement;
+      if (!p) return false;
+      const pcs = getComputedStyle(p);
+      if (pcs.overflowX !== "hidden" && pcs.overflowY !== "hidden") return false;
+      return el.getBoundingClientRect().right > p.getBoundingClientRect().right + 2 ||
+             el.getBoundingClientRect().bottom > p.getBoundingClientRect().bottom + 2;
+    })
+    .slice(0, 3)
+    .map((el) => `"${el.textContent.trim().slice(0, 24)}"`);
+
+  // Below lg the sidebar is an off-canvas drawer. If the control that opens it is missing or
+  // hidden, the navigation is unreachable and the page does not work at that width.
+  const drawer = (() => {
+    if (window.innerWidth >= 1024) return null;
+    // Only layouts that have a sidebar. The auth shell and the static pages have no navigation
+    // to reach, so there is nothing for a drawer toggle to open.
+    if (!document.querySelector("aside")) return null;
+    const toggle = document.querySelector("[aria-label='Open navigation']");
+    if (!toggle) return "no drawer toggle";
+    const r = toggle.getBoundingClientRect();
+    if (!r.width || !r.height) return "drawer toggle not visible";
+    const aside = document.querySelector("aside");
+    if (aside && aside.getBoundingClientRect().left >= 0 && aside.getBoundingClientRect().width > 0) {
+      return "sidebar is on screen below lg";
+    }
+    return null;
+  })();
+
+  return {
+    clipped,
+    drawer,
+    bodyOverflow: document.body.scrollWidth - vw,
+    spilling,
+    smallTargets: smallTargets.length,
+    /*
+     * Debug only, off unless `DUMP` is set:
+     *
+     *     DUMP=/items/inventory DUMP_WIDTH=320 pw bin/design/responsive-audit.js
+     *
+     * It names the elements rather than counting them, which is what a flickering count needs --
+     * four attempts at the `/items/inventory` flicker failed while comparing counts. What it has
+     * already established: `undersized` is stable at 52, so the swing is entirely in the *spacing
+     * exception*, and it is bimodal (0 or 50) rather than marginal, so one global factor flips all
+     * of them at once. Left in place because the next attempt starts here.
+     */
+    smallTargetList: smallTargets.map((t) =>
+      `${t.el.tagName.toLowerCase()}.${(t.el.className || "").toString().trim().split(/\s+/)[0]}` +
+      `|${Math.round(t.r.width)}x${Math.round(t.r.height)}` +
+      `|${(t.el.textContent || "").trim().slice(0, 20)}`).sort(),
+    allTargetCount: allTargets.length,
+    undersizedCount: undersized.length,
+    smallestTarget: smallTargets.length
+      ? (() => { const w = smallTargets.sort((a, b) => a.r.width * a.r.height - b.r.width * b.r.height)[0];
+                 return `${Math.round(w.r.width)}x${Math.round(w.r.height)} ${w.el.tagName.toLowerCase()}` +
+                        `"${w.el.textContent.trim().slice(0, 18) || w.el.getAttribute("aria-label") || ""}"`; })()
+      : null,
+    tinyText: tiny,
+  };
+};
+
+/*
+ * --- The short-viewport chrome check ---------------------------------------------------------
+ *
+ * A page "works" only if its own content is reachable with the fixed and sticky chrome in place,
+ * and a 740x360 landscape phone is where that stops being free.
+ *
+ * Module level and exported, so `audit-selftest.js` can drive it against a page broken on purpose.
+ * That is not tidiness: **its reporting arm has no live positive in this app.** Once the frozen
+ * actions column stopped being counted, no screen crosses the 50% threshold -- a full run considers
+ * 30 pinned elements across 146 page visits, every one of them `.table-rail` at 24px of 360, about
+ * 7% -- so nothing in the app would notice if the threshold arm broke. The controls are the only
+ * thing exercising it, and they were five shell scripts in /tmp until now.
+ */
+
+// Swappable, so the self-test can collect what this reports instead of the run collecting it.
+// Same pattern as `wcag22-audit.js`; see the note there.
+let sink = null;
+const captureInto = (fn) => { sink = fn; };
+
+const chromeProbe = () => {
+  const vh = window.innerHeight;
+  const vw = window.innerWidth;
+  const onScreen = [...document.querySelectorAll("body *")].filter((el) => {
+    const cs = getComputedStyle(el);
+    if (cs.position !== "fixed" && cs.position !== "sticky") return false;
+    if (el.closest(".profiler-results, #rack-mini-profiler")) return false;
+    // Third-party overlays are not this app's chrome: rack-mini-profiler's badge sits at
+    // z-index 2147483643 and reCAPTCHA's containers in the same range. The app's own
+    // highest is z-40, so anything past 100 belongs to somebody else.
+    if (Number(cs.zIndex) > 100) return false;
+    /*
+     * **Sticky sideways is not chrome.** This measures how much of a short viewport is eaten by
+     * chrome pinned *down* the screen. A `sticky` element with `top` and `bottom` both `auto` is
+     * pinned on a horizontal edge instead, and its vertical band scrolls away with the content --
+     * it occludes no fixed strip of the viewport at all.
+     *
+     * The frozen actions column is exactly that: `position: sticky; right: 0` on every cell.
+     * Measured on `/admin/partners` at 740x360, the counted elements were eight `td.cell-actions`
+     * at `top: auto, bottom: auto, right: 0px` in consecutive bands (216..269, 269..322,
+     * 322..375), unioned to **186px of 360** -- past the threshold, on two pages, for a column
+     * that eats no height whatever. Same family as the ancestor bug in the spacing exception
+     * above: a geometric rule reading an element whose geometry does not mean what it assumes.
+     */
+    if (cs.position === "sticky" && cs.top === "auto" && cs.bottom === "auto") return false;
+    const r = el.getBoundingClientRect();
+    // Only chrome that is actually over the content. The nav drawer below lg is
+    // `fixed inset-y-0` translated off-canvas: full height, and covering nothing.
+    return r.height > 0 && r.width > 0 && r.right > 0 && r.left < vw && r.bottom > 0 && r.top < vh;
+  });
+  // Union of the vertical bands, not the sum: a topbar and a sticky sub-bar that overlap must
+  // not be counted twice.
+  const bands = onScreen
+    .map((el) => { const r = el.getBoundingClientRect(); return [Math.max(0, r.top), Math.min(vh, r.bottom)]; })
+    .sort((a, b) => a[0] - b[0]);
+  let eaten = 0, cursor = 0;
+  for (const [top, bottom] of bands) {
+    if (bottom <= cursor) continue;
+    eaten += bottom - Math.max(top, cursor);
+    cursor = Math.max(cursor, bottom);
+  }
+  const h1 = document.querySelector("main h1, h1");
+  return {
+    eaten: Math.round(eaten), vh,
+    // What the filter kept, so a zero can be read. A correct "nothing crosses the threshold" and
+    // a check that looked at nothing produce the same pass line otherwise -- and a four-page spot
+    // check convinced me of the second before a full run printed 30 across 146 page visits.
+    considered: onScreen.length,
+    h1Hidden: h1 ? h1.getBoundingClientRect().bottom < 0 || h1.getBoundingClientRect().top > vh : false
+  };
+};
+
+// `resize: false` lets the self-test set up its own viewport and mutate the page before measuring;
+// the run needs the resize, and the 400ms with it.
+async function shortViewportChrome(page, where, { resize = true } = {}) {
+  if (resize) {
+    await page.setViewportSize(SHORT);
+    // 400ms, not 120: the sidebar slides back off-canvas with `duration-200`, and measured
+    // mid-flight it is a full-height element on screen covering the entire short viewport.
+    await page.waitForTimeout(400);
+  }
+  const short = await page.evaluate(chromeProbe);
+  // One definition of the threshold. The run swaps a sink in that pushes onto its findings list.
+  if (short.eaten > short.vh * 0.5 && sink) {
+    sink("short-viewport", where, `fixed/sticky chrome covers ${short.eaten}px of a ${short.vh}px viewport`);
+  }
+  return short;
+}
+
+const roleFor = (c) => (c.startsWith("partners/") ? "partner" : c.startsWith("admin") ? "super" : "bank");
+
+module.exports = { shortViewportChrome, captureInto, SHORT };
+
+// Requiring this file must not run the audit: `audit-selftest.js` imports the check above and
+// drives it against a page it has deliberately broken. Same guard as `wcag22-audit.js`.
+if (require.main === module) {
+(async () => {
+  const browser = await chromium.launch();
+  const users = { super: "superadmin@example.com", bank: "org_admin1@example.com",
+                  partner: process.env.PARTNER_EMAIL || "verified@example.com" };
+  const notChecked = [];
+  const findings = [];
+  let checks = 0;
+  // How much the short-viewport chrome check had to look at, so a zero can be read.
+  let shortConsidered = 0, shortPages = 0;
+
+  // The run collects what the exported check reports. `audit-selftest.js` swaps this for its own
+  // collector, which is the whole reason the threshold lives in one place.
+  captureInto((_check, where, detail) => {
+    findings.push({ path: where, width: `${SHORT.width}x${SHORT.height}`, problems: [detail] });
+  });
+
+  for (const [role, email] of Object.entries(users)) {
+    let page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    await signIn(page, email).catch(() => {});
+    for (const t of TARGETS) {
+      if (roleFor(t.controller) !== role) continue;
+      /*
+       * **A page that does not load is recorded, not dropped.**
+       *
+       * This was a bare `continue`: a 4xx, a redirect, or a timeout removed the screen from the run
+       * with nothing counted and nothing printed. That made the audit *non-deterministic* -- three
+       * runs gave 9, 9 and 8 findings, and the missing one was `/items/inventory` at 320px, a page
+       * with 332 table rows that occasionally exceeds the 45s budget on a loaded machine. The
+       * finding vanished and the summary still read like a clean run.
+       *
+       * The audit cannot make a slow page fast. What it can do is stop pretending it looked.
+       */
+      let ok = true;
+      try {
+        const resp = await page.goto(BASE + t.path, { waitUntil: "domcontentloaded", timeout: 45000 });
+        if (resp.status() >= 400) { ok = false; notChecked.push(`${t.path} — HTTP ${resp.status()}`); }
+        else if (new URL(page.url()).pathname !== t.path) {
+          /*
+           * A redirect is only a gap if it lands somewhere nothing else visits. `/` goes to
+           * `/dashboard`, `/kits/143` to its allocations, `/partners/1/approve_application` back to
+           * `/partners` -- all of which are targets in their own right, so the screen *is* measured,
+           * just under its landing path. Reporting those as "not checked" would be as misleading as
+           * the silence they replaced.
+           *
+           * `targets.js` makes the same distinction and says why: an audit that counts pages should
+           * key on where it landed.
+           */
+          ok = false;
+          const landed = new URL(page.url()).pathname;
+          if (!TARGETS.some((x) => x.path.split("?")[0] === landed)) {
+            notChecked.push(`${t.path} — redirected to ${landed}, which nothing else visits`);
+          }
+        }
+      } catch (e) {
+        try { await page.close(); } catch {}
+        page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+        await signIn(page, email).catch(() => {});
+        ok = false;
+        notChecked.push(`${t.path} — ${e.message.split("\n")[0].slice(0, 60)}`);
+      }
+      if (!ok) continue;
+
+      for (const width of WIDTHS) {
+        await page.setViewportSize({ width, height: 900 });
+        await settled(page);
+        const m = await page.evaluate(measure);
+        if (process.env.DUMP && t.path === process.env.DUMP && width === Number(process.env.DUMP_WIDTH || 320)) {
+          console.log(`DUMP ${t.path} @${width}  all=${m.allTargetCount} undersized=${m.undersizedCount} small=${m.smallTargets}`);
+          m.smallTargetList.forEach((x) => console.log(`DUMPEL ${x}`));
+        }
+        checks++;
+
+        // Whether the page can be swiped sideways, by swiping it. `window.scrollTo` is not the
+        // same question: `overflow-x: clip` on the root stops the gesture but not the script, and
+        // `document.documentElement.scrollWidth` counts clipped content inside a scroll container
+        // that no user can reach. Only the gesture answers what a person on a phone experiences.
+        // The anchor is an <h1> where there is one, because a heading sliding off screen is what a
+        // person actually notices, and the distance it moved is a number worth printing. Every
+        // screen in this app has one -- measured, 151 of 151 -- but the gesture no longer depends
+        // on it. It used to sit inside `if (anchor)`, so a page that lost its heading would skip
+        // the swipe silently and be reported clean, which is the one failure this check exists to
+        // prevent. With no heading, `window.scrollX` answers the same question less legibly.
+        const anchor = await page.evaluate(() => {
+          const h = document.querySelector("main h1, h1");
+          return h ? { y: Math.round(h.getBoundingClientRect().top + 8), left: Math.round(h.getBoundingClientRect().left) } : null;
+        });
+        await page.mouse.move(Math.round(width / 2), Math.max(anchor ? anchor.y : 90, 90));
+        await page.mouse.wheel(900, 0);
+        await page.waitForTimeout(220);
+        const swipe = await page.evaluate((before) => {
+          const h = document.querySelector("main h1, h1");
+          const moved = h && before !== null ? before - Math.round(h.getBoundingClientRect().left) : window.scrollX;
+          window.scrollTo(0, 0);
+          return moved;
+        }, anchor ? anchor.left : null);
+
+        const problems = [];
+        if (swipe > 2) problems.push(`swipes ${swipe}px sideways`);
+        else if (m.bodyOverflow > 2) problems.push(`body ${m.bodyOverflow}px wider than viewport`);
+        if (m.spilling.length) problems.push("spills: " + m.spilling.join(", "));
+        if (m.smallTargets) problems.push(`${m.smallTargets} target(s) under 24px, smallest ${m.smallestTarget}`);
+        if (m.tinyText) problems.push(`${m.tinyText} run(s) of text under 11px`);
+        if (m.clipped.length) problems.push("clipped with no ellipsis: " + m.clipped.join(", "));
+        if (m.drawer) problems.push(m.drawer);
+        if (problems.length) findings.push({ path: t.path, width, problems });
+      }
+      // Landscape phone, measured by the exported check so the self-test drives the same code.
+      const short = await shortViewportChrome(page, t.path);
+      checks++;
+      shortConsidered += short.considered;
+      shortPages++;
+
+      await page.setViewportSize({ width: 1440, height: 900 });
+    }
+    await page.close();
+  }
+
+  console.log(`${checks} page/width combinations checked (${TARGETS.length} routes x ${WIDTHS.join(", ")})`);
+  /*
+   * The short-viewport check, stated rather than assumed: it reports when fixed or sticky chrome
+   * covers more than half of a 740x360 window, and printing what it looked at is the difference
+   * between "no page crosses the threshold" and "nothing was measured", which read the same in a
+   * pass line.
+   *
+   * This line immediately earned itself. Having removed the frozen actions column from the count,
+   * a four-page spot check found nothing pinned and I concluded the check had gone inert on this
+   * app. **It has not**: a full run considers **30 elements across 146 page visits**, every one of
+   * them `.table-rail` -- the fixed 24px horizontal scroll rail on a wide table -- at 24px of 360,
+   * about 7%. Live input, negative verdict. What is genuinely unexercised is the *reporting* path
+   * above the 50% threshold, which no real screen reaches; its controls are in docs/todo.md.
+   */
+  console.log(`short viewport ${SHORT.width}x${SHORT.height}: ` +
+    `${shortConsidered} pinned element(s) considered across ${shortPages} page(s)\n`);
+
+  // Printed even when empty is wrong -- but printed loudly when not, because a screen the audit
+  // could not reach and a screen with no defects produce the same silence otherwise.
+  if (notChecked.length) {
+    console.log(`\n${notChecked.length} screen(s) NOT CHECKED -- these are absent from every ` +
+      `figure above:`);
+    [...new Set(notChecked)].sort().forEach((n) => console.log(`   ${n}`));
+  }
+  if (!findings.length) { console.log("no responsive findings"); await browser.close(); return; }
+
+  // Group by problem shape: one layout bug usually shows up on many pages at one width.
+  const byWidth = {};
+  for (const f of findings) (byWidth[f.width] ||= []).push(f);
+  for (const width of [...WIDTHS, `${SHORT.width}x${SHORT.height}`]) {
+    const list = byWidth[width] || [];
+    if (!list.length) continue;
+    console.log(`== ${width}px — ${list.length} page(s)`);
+    for (const f of list) console.log("   " + f.path.padEnd(44) + f.problems.join(" | "));
+    console.log("");
+  }
+  console.log(`${findings.length} findings across ${new Set(findings.map((f) => f.path)).size} pages`);
+  await browser.close();
+})();
+}

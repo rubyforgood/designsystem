@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Partner Page Repairs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --ground:   #FBFBFD;
+    --surface:  #FFFFFF;
+    --sunken:   #F3F3F8;
+    --line:     #E1E1EC;
+    --line-soft:#EDEDF4;
+    --ink:      #1A1B25;
+    --ink-mid:  #4A4C60;
+    --ink-soft: #6E7085;
+    --accent:   #4338CA;
+    --accent-soft: #EEEDFB;
+    --defect:   #B4232E;
+    --defect-soft: #FBEDEE;
+    --fixed:    #0F6E4F;
+    --fixed-soft:  #E9F5EF;
+    --shadow:   0 1px 2px rgba(26,27,37,.05), 0 8px 24px -16px rgba(26,27,37,.25);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #131420;
+      --surface:  #1C1D2B;
+      --sunken:   #232436;
+      --line:     #33344A;
+      --line-soft:#282A3D;
+      --ink:      #ECECF5;
+      --ink-mid:  #B6B7C9;
+      --ink-soft: #8D8FA5;
+      --accent:   #A7A1FA;
+      --accent-soft: #262551;
+      --defect:   #F2909A;
+      --defect-soft: #3A1F26;
+      --fixed:    #6FCBA5;
+      --fixed-soft:  #16332A;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:   #131420;
+    --surface:  #1C1D2B;
+    --sunken:   #232436;
+    --line:     #33344A;
+    --line-soft:#282A3D;
+    --ink:      #ECECF5;
+    --ink-mid:  #B6B7C9;
+    --ink-soft: #8D8FA5;
+    --accent:   #A7A1FA;
+    --accent-soft: #262551;
+    --defect:   #F2909A;
+    --defect-soft: #3A1F26;
+    --fixed:    #6FCBA5;
+    --fixed-soft:  #16332A;
+    --shadow:   0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 62rem; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+  .col { max-width: 40rem; }
+
+  h1, h2, h3, .ui { font-family: Archivo, "Helvetica Neue", Arial, sans-serif; }
+  h1 { font-size: clamp(2rem, 5vw, 2.9rem); line-height: 1.08; font-weight: 700;
+       letter-spacing: -.022em; margin: .5rem 0 0; text-wrap: balance; }
+  h2 { font-size: 1.4rem; font-weight: 600; letter-spacing: -.014em; margin: 0; text-wrap: balance; }
+  h3 { font-size: .8rem; font-weight: 600; margin: 0 0 .6rem;
+       text-transform: uppercase; letter-spacing: .09em; color: var(--ink-soft); }
+  p { margin: 0 0 1rem; }
+  a { color: var(--accent); }
+  code, .num { font-family: "JetBrains Mono", ui-monospace, monospace;
+               font-size: .855em; font-variant-numeric: tabular-nums; }
+  code { background: var(--sunken); border: 1px solid var(--line-soft);
+         padding: .08em .34em; border-radius: .3rem; }
+
+  .eyebrow { font-family: Archivo, sans-serif; font-size: .74rem; font-weight: 600;
+             text-transform: uppercase; letter-spacing: .14em; color: var(--accent); margin: 0; }
+  .lede { font-size: 1.19rem; color: var(--ink-mid); margin-top: 1.1rem; }
+  .rule { height: 1px; background: var(--line); border: 0; margin: 3.5rem 0; }
+
+  /* A finding: number in the margin, content in the column. */
+  .finding { display: grid; grid-template-columns: 3.25rem 1fr; gap: 0 1.25rem;
+             margin-top: 3.25rem; }
+  .fnum { font-family: "JetBrains Mono", monospace; font-size: .9rem; font-weight: 600;
+          color: var(--ink-soft); padding-top: .3rem; font-variant-numeric: tabular-nums; }
+  .fhead { display: flex; align-items: baseline; gap: .75rem; flex-wrap: wrap; }
+  .fbody { grid-column: 2; margin-top: .85rem; }
+  @media (max-width: 34rem) {
+    .finding { grid-template-columns: 1fr; }
+    .fbody { grid-column: 1; }
+  }
+
+  .chip { font-family: Archivo, sans-serif; font-size: .68rem; font-weight: 600;
+          text-transform: uppercase; letter-spacing: .08em; padding: .18rem .5rem;
+          border-radius: .3rem; white-space: nowrap; }
+  .chip-defect { background: var(--defect-soft); color: var(--defect); }
+  .chip-choice { background: var(--accent-soft); color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: .93rem; }
+  .scroll { overflow-x: auto; }
+  th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid var(--line-soft);
+           vertical-align: top; }
+  thead th { font-family: Archivo, sans-serif; font-size: .72rem; font-weight: 600;
+             text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft);
+             border-bottom: 1px solid var(--line); }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.n { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums;
+         white-space: nowrap; }
+  .flag { color: var(--defect); font-weight: 600; }
+  .ok   { color: var(--fixed); font-weight: 600; }
+
+  /* before / after */
+  .pair { display: grid; gap: 1rem; margin: 1.5rem 0; }
+  @media (min-width: 46rem) { .pair { grid-template-columns: 1fr 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: .7rem;
+           padding: 1rem 1.1rem 1.1rem; box-shadow: var(--shadow); position: relative;
+           overflow: hidden; }
+  .panel::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; }
+  .panel-now::before   { background: var(--defect); }
+  .panel-fix::before   { background: var(--fixed); }
+  .panel h3 { margin-bottom: .75rem; }
+  .panel-now h3 { color: var(--defect); }
+  .panel-fix h3 { color: var(--fixed); }
+  .note { font-size: .875rem; color: var(--ink-soft); margin: .8rem 0 0; }
+
+  /* miniature UI used inside the panels */
+  .mini { font-family: Archivo, sans-serif; }
+  .mini-card { border: 1px solid var(--line); border-radius: .55rem; background: var(--surface); }
+  .mini-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem;
+               border-bottom: 1px solid var(--line-soft); padding: .5rem .7rem; font-size: .8rem;
+               font-weight: 600; }
+  .mini-body { padding: .7rem; font-size: .78rem; color: var(--ink-soft); }
+  .btn { display: inline-flex; align-items: center; font-family: Archivo, sans-serif;
+         font-size: .75rem; font-weight: 500; height: 1.85rem; padding: 0 .6rem;
+         border-radius: .4rem; border: 1px solid var(--line); background: var(--surface);
+         color: var(--ink-mid); white-space: nowrap; }
+  .btn-pri { background: var(--accent); border-color: var(--accent); color: #fff; }
+  :root[data-theme="dark"] .btn-pri, :root:not([data-theme="light"]) .btn-pri { color: #14141f; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .btn-pri { color: #fff; } }
+  .row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+  .row-tight { display: flex; gap: 0; align-items: center; }
+  .status { font-family: Archivo, sans-serif; font-size: .65rem; font-weight: 600;
+            padding: .1rem .4rem; border-radius: .25rem;
+            background: var(--fixed-soft); color: var(--fixed); }
+  .title-lg { font-family: Archivo, sans-serif; font-weight: 700; font-size: 1rem; }
+  .sub { font-size: .78rem; color: var(--ink-soft); }
+
+  .callout { background: var(--sunken); border: 1px solid var(--line);
+             border-left: 3px solid var(--accent); border-radius: .5rem;
+             padding: 1rem 1.15rem; margin: 1.5rem 0; font-size: .97rem; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  ol.rec { counter-reset: r; list-style: none; padding: 0; margin: 1rem 0 0; }
+  ol.rec li { counter-increment: r; position: relative; padding-left: 2.1rem;
+              margin-bottom: .8rem; }
+  ol.rec li::before { content: counter(r); position: absolute; left: 0; top: .12rem;
+                      font-family: "JetBrains Mono", monospace; font-size: .78rem;
+                      font-weight: 600; color: var(--accent);
+                      background: var(--accent-soft); border-radius: .3rem;
+                      width: 1.5rem; height: 1.5rem; display: grid; place-items: center; }
+  strong { font-weight: 600; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: .2rem; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="col">
+    <p class="eyebrow">Design review</p>
+    <h1>Five things wrong on the partner pages</h1>
+    <p class="lede">
+      Measured on <code>/partners/2</code> and <code>/profiles/2/edit</code> at 1440&nbsp;px.
+      Four have one right answer. One is a genuine choice.
+    </p>
+  </header>
+
+  <!-- 1 -->
+  <article class="finding">
+    <div class="fnum">01</div>
+    <div class="fhead">
+      <h2>The badge is inside the actions slot</h2>
+      <span class="chip chip-defect">Defect</span>
+    </div>
+    <div class="fbody">
+      <div class="col">
+        <p>
+          The page header's <code>[data-page-header="actions"]</code> container holds exactly two
+          children: a <code>SPAN</code> reading “Approved”, and the Deactivate form. A status is not
+          an action — so a pill sitting in a row of buttons reads as a button that has been greyed
+          out.
+        </p>
+      </div>
+      <div class="pair">
+        <div class="panel panel-now mini">
+          <h3>Now</h3>
+          <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start">
+            <div>
+              <div class="title-lg">Pawnee Homeless Shelter</div>
+              <div class="sub">Partner administration.</div>
+            </div>
+            <div class="row"><span class="status">Approved</span><span class="btn">Deactivate partner</span></div>
+          </div>
+          <p class="note">Status and action in one row, reading as two controls — one of them broken.</p>
+        </div>
+        <div class="panel panel-fix mini">
+          <h3>Proposed</h3>
+          <div style="display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start">
+            <div>
+              <div class="title-lg">Pawnee Homeless Shelter <span class="status">Approved</span></div>
+              <div class="sub">Partner administration.</div>
+            </div>
+            <div class="row"><span class="btn">Deactivate partner</span></div>
+          </div>
+          <p class="note">Status belongs to the thing, so it sits with its name. The actions slot holds only actions.</p>
+        </div>
+      </div>
+      <div class="col">
+        <p class="note">
+          Needs a <code>status:</code> slot on the page-header partial — which nothing in the app has
+          today, and which every other entity page could then use.
+        </p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 2 -->
+  <article class="finding">
+    <div class="fnum">02</div>
+    <div class="fhead">
+      <h2>“See zipcodes” is 757&nbsp;px from the zipcodes</h2>
+      <span class="chip chip-choice">Your call</span>
+    </div>
+    <div class="fbody">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Element</th><th>Left edge</th><th>Vertical</th></tr></thead>
+          <tbody>
+            <tr><td>“Zipcodes served” card</td><td class="n">1045</td><td class="n">ends at 292</td></tr>
+            <tr><td>“See zipcodes” button</td><td class="n flag">288</td><td class="n">starts at 316</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <p>
+          The button that expands the <em>third</em> stat sits on the next row down, at the far left,
+          underneath the <em>first</em> one. Nothing connects them.
+        </p>
+      </div>
+      <div class="pair">
+        <div class="panel panel-fix mini">
+          <h3>A — inside the card it explains &nbsp;·&nbsp; recommended</h3>
+          <div class="mini-card" style="padding:.8rem">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:1.35rem;font-weight:600">13</div>
+            <div class="sub">Zipcodes served</div>
+            <a href="#" style="display:inline-block;margin-top:.5rem;font-family:Archivo,sans-serif;font-size:.74rem;font-weight:600">See all 13</a>
+          </div>
+          <p class="note">The way in sits on the number it opens. A stat card with detail behind it is the standard place to put it.</p>
+        </div>
+        <div class="panel mini" style="border-left:3px solid var(--line)">
+          <h3>B — a “Service area” card</h3>
+          <div class="mini-card">
+            <div class="mini-head"><span>Service area</span><span class="btn">See zipcodes</span></div>
+            <div class="mini-body">13 zipcodes · 13 families · 68 children</div>
+          </div>
+          <p class="note">More room, and somewhere for served-area detail later. But it is a whole card for one link, on a page that already carries six.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3 -->
+  <article class="finding">
+    <div class="fnum">03</div>
+    <div class="fhead">
+      <h2>Two buttons, two zones, one card</h2>
+      <span class="chip chip-defect">Defect</span>
+    </div>
+    <div class="fbody">
+      <div class="col">
+        <p>
+          In “Partner details”, <strong>Edit details</strong> sits at <span class="num">y=906</span>
+          at the end of the field list and <strong>Manage users</strong> at
+          <span class="num">y=969</span> below a divider — two separate action zones
+          <span class="num">63&nbsp;px</span> apart, both left-aligned at the bottom of one card.
+        </p>
+      </div>
+      <div class="pair">
+        <div class="panel panel-now mini">
+          <h3>Now</h3>
+          <div class="mini-card">
+            <div class="mini-head"><span>Partner details</span></div>
+            <div class="mini-body">Email, storage location, group, notes…</div>
+            <div style="padding:0 .7rem .5rem"><span class="btn">Edit details</span></div>
+            <div style="margin:0 .7rem;border-top:1px solid var(--line-soft)"></div>
+            <div style="padding:.5rem .7rem"><span class="btn">Manage users</span></div>
+          </div>
+        </div>
+        <div class="panel panel-fix mini">
+          <h3>Proposed — card header actions</h3>
+          <div class="mini-card">
+            <div class="mini-head">
+              <span>Partner details</span>
+              <span class="row"><span class="btn">Manage users</span><span class="btn">Edit details</span></span>
+            </div>
+            <div class="mini-body">Email, storage location, group, notes…</div>
+          </div>
+          <p class="note">The app's own pattern, already used on this very page — “Prior distributions” puts Export in its card header.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 4 -->
+  <article class="finding">
+    <div class="fnum">04</div>
+    <div class="fhead">
+      <h2>The modal is pinned to the top — and it isn't only this modal</h2>
+      <span class="chip chip-defect">Defect</span>
+    </div>
+    <div class="fbody">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Dialog</th><th>Top</th><th>Margin</th></tr></thead>
+          <tbody>
+            <tr><td><code>#see-zipcodes</code></td><td class="n flag">0</td><td class="n">0px 464px 24px</td></tr>
+            <tr><td><code>#csv-import-modal</code></td><td class="n">340</td><td class="n ok">339.5px 336px</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col">
+        <p>
+          A native <code>&lt;dialog&gt;</code> centres itself through the browser's own
+          <code>margin: auto</code>. This one is rendered inside a <code>space-y-6</code> container,
+          and that container's spacing rule lands on the dialog and replaces the auto margins.
+        </p>
+        <p>Proven by toggling the class with the dialog still open:</p>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Parent</th><th>margin-top</th><th>Top</th><th>In the top layer?</th></tr></thead>
+          <tbody>
+            <tr><td><code>space-y-6</code></td><td class="n">0px</td><td class="n flag">0</td><td>yes</td></tr>
+            <tr><td>class removed</td><td class="n">452.5px</td><td class="n ok">453 — centred</td><td>yes</td></tr>
+            <tr><td>restored</td><td class="n">0px</td><td class="n flag">0</td><td>yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout col">
+        <p>
+          Six dialogs exist in the app. Five happen to sit somewhere harmless and one does not, and
+          nothing stops the next one landing in a spacing container. <strong>The fix belongs in the
+          shared modal partial</strong>, so a dialog cannot be moved by whatever it happens to be
+          rendered inside — not in this one call site.
+        </p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 5 -->
+  <article class="finding">
+    <div class="fnum">05</div>
+    <div class="fhead">
+      <h2>Edit partner profile</h2>
+      <span class="chip chip-defect">Defect</span>
+    </div>
+    <div class="fbody">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Measured</th><th>Reading</th></tr></thead>
+          <tbody>
+            <tr><td>Heading at <span class="num">288</span>, cards at <span class="num">276</span></td>
+                <td><span class="flag">12&nbsp;px out</span> — the header uses the page gutter, the form uses <code>mx-5</code></td></tr>
+            <tr><td><span class="num">4</span> submit buttons on the page</td>
+                <td><span class="flag">Duplicated</span> — the same row rendered above <em>and</em> below</td></tr>
+            <tr><td>Buttons are <span class="num">36&nbsp;px</span> tall</td>
+                <td><span class="flag">Not 38</span> — raw utility strings with no <code>border</code>, the exact defect design.md records</td></tr>
+            <tr><td>Gap between them: <span class="num">0&nbsp;px</span></td>
+                <td><span class="flag">Touching</span> — <code>flex justify-start</code>, no <code>gap</code></td></tr>
+            <tr><td><code>bi-sliders</code> on <span class="num">10</span> of 13 sections</td>
+                <td><span class="flag">Noise</span> — an icon that never distinguishes anything</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pair">
+        <div class="panel panel-now mini">
+          <h3>Now</h3>
+          <div style="margin-left:12px" class="title-lg">Edit partner profile</div>
+          <div class="row-tight" style="margin-top:.6rem">
+            <span class="btn" style="height:1.7rem">Save progress</span><span class="btn btn-pri" style="height:1.7rem">Save and review</span>
+          </div>
+          <div style="display:grid;gap:.35rem;margin-top:.7rem">
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">⚙&nbsp; Sources of funding</div>
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">⚙&nbsp; Area served</div>
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">⚙&nbsp; Population served</div>
+          </div>
+          <p class="note">Buttons above the content and touching, cards hanging left of the title, one icon three times.</p>
+        </div>
+        <div class="panel panel-fix mini">
+          <h3>Proposed</h3>
+          <div class="title-lg">Edit partner profile</div>
+          <div class="sub">Pawnee Homeless Shelter</div>
+          <div style="display:grid;gap:.35rem;margin-top:.7rem">
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">Sources of funding</div>
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">Area served</div>
+            <div class="mini-card" style="padding:.45rem .6rem;font-size:.78rem">Population served</div>
+          </div>
+          <div class="row" style="margin-top:.9rem;padding-top:.8rem;border-top:1px solid var(--line-soft)">
+            <span class="btn">Cancel</span><span class="btn btn-pri">Save and review</span>
+          </div>
+          <p class="note">One action row, at the end, on the page gutter, from the button helper — 38&nbsp;px, a real gap, primary last.</p>
+        </div>
+      </div>
+      <div class="col">
+        <p>
+          <strong>One sub-question is genuinely yours.</strong> “Save progress” is a second submit
+          that saves without leaving, which is worth keeping on a thirteen-section form — but two
+          submits side by side, one of them primary, is ambiguous. Keep both with the primary clearly
+          last, or drop it and let each section save itself. I would keep it: a long form you can
+          only save by finishing is worse.
+        </p>
+      </div>
+    </div>
+  </article>
+
+  <hr class="rule">
+
+  <section class="col">
+    <h2>Recommendation</h2>
+    <p style="margin-top:.75rem">All five. Only <strong>02</strong> is a real choice.</p>
+    <ol class="rec">
+      <li>Status pill onto the title line, out of the actions slot — via a new <code>status:</code> slot other entity pages can share.</li>
+      <li>“See all 13” inside the Zipcodes card, unless you would rather have the Service-area card.</li>
+      <li>Edit details and Manage users into the card header, the pattern already used by “Prior distributions”.</li>
+      <li>Fix modal centring in the shared partial, so no ancestor's spacing can move a dialog again.</li>
+      <li>Edit partner profile onto the page gutter: one action row at the end, real button helpers, and drop the icon that repeats ten times.</li>
+    </ol>
+  </section>
+</div>
+</body>
+</html>
