@@ -709,6 +709,80 @@ should be through one of these methods.*
 
 ### Row actions
 
+**Reading note.** This is the single largest section in this document (~700 lines) and — per
+`docs/portability/design-md-tagging.md`'s tagging pass — the most Local-heavy: dense with exact
+pixel measurements (`349px`, `size-7`, `168–273px`), Human Essentials' own Rails helper names
+(`essentials_row_icon_link`, `essentials_action_button`), and page-specific evidence (`/vendors`,
+`/organization`). Tagging every sentence individually would be both unreliable at this density and
+beside the point — this section's value *as a section* is that it's a single, fully-worked case
+study of a real migration, evidence and all, and that's worth keeping intact rather than
+dissolving into isolated rule fragments.
+
+What follows instead: the rules below that hold regardless of stack, framework, or component
+vocabulary, surfaced up front with links into where each is argued in full. Everything else in
+this section — including most of what these same paragraphs say — is Local: a real, working,
+evidenced answer for *this* app's implementation, worth reading as an example of how to reach a
+decision like this, not as a rule to inherit unmodified.
+
+**Portable, surfaced from this section:**
+
+- A varying action set forces the menu regardless of how few actions there are at any one moment
+  — judge *whether it can vary* from the code, not from what one seed of data happens to show
+  ([collapse threshold](#collapse-by-table), [judged from code not a seed](#varies-in-code-not-in-a-seed)).
+- A chart's series count is a decision the design makes, never a number the data hands it
+  ([series count](#series-count-is-a-constant)); break a chart down by a grouping the data
+  already has, not a cut invented for the chart
+  ([grouping](#stack-by-a-grouping-the-bank-maintains)).
+- A chart answers one question and a table beside it answers the rest; a chart with more series
+  than its palette has colours to distinguish them is not a chart; a chart that draws nothing
+  until a button is pressed has already failed ([chart answers one question](#a-chart-answers-one-question)).
+- Colour is never the sole distinguisher between data series, and there's a hard ceiling on how
+  many series a palette can distinguish at all — this is a measured constraint, not a taste
+  question (see the in-place correction under [series count](#series-count-is-a-constant)).
+- A sparkline or share bar that conveys meaning through its shape/fill alone needs a text
+  alternative beside it — `aria-hidden` on the visual, the actual figure or a described peak in
+  text ([sparkline](#a-sparkline-per-row), [share bar](#a-share-bar-goes-in-the-row)).
+- The cell that identifies a table row is a real header cell (`<th scope="row">`), not styled to
+  merely look like one ([row header](#a-row-header-is-a-cell)) — a WCAG/semantics rule, not a
+  visual preference.
+- Bounded, one-row-per-entity data (a report) doesn't need pagination; unbounded, one-row-per-event
+  data (an index/ledger) does ([reports don't paginate](#reports-do-not-paginate)).
+- An icon-only control gets its accessible name from a real attribute (`aria-label` or
+  equivalent) and, if it also carries a visual tooltip, that tooltip is a genuine hoverable,
+  focusable, dismissible mechanism — never the browser's native `title`, which is inaccessible on
+  several axes at once ([tooltips](#tooltips), WCAG 1.4.13). A tooltip and an accessible name that
+  say the same thing shouldn't both be announced — hide the visual tooltip from assistive tech
+  once the name already carries it.
+- A menu trigger that opens a *known* menu (a kebab, an overflow) doesn't need its own tooltip —
+  the thing it opens already names its contents. A dismiss control whose action is self-evident
+  from context (it sits inside the exact thing it removes) can skip a tooltip too, but only when
+  that's declared explicitly on the element, never inferred from "it happens to sit near text"
+  ([kebab](#tooltips), [chip dismiss](#tooltips)).
+- An interactive control's visibility can't depend on hover — there's no hover on touch, and a
+  keyboard user can't reach a control that doesn't exist yet. Reveal-on-hover is not an acceptable
+  way to reduce visual clutter.
+- A `position: fixed` element trapped inside an ancestor with its own stacking context needs to
+  escape that ancestor by actually moving in the DOM, not just visually — `overflow` and stacking
+  context are two different escapes and fixing one doesn't fix the other
+  ([portalled panel](#a-fixed-panel-is-portalled)).
+- A destructive or state-changing action should be confirmed through the app's own UI, not the
+  browser's native `confirm()` — the native dialog is unstyleable, blocks the main thread
+  synchronously, and can't be intercepted or tested the way real UI can
+  ([app confirms](#the-app-confirms-not-the-browser)).
+- Every interactive control needs an accessible name that's actually distinct from its siblings —
+  a page with four controls all announcing the identical name is a real defect a screen reader
+  user can't work around, even if it looks fine visually
+  ([named by its row](#a-row-action-is-named-by-its-row)).
+- Prefer *offering* an action that might fail and explaining the failure clearly over silently
+  disabling it — disabling a control removes information from everyone to protect against a
+  state only some records are in; the one exception is when there's no request to make at all (the
+  action doesn't apply to *you*, not to the record's state), which is the one case actually worth
+  disabling for ([offer and explain](#offer-it-and-explain), [disable only for who you are](#disable-only-for-who-you-are)).
+
+The rest of this section is the Local, worked-through detail behind each of those, plus a great
+deal more that's specific to this app's own components, measurements, and Rails implementation —
+read on for the case study; read the list above for what travels.
+
 **Every action in a table row uses `:ghost`, whatever it does.** A table is read down a column,
 so a second weight implies a hierarchy that does not survive the next row — on a partner list
 "Review profile" and "Request recertification" are each the main thing to do for their own row,
