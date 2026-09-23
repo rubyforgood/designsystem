@@ -2069,8 +2069,9 @@ a layered rule loses to it however specific it is. The multi-select takes `min-h
 
 ### Stats
 
-A figure and the words that say what it counts. `essentials_stats` renders a description list,
-because that is the relationship: the label describes the value.
+**Portable — a figure and the words that say what it counts are a description-list relationship,
+semantically, and should be marked up that way** (a `<dt>`/`<dd>` pair or equivalent), not a
+generic `<div>` pair. **Local — this default:** `essentials_stats` renders it.
 
 ```erb
 <%= essentials_stats([
@@ -2079,10 +2080,9 @@ because that is the relationship: the label describes the value.
     ], title: "Totals", subtitle: essentials_stats_scope(@donations.size, "donation")) %>
 ```
 
-**Give the band a header.** Without one it is a row of numbers with nothing saying what they
-are, and a bare period above it reads as though it might belong to the table underneath. The
-title names the thing (*Totals*); the subtitle states the **scope** —
-`essentials_stats_scope(count, noun)` builds it:
+**Portable — a group of statistics needs a header naming what they are; a bare row of numbers,
+or a time period with nothing to anchor it to, reads as ambiguous or as belonging to whatever's
+printed above it.** **Local — this default's scope-subtitle pattern:**
 
 > 13 donations, from June 19, 2026 to September 19, 2026
 > 4 donations **matching these filters**, over the last 30 days
@@ -2093,16 +2093,18 @@ range is always set, so counting it would make every page claim to be filtered w
 touched nothing. There is no leading "The": it does not survive the edges — "The 1 donation" and
 "The 0 donations" both read as though a machine wrote them.
 
-**One card, hairline separators, no fill per figure.** A summary band is one reading, and a
-filled box around each figure makes it four objects instead. This is the metric strip Stripe,
-Shopify and Linear all use.
+**Portable — a summary band is one reading, not N separate objects.** A filled box around each
+individual figure turns a single coherent reading into a row of competing cards. This is the
+metric-strip pattern Stripe, Shopify and Linear all use, corroborating rather than justifying it.
 
 The separators are a `gap-px` grid showing a `slate-200` backdrop through the gaps between white
 cells. That draws a hairline between **every pair of neighbours — rows as well as columns**,
 which `divide-x` cannot: in a grid of more than one row `divide-*` borders by DOM order rather
 than by grid position, so a 2×2 arrangement comes out wrong.
 
-**The figure count must divide the column count.** `STATS_COLUMNS` maps one to the other:
+**Portable — a responsive grid of figures should never orphan a lone cell at any breakpoint it
+actually ships**; map figure count to column count deliberately rather than using one flat
+responsive class regardless of count. **Local — this default's mapping:**
 
 | Figures | Columns |
 | --- | --- |
@@ -2117,51 +2119,49 @@ This was a flat `sm:grid-cols-2 lg:grid-cols-3` whatever the count, which orphan
 An empty cell matters more now than it did then: with the separators drawn by a backdrop showing
 through, a missing cell shows as a grey block rather than as whitespace.
 
-**A statistic is not a heading.** The reports marked six of them up as `<h2>`, which put the
-page's figures into its heading outline — someone navigating by heading heard "Total spent on
-diapers: $412" as document structure. They also set the figure in a `<p>` at `text-2xl` while
-the real headings were `text-base`, so the visual hierarchy ran opposite to the semantic one.
-A heading names a section; if the thing is data, it is a `<dt>`/`<dd>` pair.
+**Portable — a statistic is data, not a section name, and shouldn't be marked up as a
+heading.** A heading placed on a data value puts that value into the page's navigable outline —
+someone navigating by heading hears the figure read out as document structure, not as data. If
+the visual size of a data value happens to exceed nearby real headings, that's a sizing choice
+independent of the semantic tag, and letting the two diverge (a heading-sized `<p>` beside
+real headings styled smaller) inverts the visual hierarchy relative to the semantic one.
+**Local — measured:** six figures here were marked up as `<h2>` before this was caught.
 
 ### Numbered steps
 
-`essentials_step_number(n)` is the brand-tinted disc beside a step in an ordered list of
-instructions. It exists because its eleven classes were written out **five times** in
-`dashboard/_getting_started_prompt` — the case this document argues against when it explains why
-`.data-table` is a component class and not a utility string.
+**Portable — a visual step number beside an ordered-list item is decorative and hidden from
+assistive tech**, because the number is already carried by the list's own semantics — showing it
+to assistive tech too means the position gets announced twice. **Local — this default:**
+`essentials_step_number(n)`, extracted after its class string was duplicated five times, the case
+this document argues generally under Components' opening rule.
 
-It is `aria-hidden`, because the number is already carried by the `<ol>`; without that a screen
-reader reads the list semantics twice — *"1, 1, Set up storage locations"*.
-
-The avatar disc in the two top bars is the same idea at `h-8 w-8` holding initials rather than an
-index, and is deliberately **not** the same helper: near enough to look like one component, far
-enough apart in purpose that merging them would need a size and a semantics argument at every call
-site.
+**Portable — two components can look nearly identical and still deserve separate
+implementations, when merging them would require a size-and-semantics argument at every call
+site.** Visual similarity alone isn't sufficient reason to share code. **Local:** the numbered
+step disc and the initials avatar in this app's top bars are exactly that pair — kept deliberately
+separate.
 
 ### Status pills
 
-A pill is a **state**, not a control: not focusable, does not look pressable. It is also
-**exceptional** — badge the rows that need attention, not every row. A column where each row
-carries a badge spends colour on something the reader already knows, and the eye learns to skip
-the column, exceptions included. Most tables here get this right: "Inactive", "Expired" and
-"Below minimum" appear only when true, next to the name, without a column of their own.
+**Portable — a pill communicates state, not action: it's never focusable and never looks
+pressable.** Reusing a state-communicating visual language for an actual control (a chip you can
+click) produces a control that looks like data, which is a category error a reader has no way to
+detect visually — see [badge the exception](#badge-the-exception) for the same exceptional-only
+discipline applied to table columns.
 
-**An icon on a pill is decorative, and only earns its place on a pill that is rare.** The word
-carries the meaning — which is also what stops the pill depending on colour alone — so a column
-where every row is badged should drop the icon: six of them stack into clutter. Keep icons for
-exceptions like "Inactive" and "Expired". Pills never wrap (`whitespace-nowrap`); a two-line pill
-leaves its icon centred across both lines, which reads as a misalignment rather than a wrap.
-
-Never build a control out of `PILL_TONES`. A filter chip that borrows the status palette is a
-control that looks like data; the partner list does this and
-[docs/table-audit.md](docs/table-audit.md) records it as a defect.
+**Portable — an icon on a pill is decorative and only earns its place when the pill itself is
+rare.** The word already carries the meaning (which is also what keeps the pill from relying on
+colour alone); a column where every row is badged should drop the icon entirely, since several
+identical icons in a row is clutter rather than signal. **Local — this default:**
 
 ```erb
 <%= essentials_status_pill "Awaiting review", tone: :warning, icon: "bi-hourglass-split" %>
 ```
 
 Tones: `:neutral` `:info` `:success` `:warning` `:danger` `:brand`. Each pairs a tint with a
-word; pass an `icon:` when the pill is doing real signalling work rather than labelling.
+word; pass an `icon:` when the pill is doing real signalling work rather than labelling. Pills
+never wrap; a wrapped pill leaves its icon centred across two lines, reading as misalignment
+rather than a wrap.
 
 ### Icon tiles and avatars
 
@@ -2171,56 +2171,48 @@ word; pass an `icon:` when the pill is doing real signalling work rather than la
 <%= essentials_avatar_initials current_user.name %>
 ```
 
-**Two sizes, named as the buttons are.** `md` (36px, `rounded-xl`) is the default and stands
+**Portable — reuse the same size vocabulary across related components** (here, the icon tile's
+sizes are named the same as button sizes), so a reader doesn't have to learn a second scale.
+**Local — this default's two sizes:** `md` (36px, `rounded-xl`) is the default and stands
 beside a figure or a `text-base` heading. `sm` (28px, `rounded-lg`) is for a compact card header,
 where the larger tile beside a `text-sm` heading reads as heavy. Never build one by hand: the
 reports hub did, and drifted on all three of size, radius and text colour before anyone noticed.
 
-A soft coloured tile behind an icon means "a stat or a status". A **person** is an initials
-avatar instead. Keeping these disjoint is what makes either one readable at a glance, and it is
-also the line `page-audit.rb` draws: a tone-coloured fixed-size box that is **not** `rounded-full`
-is a tile and must come from the helper; a circle is an avatar or a numbered step badge and is
-left alone.
+**Portable — reserve two distinct visual vocabularies for "a stat or status" versus "a
+person," and never let them overlap** — a shape convention (a soft-coloured tile vs. a circular
+avatar) that stays legible specifically because it's applied with no exceptions.
 
-**A tile earns its place by being different from the tile next to it.** In a row of stats or a
-list of options each icon names its own item, so it is doing work. The same glyph repeated down
-every row of a list is not — it gives the eye a second column of identical marks to skip and
-distinguishes nothing. If every row would carry the same icon, it belongs to the card: pass
-`icon:` to `shared/essentials/card` and it renders once, beside the `h2`. Both announcement
-cards used to stamp a megaphone on every announcement, inside a card already titled
-"Announcements".
+**Portable — a repeated visual element earns its place by varying meaningfully between
+instances; an identical element repeated down every row of a list is noise, not signal, and
+belongs at the container level instead (once, in a header) rather than once per row.**
+**Local — the mechanical test this default uses:** is the icon a literal value passed in, or is
+it the same hardcoded icon inside a loop? The former varies per row and stays; the latter doesn't
+and moves to the card header.
 
-The test is mechanical: **is the icon a literal, or does it come from the row?**
-`essentials_icon_tile(stat[:icon], …)` varies per row and stays; `essentials_icon_tile("bi-megaphone", …)`
-inside a loop does not and moves to the header.
-
-The account menu's trigger in either top bar is the avatar **alone** — initials and a chevron,
-no name beside it. The name is not gone, it is one layer in: the panel opens with the name, the
-email and the role. A name in the bar is the one piece of text on the page that never changes,
-so it competes with the page for the eye at every width and truncates at the narrow ones, and
-the initials already say whose account it is. Because the avatar is `aria-hidden`, that makes
-the trigger an icon-only control, so it carries the name in its own `aria-label` — `Account menu
-for …` — and a screen reader is told what the initials tell everyone else.
+**Portable — a piece of chrome that appears identically on every page competes with the page's
+own content for attention at every width, and is a strong candidate to move one layer deeper**
+(behind a click) rather than staying permanently visible. **Local — this default:** the account
+menu's trigger is the avatar alone — initials and a chevron, no name — with the name, email and
+role surfacing once the panel opens. Since the avatar itself is decorative, the trigger is an
+icon-only control and carries the name in its own accessible name instead, per the icon-only
+rules above.
 
 ### Cards
 
-The surface everything sits on: white, hairline border, `rounded-2xl`, `shadow-sm`.
+The surface everything sits on: white, hairline border, `rounded-2xl`, `shadow-sm` — this app's
+values for [surface elevation](#spacing-radius-elevation).
 
-**That surface is `.card-surface`, and it is written in exactly one place** — a component class
-in the Tailwind entry, beside `.data-table`. Never paste `rounded-2xl border border-slate-200
-bg-white shadow-sm` into a template; `page-audit.rb` sweeps views, helpers and JavaScript for it
-and reports every copy.
+**Portable — separate "the surface" from "the component," when other things legitimately need
+the surface's visual treatment without the component's full structure (a title/subtitle/actions
+header).** Forcing every surface-user through the full component either bloats the component with
+options nobody wants together, or produces copy-pasted utility strings that drift the moment one
+copy is edited without the others. **Local — this default:** the surface is `.card-surface`, one
+class, checked for accidental duplication by `page-audit.rb`.
 
-The class exists because the component is not the only thing that needs the surface, and the
-other four callers should not be forced through it: `essentials_stats` builds its own container,
-the admin dashboard and the partner header build `flex` stat tiles, the reports hub builds a
-compact labelled `<section>`, and `shared/essentials/_disclosure` wraps a panel. None of them
-wants a title/subtitle/actions header. All five were pasting the utilities, so a change to the
-card reached one of six places.
-
-**Use the component when you want a card; use the class when you only want the surface.** If you
-reach for the class to avoid the component's header, that is the right call — if you reach for it
-to build a second card, render the component instead.
+**Portable — reach for the lighter primitive (the surface class) when you only need the visual
+treatment; reach for the full component when you actually want its structure.** Needing to avoid
+the component's header is a legitimate reason to use the surface alone — needing a second card is
+a sign to render the actual component instead of re-deriving its look.
 
 ```erb
 <%= render "shared/essentials/card",
