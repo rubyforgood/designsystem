@@ -4073,10 +4073,12 @@ front of everything without one. The audit fails on any.
 
 ### select2 names nothing it builds
 
-select2 hides the `<select>` and builds a combobox, a value display and a search input beside it.
-None of them inherits the original's accessible name, and the combobox's own `aria-labelledby`
-points at its value container — empty until something is chosen, so the control has no name at
-all.
+**Portable — a widget that replaces a native form control with custom markup does not
+automatically carry over that control's accessible name to its replacement parts, and needs to be
+checked explicitly, not assumed.** A generated `aria-labelledby` that happens to point at a
+container that's empty until interaction produces a control with no accessible name at all — a
+subtle, easy-to-miss failure mode specific to widget libraries that hide-and-rebuild rather than
+progressively enhance. **Local:**
 
 `utils/select2_accessibility.js` names all three. It lives in a util rather than in
 `select2_controller` because **select2 is initialised in two places**: the fix lived in the
@@ -4085,52 +4087,55 @@ instead, so it kept the exact fault the fix was written for.
 
 ### Forms: required fields and validation errors
 
-Audit with `pw bin/design/form-validation-audit.js`, which opens every `new` form, reads how its
-required fields are marked, submits it empty and reads what came back — **and opens the four modal
-forms**, which have no route of their own and so had never been audited at all. That gap is how
-`New quantity request` came to carry a `required` select with no visible marker: programmatically
-required, and silently. A modal is checked for marking only; an empty submit in one either navigates
-away or redirects with a flash, so there is no re-rendered form to read.
+**Reading note.** One of the densest, most consistently portable sections in this document — form
+validation UX and accessibility correctness barely varies by framework. Full inline tags below
+rather than a synthesis block, given how load-bearing nearly every paragraph is on its own.
 
-**Required is stated two ways, and both come from the wrapper.**
+**Portable — an audit enumerating "every form" needs to include forms with no route of their own**
+(modals, dialogs reached only through JS) — an enumeration based on routable pages alone is blind
+to exactly the forms most likely to be checked nowhere else.
+
+**Portable — a required field's state is marked two ways simultaneously: visually (for sighted
+users) and programmatically (`aria-required` or equivalent, for assistive tech) — one without the
+other is an incomplete implementation, not a partial one.**
 
 | | Where | Who it is for |
 | --- | --- | --- |
 | a **red asterisk** — `<abbr class="required-marker" title="required">*</abbr>` | in the label | sighted users |
 | `aria-required="true"` | on the input | screen readers |
 
-**The marker is `rose-600` and carries `text-decoration: none`, and the second half matters as
-much as the first.** Every browser underlines `abbr[title]` with a dotted line, so for a year the
-marker rendered as a slate-700 asterisk with three dots under it — neither red, nor plainly an
-asterisk. The class comes from the `simple_form.*.yml` `required.html` key rather than an
-attribute selector, because the `title` is localised and a marker that only turns red in English
-is worse than one that never does.
+**Portable — a semantic HTML element (like `abbr[title]`) carries browser default styling that
+can visually defeat your own styling if not explicitly overridden, and a selector keyed to
+translatable text content breaks the moment the app is localized.** Style by a stable class/attribute
+your own code controls, never by the literal (and potentially localized) text content or the
+browser's own default presentation of a semantic element.
 
-**There is no legend explaining the asterisk.** There was — "Fields marked * are required.",
-rendered by `essentials_form_for` and CSS-hidden on forms with nothing required — and it was
-removed: a red asterisk is the convention, and a line restating it cost ~32px at the top of every
-form's card. This reverses an earlier decision taken for WCAG 3.3.2; the reasoning both ways is in
-[design-decisions.md](docs/design-decisions.md). Nothing programmatic changed — `abbr@title` and
-`aria-required` both remain.
+**Portable — a widely-understood visual convention (a red asterisk for "required") doesn't need
+a redundant legend explaining it, once it's established consistently across the whole app** — but
+removing the legend is a UX decision to make deliberately and record, not a default, and the
+underlying programmatic markers (a semantic `abbr[title]`, `aria-required`) stay regardless of
+whether the visual legend does.
 
-**Do not write an asterisk into label text.** A red one means required; a black one written by
-hand means something the reader has to guess at. Four labels on the product drive participant
+**Portable — a visual convention that means something specific (a red asterisk = required) must
+not be reused, even superficially, for something else** (a hand-written asterisk in a different
+colour meaning a different, unstated thing) — the reader has no way to distinguish "the real
+convention" from "something that looks like it." Four labels on the product drive participant
 form used to do this for conditionally-required fields, and say the condition in words as well —
 the words stayed and the asterisks went.
 
-`aria-required` is added by `EssentialsInputAria` rather than by simple_form's `html5` component,
-which derives `required` from `SimpleForm.browser_validations` — off here, deliberately, because
-the server validates and a browser bubble competing with a rendered error is two answers to one
-question. Turning it off also removed the only programmatic signal; this puts it back without
-the browser's UI.
+**Portable — server-side and browser-native validation UI shouldn't compete for the same
+field.** If the server is the authority on validity (because business rules the browser can't
+express live there too), disable the browser's own validation UI rather than letting it show a
+competing, possibly-inconsistent message alongside the server-rendered one — but preserve
+whatever programmatic accessibility signal the browser validation would otherwise have provided,
+since disabling the UI shouldn't also silently disable the accessibility semantics.
 
-**A requirement that belongs to a group is marked on its `<legend>`, not on each control.** The
-group is what is required — a radio set, or a pair where either one will do.
-
-**A conditional requirement goes on the legend too, and is said once.** It used to be written into
-both labels — `Phone (phone or email required)`, and the same sentence again on Email — which made
-the *accessible name* of the field carry the condition and repeat it. The label names the field; the
-legend states the rule; neither field carries `aria-required`, because neither is required alone.
+**Portable — a requirement belonging to a *group* (a set of radios, an either/or pair) is
+marked on the group's own container (`<fieldset>`/`<legend>` or equivalent), not duplicated onto
+each individual control** — a rule stated once, at the level it actually applies, rather than
+copy-pasted into every field's own label/accessible name (which then has to repeat the same
+condition on every affected field, bloating every individual field's accessible name with a rule
+that isn't really about that one field alone).
 
 ```erb
 <fieldset>
@@ -4143,21 +4148,22 @@ legend states the rule; neither field carries `aria-required`, because neither i
 `form-validation-audit` reads a legend for any field now, not only for a radio or checkbox, so a
 condition stated there still counts as marked.
 
-**An error belongs to its field, not only to a summary.**
+**Portable — a validation error belongs to its specific field (marked invalid, described by
+the message, both programmatically) in addition to appearing in any page-level summary — never
+only in the summary.**
 
 - `aria-invalid="true"` on the input, from simple_form's `html5` component.
 - `aria-describedby` pointing at the message, from `EssentialsInputAria`. The message text is
   wrapped in a span with an id, because the `<p>` the wrapper builds cannot take a per-field one.
 - `essentials_error_summary` above the form, listing every failure in one place.
-- **The summary's items are plain text, not links.** They were anchors to each field once --
-  the GOV.UK pattern -- and inside a red box they read as blue underlined links, a third colour
-  in a component that already has two. Two rules were being broken at once: the underline,
-  because [Interaction](#accessibility) says a link that is its own block takes none, and the
-  tone, because brand blue on a danger surface points at nothing the reader can act on. A plain bulleted
-  list under a bold line is what Polaris, Carbon and Atlassian are each observed showing for the
-  same component. The jump is
-  not missed: every message is repeated at its own field and tied to the input by
-  `aria-describedby`, so the summary says **what** is wrong and the field says **where**.
+- **Portable — a genuinely well-regarded reference pattern (GOV.UK's linked error summary) can
+  still be the wrong choice for a different visual system**, if it violates that system's own
+  established rules (here: block-level links take no underline; a third accent colour inside a
+  component already using two reads as noise, not signal). Borrowing a pattern means borrowing its
+  *reasoning*, checked against your own established rules, not copying its exact implementation
+  unconditionally. The functional benefit the links provided (getting to the field) is fully
+  preserved another way — every message is duplicated at its own field, tied by
+  `aria-describedby` — so nothing is actually lost by not linking.
 - **The glyph sits in its own column, and the heading and list share the next**, so the bullets
   line up under the heading's text instead of under the glyph. The alignment is structural --
   a flex row -- rather than left padding measured against the icon, which is a number that goes
@@ -4175,11 +4181,10 @@ condition stated there still counts as marked.
   surface inside a `rose-200` border. The frame and the glyph carry the danger; colouring the
   sentences as well is the same signal three times.
 
-**One failure, one alert. The summary is the convention; a flash is the fallback.**
-
-A validation failure gets the error summary and the inline messages, and nothing else. It used
-to get a flash as well, on **18 forms** — two `role="alert"` regions for one event, announced
-twice and disagreeing about what to say. The summary said "Storage location must exist"; the
+**Portable — one failure produces exactly one alert-level announcement, from exactly one
+mechanism.** Two independent alert mechanisms both firing for the same underlying event is a real
+correctness bug (they can disagree about what happened, and assistive tech announces both), not
+just visual redundancy. The summary said "Storage location must exist"; the
 flash said `storage_location: must exist` on `/adjustments`, and "Something didn't work quite
 right -- try again?" on eight others.
 
@@ -4189,17 +4194,25 @@ the case a flash is genuinely for: a service raised, or a business rule failed w
 anything on the record — `can_deactivate?` on an item, an inventory shortfall on a distribution.
 Operational failure gets the flash; validation failure gets the summary; never both.
 
-**Never render `f.input` with a block containing `f.input_field`.** It renders the label and then
+**Portable — bypassing a form framework's field-rendering pipeline to "just tweak the
+markup" silently drops everything else that pipeline was responsible for** (accessibility
+attributes, wrapper classes, error/required state) — a targeted-looking shortcut with a
+broad, invisible cost. It renders the label and then
 the block, so the field never goes through the input pipeline: no wrapper classes, no
 `aria-required`, no `aria-invalid`, no `aria-describedby`. It has been found three times — a
 checkbox on the admin partner editor, a select on the account request form, and both fields of
 the shared admin user partial, where the label said "Name *" and the input said nothing.
 
-**On failure, re-render the record that failed — not a new one built from the same params.**
+**Portable — a failed form submission must re-render the actual invalid object carrying its
+validation errors, not a fresh object reconstructed from the same input** — reconstructing loses
+the error state even when the visible field values look identical, leaving no visible sign
+anything went wrong except a message the reader may have already dismissed.
 Rebuilding loses the errors, so every field comes back clean and the only sign of trouble is a
 sentence at the top. `items`, `kits` and `admin/users` each did this.
 
-**Do not mark a field required unless something enforces it, and put the rule in one place.** A
+**Portable — a required-field marker with no actual validation behind it is a promise the form
+doesn't keep, and it's worse than no marker at all** — it teaches users to distrust the required
+markers on the rest of the form once they discover one is decorative. A
 label asterisk and `aria-required="true"` with no validation behind them is a promise the form does
 not keep — the cancellation reason carried both for years while a blank one saved and the partner's
 email read "Reason Provided: N/A".
@@ -4216,7 +4229,10 @@ states. That is the same retryable/not split as above: a missing reason is somet
 fix, so it re-renders; "already cancelled" is not, so it redirects. One rule, one owner, and the
 owner is the one that can re-render.
 
-**A model or service message reaches the user verbatim.** `partners/requests/_error` prints every
+**Portable — any message text with a code path direct enough to reach the user (a model
+validation message, a service error) is effectively UI copy, whether or not it was written with
+that in mind** — apply the same copy standards to it as to hand-written UI strings, since the
+reader can't tell the difference. `partners/requests/_error` prints every
 base error as a bullet and the flash interpolates `full_messages` straight in, so a validation
 string is UI copy whether or not it was written as one. Read them as a partner would:
 `"completely empty request"`, `"request_id is invalid"`, `"detected a unknown item_id"`.
@@ -4227,7 +4243,10 @@ remedy differs by form and the callout's guidance line already gives it ("Choose
 child" on the family form, "every line needs an item selected" on the other two). Changing it meant
 updating the three specs that assert the exact string, which is the whole cost and worth paying.
 
-**A failure nobody can retry does not go back to the form.** Re-rendering is right when the user
+**Portable — distinguish a *retryable* failure (the user can change something and resubmit)
+from a *state* failure (nothing the user resubmits will ever succeed, because the underlying
+situation has already changed) — a retryable failure re-renders the form; a state failure sends
+the user somewhere that reflects reality, never back to a control that can only fail again.** Re-rendering is right when the user
 can change something and try again. When the failure is a *state* — the record is already gone,
 already cancelled, already claimed by someone else — returning them to the form puts them in front
 of a control that can never succeed, and silently discards whatever they had typed into it.
@@ -4244,19 +4263,25 @@ The flash was never the problem: an operational failure is exactly what a flash 
 destination was. **Ask what the user should do next, and send them there** — if the answer is
 "nothing, it is already done", the form is the one place they should not be.
 
-**The summary takes focus when the form comes back failed.** `essentials_error_summary` carries
+**Portable — after a full-page re-render following a failed submission, focus needs to be
+explicitly moved to the error summary** — a full page load resets focus to the top of the
+document regardless of where the summary happens to render, leaving a keyboard user with no
+indication anything failed unless they scroll to look. `essentials_error_summary` carries
 `tabindex="-1"` and `data-controller="error-summary"`, and the controller focuses it on connect.
 A failed submit re-renders the whole page — Turbo Drive is off app-wide — so the browser puts
 focus on `<body>` and leaves the user at the top of a form that looks like the one they just sent.
 Measured on `/manufacturers`, `/vendors` and `/storage_locations`: `document.activeElement` was
 `BODY` on all three, with `scrollY` 0 whether or not the summary was on screen.
 
-`role="alert"` does not cover this by itself. **A live region is defined in terms of a subtree
-changing**, and on a full page load the summary is already in the markup when the accessibility
-tree is first built — so whether it is announced varies by screen reader. Focus does not depend on
-that timing, and it also puts a keyboard user *at* the errors, which the live region never does.
+**Portable — a live region only reliably announces a genuine change to its subtree after the
+accessibility tree already exists; content present on the very first render of a live region is
+not a "change," so whether it's announced on a full page load varies by screen reader and can't be
+relied on.** Explicit focus movement doesn't have this timing ambiguity, and additionally places
+a keyboard user directly at the problem, which a live region announcement never does on its own.
 
-**The live region goes inside the focused element, never on it.** Focusing something that is itself
+**Portable — an alert-role live region should be nested inside the element that receives
+focus, not applied directly to the focused element itself** — several screen reader/browser
+combinations announce a focused element's own alert-role content twice. Focusing something that is itself
 `role="alert"` reads its contents twice on several screen reader and browser pairings. The focused
 container is a plain `<div>`; the `role="alert"` sits on the wrapper within it. This is the shape
 the GOV.UK error summary settled on. What is verified in this repository is the mechanics — focus
@@ -4266,7 +4291,10 @@ The callout has a **`focusable:`** option that does the same two things together
 `partners/requests/_error`: `tabindex="-1"` on the root and the role moved to the inner wrapper.
 One local, because the two halves are only correct as a pair.
 
-**It takes focus only from nothing.** The controller returns unless `activeElement` is `<body>` or
+**Portable — programmatic focus-stealing should only happen when nothing more specific
+already has focus** (e.g. focus currently sits on the generic document body/root) — forcibly
+moving focus away from an element the user is actively interacting with (mid-typing, say) loses
+their place for no benefit. The controller returns unless `activeElement` is `<body>` or
 `<html>`. If a summary ever arrives in a frame update while somebody is typing, stealing the caret
 would lose their place.
 
@@ -4275,7 +4303,10 @@ in `brand-600`. Chrome matches `:focus-visible` on this programmatic focus and w
 paint its own 1px outline; a keyboard user whose focus has just been moved for them is exactly who
 needs to see where it went.
 
-**One concept gets one rendering, and the helper is where that is enforced.** Invitation status was
+**Portable — when the same underlying concept is displayed on more than one screen, it needs
+exactly one rendering implementation, shared by every screen that shows it — not independently
+reimplemented per screen, which drifts both in appearance and, eventually, in the underlying
+logic each reimplementation uses to compute the same nominal value.** Invitation status was
 drawn two ways for the same `User`: the bank's organization table printed `user.invitation_status`
 raw — the lowercase words "joined", "accepted", "invited", and an empty cell for a user never
 invited — while the partner's user table ignored that method, recomputed from
