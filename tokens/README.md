@@ -26,6 +26,15 @@ is a find-and-replace in one file, not an edit to the spec.
   *this* palette and this background; a different hue or a dark-mode surface needs its own
   measurement, not an assumption that "the 700 step" is universally safe.
 - Depth comes from a hairline border, not a shadow. A shadow is a hint; the border is the edge.
+- **A `dark:` utility is live the moment it's used, whether or not the app has a dark-mode
+  toggle.** Under Tailwind v4, `dark:` compiles to a real `@media (prefers-color-scheme: dark)`
+  query — it fires on any visitor whose OS is set to dark mode, unconditionally, independent of
+  any in-app setting. "We haven't built dark mode" is not the same claim as "no `dark:` utility
+  can currently render," and treating the two as equivalent is exactly the gap that let one Ruby
+  for Good project ship a `dark:text-slate-400` believed to be 6.99:1 while it actually rendered
+  2.45:1 — a real AA failure, live in production, for every OS-dark-mode visitor, discovered only
+  because someone measured the painted pixels rather than trusting the class name. A single
+  stray `dark:` utility, added once for one component and forgotten, is enough.
 
 **Local (this default's answer):**
 - Brand hue: indigo. Neutral: Tailwind's slate. Semantic hues: emerald/amber/rose/sky.
@@ -87,3 +96,8 @@ is a find-and-replace in one file, not an edit to the spec.
    `docs/portability/adapter-reference-app.md` for what happened the one time this was tried for
    real — a reasonable, different spacing choice on a second app tripped several Local pixel
    thresholds baked into the audits themselves, not just the spec.
+4. Before using even one `dark:` utility anywhere in the app — not only when deliberately building
+   a dark mode — grep for `dark:` across the codebase and verify every match has a real, measured
+   (painted-pixel, not declared-value) contrast pairing. "No dark mode has been built" is not
+   evidence that no `dark:` utility can render; it can, unconditionally, on any OS-dark-mode
+   visitor, whether or not the app ever intended to support the mode at all.

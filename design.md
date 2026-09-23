@@ -4031,6 +4031,30 @@ below `lg`, and fixed chrome covering more than half a short viewport. `overlay-
 every dialog and popover at **320×640 as well as 1360×900** — an overlay that fits on a desktop
 tells you nothing about a phone, and that is where a 26rem panel runs out of room.
 
+<a id="components-size-against-their-container"></a>
+### Components size against their container
+
+**Portable — anything that can render inside a card, a column, a modal or a table cell sizes
+against its own *container*, via a container query, not against the viewport, via a media query.**
+Viewport breakpoints answer "how wide is the window"; a component embedded somewhere narrower than
+the window (a card in a two-column layout, a widget in a sidebar) needs to respond to *its own*
+available width, which a media query cannot see. A recurring, well-evidenced failure shape across
+Ruby for Good projects that have measured it: a component built and tested at the page level,
+sized against the viewport, that then breaks the moment it's reused somewhere narrower — every
+instance of "this broke when we put it somewhere else" traced back to exactly this. Reserve
+viewport breakpoints for page-level layout — the shell, the overall grid — and reach for
+`@container` for anything that has to work regardless of where it's embedded.
+
+**The one documented exception, and why it's an exception rather than a reason to avoid container
+queries generally:** `container-type: inline-size` computes to `contain: layout`, which makes the
+container a containing block for **fixed**-positioned descendants — see
+[why table-stacking here uses a media query instead](#why-not-container) for the specific case
+this broke, a component whose escape mechanism (a row-action menu positioned `fixed` specifically
+to get outside its card) depends on *not* having a new containing block introduced above it. This
+is a real, narrow conflict between two portable techniques, not a reason to prefer viewport
+queries generally — check for a `position: fixed` descendant that relies on escaping its ancestors
+before reaching for `container-type` on anything that contains one.
+
 ### The document never scrolls sideways
 
 **Portable — the document root itself never scrolls horizontally; a wide element that genuinely
@@ -4966,11 +4990,15 @@ where the old rule was container-based, and that is safe here because **the cont
 less 34px at these sizes, on every page**: measured across four pages and twelve widths, with a 1px
 scan putting the transitions at **450** and **690**. So the translation is exact.
 
+<a id="why-not-container"></a>
 **Why not `@container`, which is what the question really is about?** `container-type: inline-size`
 computes to `contain: layout`, which would make the card a containing block for **fixed** descendants
 — and the [row action menus](#row-actions) are fixed precisely to escape this card. `@media` has no
 such effect. (That was already the recorded reason for not using a container query; what changed is
-noticing that it never applied to a *media* query.)
+noticing that it never applied to a *media* query.) This is the specific, narrow exception the
+general rule under [Components size against their container](#components-size-against-their-container)
+names — not a reason to avoid container queries elsewhere, only here, and only because of the
+fixed-positioned menu specifically.
 
 Four things this needs, and the last two are the ones this pattern is usually built without:
 
@@ -5782,6 +5810,14 @@ Known gaps, in rough priority order:
 - **Charts are not accessible.** Highcharts output has no text alternative beyond the table
   beside it. A summary sentence per chart would be cheap.
 - **No dark mode.** The tokens would support it; nothing has been built.
+
+  **Annotated 2026-09, comparison against a sibling project.** "Nothing has been built" is true
+  and was read as "nothing to worry about" — that reading is false under Tailwind v4 specifically.
+  A `dark:` utility compiles to a real `@media (prefers-color-scheme: dark)` query unconditionally,
+  independent of whether an in-app dark mode exists; a single stray one, added once and forgotten,
+  is live for any OS-dark-mode visitor regardless of what this bullet says. See
+  [`tokens/README.md`](tokens/README.md)'s Colour section for the rule and the retheming
+  checklist for the check.
 - **`shared/_custom_file_input`** duplicates what `:essentials_file` now does through
   `::file-selector-button`. It can probably go.
 - **The partner profile forms** are the largest remaining views and still carry a lot of
