@@ -5353,12 +5353,18 @@ elements forward is noise in the tab order rather than the accessibility aid it'
 
 ### Turbo is opt-in per action
 
-`<body data-turbo="<%= @turbo %>">`. Controllers opt in; it is not on by default. Turbo frames
-are used for the flash strip and for the few index pages that update in place.
+**Portable — a partial-update/AJAX-interception mechanism should be opt-in per action, not
+applied globally by default.** A blanket default makes every action's actual behavior implicit
+and hard to predict; opting in explicitly where partial updates genuinely help keeps the default
+(a normal full navigation) predictable everywhere else. **Local:**
 
 ### Stimulus first
 
-No jQuery in new code, and no framework JS at all. Controllers in `app/javascript/controllers/`:
+**Portable — standardize on one JS approach for new code, and bring third-party widgets into
+that approach (wrapping them, adding what they're missing) rather than mixing paradigms
+call-site by call-site.** A codebase with two JS idioms in active use costs every future
+contributor the tax of learning both and guessing which one a given piece of code follows.
+**Local — this default's controllers:**
 
 | Controller | Does |
 | --- | --- |
@@ -5379,9 +5385,13 @@ by the date range picker above and its two CDN pins are gone.
 
 ### Multi-tenancy is visible
 
-The organization's name is in the top bar on every bank page, and the partner's name on every
-partner page. It is not decoration: users work across several organizations and a screen with
-no tenant on it is a screen you can act on by mistake.
+**Portable — in any multi-tenant application, the current tenant context is visibly displayed on
+every screen, always, not just where it happens to be convenient.** This is not decoration: a
+user who works across more than one tenant can act on a screen with no visible tenant context
+believing they're in a different one than they actually are — a real, costly mistake class that
+constant visible context prevents structurally rather than relying on the user to remember. **Local:**
+the organization's name is in the top bar on every bank page, and the partner's name on every
+partner page.
 
 ### Print
 
@@ -5432,6 +5442,12 @@ Notes that will bite you otherwise:
 
 <a id="citing-another-system"></a>
 ## Citing another system
+
+**Portable, entirely — 100% per this document's own tagging pass, and it reads that way already.**
+This whole section is citation methodology with no Human Essentials content in it; the specific
+failure example (Carbon/Material/GitHub/Gmail) is illustration, not the point. Applies directly to
+this repo's own field notes in `docs/portability/` and to anyone else writing a spec that argues
+from industry precedent.
 
 Half the decisions in this document are argued partly from what other design systems do. That
 argument is worth making and it is easy to make badly, so here is the standard it has to meet.
