@@ -2247,64 +2247,110 @@ sits on the `h1` baseline; `items-start` when there is one, so the CTA cannot be
 to the subtitle's baseline.
 
 <a id="radio-spacing"></a>
-**Radio and checkbox options are 24px rows with 8px between them** — a 32px pitch, set once on
-`:essentials_collection`'s `item_wrapper_class`, so no page decides this for itself.
+**Portable — target size and inter-target spacing are two separate variables; a row already at
+the WCAG 2.5.8 minimum needs a gap added, not the row itself inflated, to create visual
+separation.** Meeting the size floor exactly is compliant but reads as flush/cramped without a
+gap between rows; growing the row itself past what the floor requires is a different, needless
+change. **Local — this default's numbers:** 24px rows, 8px gap, a 32px pitch, set once so no page
+decides for itself.
 
-They were 24px rows with a **0px** gap, flush against each other, in every group in the app. That
-passes [2.5.8](#tap-targets) on size alone — the row is exactly the 24px minimum — and sits on its
-floor with no separation.
-
-**The gap is what buys the separation; do not inflate the row.** A first pass took the row to 32px
-as well, for a 40px pitch, on **GOV.UK**'s 40+10 and **Material 3**'s 48dp — and it was reported as
-too loose, correctly. Those two are the wrong comparators: GOV.UK sizes for a full-page public
-service form and Material for a touch list. The systems this app resembles sit near 24/8 —
-**Carbon**, **Ant Design**, **Atlassian** and **Bootstrap 5**'s `.form-check` are all in that
-region. Those four figures were **recalled, not measured**, unlike every other number in this
-document; the one that decided it was ours, and WCAG 2.5.8's 24px floor is what makes the row size
-defensible on its own. The row was already compliant; only the
-gap was missing.
+**A citation-honesty note, preserved from the original:** the comparator systems named for these
+values (Carbon, Ant Design, Atlassian, Bootstrap 5's `.form-check`) were *recalled, not measured*
+— unlike every other cited figure in this document — and that gap is flagged explicitly here
+rather than corrected silently, per this project's own evidence-discipline standard. The actual
+decision rests on the WCAG floor, not the citations.
 
 <a id="render-the-state-do-not-correct-it"></a>
-**The server renders the correct initial state; JavaScript may reveal, never un-draw.** A
-controller that hides something in `connect()` is a controller that has already let the reader see
-it — between first paint and Stimulus booting, it is on screen. Reported as *"a ghost button that
-appears for a second when you refresh"* on `/distributions/new`: the shipping cost field, which
-`distribution_delivery_controller` hides unless the delivery method is `shipped`, and a new
-distribution defaults to `pick_up`.
+**Portable — the server renders the correct initial state; client-side script may reveal, never
+un-draw.** Any script that hides an element after mount has already let the reader see it —
+between first paint and the script initializing, it's genuinely on screen, however briefly. Give
+the element its hidden state in the initial markup, computed from the same value the script itself
+would read, rather than rendering it visible and having script correct that after the fact. This
+generalizes to any progressively-enhanced conditional UI, regardless of framework — see
+[the scroll rail](#the-rail) and [tag input](#tag-input) elsewhere in this document as two more
+instances of the identical pattern.
 
-This is the rule [`[data-railed]`](#the-rail) and [`[data-tag-input="ready"]`](#tag-input) already
-follow, stated for the general case. Give the wrapper its `hidden` class in the template, from the
-same value the controller reads.
-
-**Match the controller's logic exactly, including "neither".** The deadline fields had the same
-flash, and the first fix defaulted the unset case to `day_of_month` — which put the field back for a
-frame, because with nothing set *neither* radio is checked and the controller hides *both*. `nil`
-matching neither branch is the correct initial state.
-
-`bin/design/flash-of-hidden-audit.js` checks for it: everything visible at `commit` that is gone
-once the page settles.
+**Portable — when the initial state has more than two branches (including "unset" or
+"neither"), the server-rendered state must match the script's logic for every branch, not just
+the obvious ones.** A fix that maps an unset value to one visible default, when the client script
+actually treats "unset" as "hide everything," reintroduces the exact flash it was meant to fix —
+just for the previously-overlooked branch.
 
 <a id="reserve-the-space-for-what-arrives-late"></a>
-**And reserve the space for anything that arrives late.** The flash rule is about content that
-should never have been drawn; this is about content that is not drawn *yet*. A chart container was
-an empty div until Highcharts inflated it on `connect()`, so the two buttons under it and the whole
-table card were thrown **850px** down the page a moment after the reader could see them. Measured
-with Chrome's own `layout-shift` entries: **CLS 0.352** on all three historical trend pages, against
-thresholds of **0.1 good and 0.25 poor**. Give the box its height from the same number the thing
-will draw at — the same reason an `<img>` carries width and height.
+**Portable — reserve layout space for anything that will arrive after initial render, sized to
+what it will actually draw at.** This is the same problem as an `<img>` with no width/height
+attribute, generalized to any late-arriving content (a chart library that inflates a container
+on mount, an async widget, a lazy-loaded embed) — an empty container that only takes its real
+size once content lands causes a measurable layout shift (CDS/CLS) for anything below it on the
+page. **Local — measured:** an unreserved chart container here threw a table card and two buttons
+850px down the page after initial paint, measured at CLS 0.352 against a 0.1-good/0.25-poor
+threshold.
 
-`pw bin/design/layout-shift-audit.js` scores every screen the way Chrome does, and names what moved.
-**147 screens, worst 0.000 above the noise floor** at desktop widths. It takes `--width=` because a
-shift is a property of the layout and the layout changes at the breakpoints.
-
-**A `<select>` is not automatically excused.** The flash audit used to skip every one, on the
-grounds that select2 replaces a select with its own container — a swap rather than a hide. That
-excused four genuinely painted-then-hidden selects on the donation form, worth **100px** of reflow
-on every load, which the layout-shift audit had to find instead. It now recognises the actual swap
-— `select2-hidden-accessible`, a `.select2-container` sibling, or a tag input — rather than the tag.
+**Portable — an audit that excuses a whole category of element by name ("selects don't need this
+check, a known library swaps them out") needs to verify the *actual* runtime behavior it's
+excusing, not just the element's tag.** A blanket exemption by tag name will excuse genuine
+instances of the exact defect it exists to catch, the moment any of those elements are handled
+differently than assumed.
 
 <a id="conditional-reveal"></a>
 ### Conditional reveal
+
+**Reading note.** A third mega-section under one stale heading — conditional field reveals,
+barcode scanning (including camera-failure messaging), navigation-destination rules, breadcrumbs,
+page-wrapper structure, and form width/alignment, none broken into their own subheadings. Same
+treatment as Row actions and Filters.
+
+**Portable, surfaced from this section:**
+
+- A field that only applies to one answer in a set is revealed directly below/after the control
+  that reveals it (in DOM order, so keyboard focus reaches it next), never beside it in a parallel
+  column — a named pattern in several government and enterprise design systems, not an invented
+  one ([reveal placement](#conditional-reveal)).
+- A revealed field needs a visual marker (an indent, a rule) tying it to the specific option that
+  revealed it — unmarked, it reads as belonging to every option in the group.
+- Verify which ARIA state attributes are actually valid for your trigger's specific role before
+  applying one uniformly — `aria-expanded` is not allowed on some roles at all, and what actually
+  carries reveal/hide behavior to assistive tech is DOM order, not a state attribute for its own
+  sake.
+- Server-render the correct hidden/shown state ([render the state, don't correct it](#render-the-state-do-not-correct-it)
+  applies here too, not just to the earlier flash-of-hidden case).
+- A failure state should say what happened and what to do about it, in place of the thing that
+  failed to appear — never fail silently or leave a blank/dead area where content should be.
+  Distinguish causes that need genuinely different remedies (a permissions problem vs. a hardware
+  problem vs. an insecure-origin problem) rather than one generic error.
+- A joined pair of controls that must always render the same height (an input with an attached
+  button, say) should be built as one visual unit sharing a border, not as two independently
+  positioned elements — independently positioned pairs drift the moment either one's surrounding
+  context changes.
+- When a component can appear more than once on the same page, target its parts through their
+  containing region/scope, not through global element IDs — an ID that's meant to be unique will
+  collide the moment the component repeats, and whichever instance matches first silently wins.
+- A destination belongs in exactly one navigation surface. The same link reachable from two
+  different places in the same UI, gated identically, is unnecessary duplication even though
+  neither instance is individually wrong.
+- A breadcrumb trail follows a real standards pattern where one exists (here, the W3C ARIA APG
+  breadcrumb: an ordered list because order carries hierarchy, ancestor links, the current page as
+  plain text with `aria-current="page"`) — implement the standard shape, and treat other systems'
+  visual variations (separator, spacing) as decoration on top of it, not as the part that matters.
+- Every page reachable inside the app should also be *leavable* — reachable via a nav root,
+  a breadcrumb, or a sibling link — not just reachable by the browser's back button.
+- Structural containers (a page's outer padding wrapper) get rendered exactly once per page.
+  Nested or duplicated instances of the same structural wrapper are invisible to markup validators
+  and rendering checks, and only show up as additive spacing that looks like a design defect.
+- A form's width and alignment follow its own content and its page's layout, not a default
+  "centre everything" assumption — centring belongs to standalone pages with no surrounding
+  navigation chrome to align against (a sign-in screen); a form embedded in a page that has a
+  heading and surrounding furniture should align with that heading, so navigating between views of
+  the same resource doesn't visibly shift the page title sideways.
+- Pair short, related fields on one line only when both conditions hold: full width would be
+  visually absurd for the content, *and* the fields are genuinely related enough that reading them
+  as a pair (including in DOM/tab order, which is what a screen reader user actually experiences)
+  is correct — pairing unrelated short fields for layout convenience costs a screen-reader user
+  more than it saves anyone else.
+
+The rest of this section is the Local, heavily-measured detail behind each of those, plus this
+app's own barcode-scanning implementation and page-wrapper/form-width specifics — read on for the
+case study; read the list above for what travels.
 
 A field that only applies to **one answer** is revealed under the answer that needs it.
 
