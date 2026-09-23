@@ -17,9 +17,8 @@
  */
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Targets come from the seam, which regenerates the list when it is older than the routes
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or

@@ -19,9 +19,8 @@
 //
 // Usage: pw bin/design/tab-set-audit.js
 const { chromium } = require("playwright");
-const { targets, signIn, visit, BANK } = require("./targets");
+const { targets, signIn, visit, BANK, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
 // Each set is the tabs as a reader meets them, plus the sidebar entry they sit under. `null` for

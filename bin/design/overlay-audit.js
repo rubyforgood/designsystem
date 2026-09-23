@@ -43,7 +43,6 @@ const { chromium } = require("playwright");
 const fs = require("fs");
 
 const AXE = "/tmp/axe/node_modules/axe-core/axe.min.js";
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
 // Pages that carry an overlay, and who can see them.
@@ -58,7 +57,7 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
  * swallowing it. With those bounded and the fixed sleeps replaced by condition waits it is 8x
  * faster, and the widening is affordable.
  */
-const { targets, signIn, visit, RUNS } = require("./targets");
+const { targets, signIn, visit, RUNS, BASE } = require("./targets");
 
 const PAGES = RUNS.flatMap(([email, wants]) =>
   targets().filter((t) => wants(t.path)).map((t) => [email, t.path]));

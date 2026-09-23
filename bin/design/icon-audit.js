@@ -25,9 +25,8 @@
 const { chromium } = require("playwright");
 const fs = require("fs");
 const nodePath = require("path");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const LIST = process.argv.includes("--list");
 const LEXICON = JSON.parse(fs.readFileSync(nodePath.join(__dirname, "icon-lexicon.json"), "utf8"));
 

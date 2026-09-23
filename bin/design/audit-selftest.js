@@ -32,9 +32,8 @@ const nodePath = require("path");
 const manual = require(nodePath.join(__dirname, "wcag-manual.js"));
 const wcag22 = require(nodePath.join(__dirname, "wcag22-audit.js"));
 const responsive = require(nodePath.join(__dirname, "responsive-audit.js"));
-const { signIn } = require("./targets");
+const { signIn, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
 // A page with a wide table, a scroll rail and the full app shell: everything these checks look at.

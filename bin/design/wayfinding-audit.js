@@ -1,6 +1,6 @@
 // AUDIT-READS: RENDER
 const { chromium } = require("playwright");
-const { signIn, targets: allTargets } = require("./targets");
+const { signIn, targets: allTargets, BASE } = require("./targets");
 
 // Every screen must be reachable *and* leavable. A page that is not in the sidebar and has no
 // breadcrumb has one way out: the browser's back button. The five report pages were all like that,
@@ -9,7 +9,6 @@ const { signIn, targets: allTargets } = require("./targets");
 // Usage: pw bin/design/wayfinding-audit.js
 //        BASE_URL=http://127.0.0.1:3000 pw bin/design/wayfinding-audit.js
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Screens with no app chrome, so there is nothing for a breadcrumb to sit under and nowhere in
 // the app to go back to. All of them are signed-out or standalone flows.

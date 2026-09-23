@@ -14,7 +14,6 @@
 // Usage: pw bin/design/flash-of-hidden-audit.js
 const { chromium } = require("playwright");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 // Pages carrying a controller that hides something in `connect()`.
 /*
@@ -23,7 +22,7 @@ const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
  * somebody had already found. `visit` from `targets` is deliberately *not* used below: this audit
  * navigates with `commit` because the whole point is to look before scripts have run.
  */
-const { targets, signIn, RUNS } = require("./targets");
+const { targets, signIn, RUNS, BASE } = require("./targets");
 
 // The controls a *swap* took over, collected from the settled DOM.
 //

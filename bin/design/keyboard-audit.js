@@ -17,9 +17,8 @@
  */
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 const ONLY = process.env.ONLY ? process.env.ONLY.split(",") : null;
 const WIDTH = Number(process.env.WIDTH || 1280);

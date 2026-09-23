@@ -16,7 +16,6 @@
 // Run against a seeded development server: bin/start, then `pw bin/design/button-audit.js`.
 const { chromium } = require("playwright");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 /*
  * **Every screen, in four passes.** The list here named 43 paths and went stale -- `/users` was on
@@ -27,7 +26,7 @@ const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
  * appears. The module supplies the three standard passes; the fourth is composed here because it is
  * this audit's concern, not everybody's.
  */
-const { targets, signIn, visit, RUNS, BANK } = require("./targets");
+const { targets, signIn, visit, RUNS, BANK, BASE } = require("./targets");
 
 const PASSES = [...RUNS, ["user_1@example.com", BANK]];
 

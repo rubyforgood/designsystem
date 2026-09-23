@@ -9,10 +9,9 @@
 // Run:           pw bin/design/wcag-audit.js [--json]
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets: allTargets } = require("./targets");
+const { signIn, targets: allTargets, BASE } = require("./targets");
 
 const AXE = "/tmp/axe/node_modules/axe-core/axe.min.js";
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const JSON_OUT = process.argv.includes("--json");
 
 // WCAG 2.1 A and AA only. Best-practice rules are reported separately so a real failure is
@@ -26,72 +25,6 @@ const SIGNED_OUT = [
   ["404", "/404.html"],
   ["500", "/500.html"]
 ];
-
-const BANK = [
-  ["dashboard", "/dashboard"],
-  ["distributions", "/distributions"],
-  ["new distribution", "/distributions/new"],
-  ["donations", "/donations"],
-  ["new donation", "/donations/new"],
-  ["purchases", "/purchases"],
-  ["requests", "/requests"],
-  ["items", "/items"],
-  ["new item", "/items/new"],
-  ["storage locations", "/storage_locations"],
-  ["transfers", "/transfers"],
-  ["new transfer", "/transfers/new"],
-  ["adjustments", "/adjustments"],
-  ["audits", "/audits"],
-  ["kits", "/kits"],
-  ["partners", "/partners"],
-  ["partner groups", "/partner_groups"],
-  ["new partner", "/partners/new"],
-  ["new partner group", "/partner_groups/new"],
-  ["donation sites", "/donation_sites"],
-  ["product drives", "/product_drives"],
-  ["manufacturers", "/manufacturers"],
-  ["vendors", "/vendors"],
-  ["barcode items", "/barcode_items"],
-  ["announcements", "/broadcast_announcements"],
-  ["new announcement", "/broadcast_announcements/new"],
-  ["users", "/users"],
-  ["my account", "/users/edit"],
-  ["organization settings", "/manage/edit"],
-  ["reports hub", "/reports"],
-  ["itemized distributions", "/reports/itemized_distributions"],
-  ["annual survey", "/reports/annual_reports"],
-  ["activity graph", "/reports/activity_graph"],
-  ["history", "/events"],
-  ["pick ups", "/distributions/schedule"]
-];
-
-const ADMIN = [
-  ["admin dashboard", "/admin/dashboard"],
-  ["admin organizations", "/admin/organizations"],
-  ["admin new organization", "/admin/organizations/new"],
-  ["admin users", "/admin/users"],
-  ["admin base items", "/admin/base_items"],
-  ["admin new base item", "/admin/base_items/new"],
-  ["admin partners", "/admin/partners"],
-  ["admin announcements", "/admin/broadcast_announcements"],
-  ["admin account requests", "/admin/account_requests"],
-  ["admin FAQ", "/admin/questions"],
-  ["admin NDBN upload", "/admin/ndbn_members"]
-];
-
-const PARTNER = [
-  ["partner dashboard", "/partners/dashboard"],
-  ["partner profile", "/partners/profile"],
-  ["partner edit profile", "/partners/profile/edit"],
-  ["partner requests", "/partners/requests"],
-  ["partner new request", "/partners/requests/new"],
-  ["partner distributions", "/partners/distributions"],
-  ["partner families", "/partners/families"],
-  ["partner new family", "/partners/families/new"],
-  ["partner children", "/partners/children"],
-  ["partner help", "/partners/help"]
-];
-
 
 async function audit(page, label, path) {
   const res = await page.goto(BASE + path, { waitUntil: "networkidle", timeout: 30000 });

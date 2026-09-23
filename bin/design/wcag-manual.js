@@ -18,9 +18,8 @@
 // nothing about the other hundred and forty. Widening the cheap checks took 2.4.2 from "0 failures
 // on 8 pages" to 14 on 92, which is the same lesson arriving early.
 const { chromium } = require("playwright");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 // The expensive checks -- reflow, zoom, text spacing, a full tab traverse -- resize the viewport
 // several times per page, so they run over a representative sample rather than the whole app: one

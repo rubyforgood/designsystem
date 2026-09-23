@@ -23,9 +23,8 @@
 // Usage: bin/rails runner bin/design/route-targets.rb > /tmp/targets.json && pw bin/design/wcag22-audit.js
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Targets come from the seam, which regenerates the list when it is older than the routes
 // file *or* the generator. Reading /tmp/targets.json directly meant a stale list silently, or

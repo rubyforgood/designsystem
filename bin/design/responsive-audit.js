@@ -16,9 +16,8 @@
  */
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets } = require("./targets");
+const { signIn, targets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Tailwind's breakpoints, the two sides of each switch, and the ends. A layout that breaks
 // usually breaks *at* the boundary -- 639 and 641 are different layouts and only one of them

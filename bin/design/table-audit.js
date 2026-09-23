@@ -10,14 +10,13 @@
 // Run against a seeded development server: bin/start, then `pw bin/design/table-audit.js`.
 const { chromium } = require("playwright");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 
 /*
  * **Every screen, not a list of the tables somebody knew about.** A table on an unlisted page was
  * not audited, and the list had already gone stale -- `/users` is on it and was deleted in August.
  * `auditPage` returns nothing for a page with no table, so the widening is free of false findings.
  */
-const { targets, signIn, visit, RUNS } = require("./targets");
+const { targets, signIn, visit, RUNS, BASE } = require("./targets");
 
 
 async function auditPage(page, path) {

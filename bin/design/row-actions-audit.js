@@ -18,9 +18,8 @@
 // Usage: pw bin/design/row-actions-audit.js
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets: allTargets } = require("./targets");
+const { signIn, targets: allTargets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
 const ROLES = {

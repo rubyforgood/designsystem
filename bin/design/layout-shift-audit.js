@@ -22,9 +22,8 @@
 //        pw bin/design/layout-shift-audit.js --all          list every page, not only the offenders
 //        pw bin/design/layout-shift-audit.js --width=390    a phone, where tables stack into cards
 const { chromium } = require("playwright");
-const { signIn, targets: allTargets } = require("./targets");
+const { signIn, targets: allTargets, BASE } = require("./targets");
 
-const BASE = process.env.BASE_URL || "http://127.0.0.1:3000";
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 const SHOW_ALL = process.argv.includes("--all");
 // A shift is a property of the layout, and the layout changes at the breakpoints: a table that
