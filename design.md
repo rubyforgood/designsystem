@@ -732,13 +732,16 @@ frozen columns, sized to this app's own rail height and column widths, discovere
 
 ## Components
 
-Components are Ruby helpers in `app/helpers/essentials_ui_helper.rb` and partials under
-`app/views/shared/essentials/`. Reach for one before writing a utility string: the point of
-the system is that a card looks the same on all 77 pages that render one.
+**Portable — components are the one definition of a repeated composite pattern, reached for
+before writing a one-off utility string at each call site.** **Local — this default's
+implementation:** Ruby helpers in `app/helpers/essentials_ui_helper.rb` and partials under
+`app/views/shared/essentials/`.
 
 ### Buttons
 
-One treatment per role. The **variant** carries the meaning, the **size** carries the context.
+**Portable — one treatment per role, decomposed as two independent axes: what the action *means*
+(variant) and what *context* it appears in (size) — not decided freshly per button.**
+**Local — this default's variants and sizes:**
 
 | Variant | Looks like | Use for |
 | --- | --- | --- |
@@ -759,9 +762,11 @@ One treatment per role. The **variant** carries the meaning, the **size** carrie
 <button class="<%= essentials_button_classes(variant: :secondary, size: :sm) %>">Filter</button>
 ```
 
-`essentials_link_button` is a `GET` — it navigates. `essentials_action_button` goes through
-`button_to`, so the verb, the CSRF token and `disable_with` are handled for you. A thing that
-changes state is never a link.
+**Portable — a control that changes state is never a plain link (a GET).** State-changing actions
+need a real form submission (correct HTTP verb, CSRF protection, a double-submit guard) — a link
+styled as a button is still, mechanically, a navigation. **Local — this default's split:**
+`essentials_link_button` is a `GET` that navigates; `essentials_action_button` goes through
+`button_to`, handling the verb, CSRF token and `disable_with` automatically.
 
 **`UiHelper` is the older API and it still works.** `new_button_to`, `edit_button_to`,
 `delete_button_to`, `submit_button` and the rest have ~100 call sites; they now emit design
@@ -1549,6 +1554,69 @@ row: they map onto `:primary` and `:danger`, which are filled.
 [docs/table-audit.md](docs/table-audit.md) lists the rows that still do.
 
 ### Filters
+
+**Reading note.** Like Row actions, this section's heading undersells its scope — ~450 lines
+covering filter controls, modal centring, button/control height, a scroll-rail implementation
+saga, and a full FullCalendar/select2 restyling case study, none broken into their own
+subheadings. Same treatment as Row actions: the rules below hold regardless of stack; everything
+else is a genuinely valuable, heavily Local worked example, left intact rather than dissolved.
+
+**Portable, surfaced from this section:**
+
+- Auto-apply a single filter on change; keep an explicit apply action once several filters are
+  live at once — auto-applying each of many controls fires a query per control while someone is
+  still describing what they want.
+- When a filter set has an unambiguous reset (e.g. the first/default option), don't also offer a
+  separate "clear" control for the same effect — two ways to undo the same thing is one too many.
+- Keep an option's visible label short; put any qualifying rule in real hint text wired to the
+  control (`aria-describedby`), not inside the label — a rule inside a closed list is invisible
+  exactly when someone needs it.
+- Don't rely on a browser-drawn sub-element (like a `<select>`'s `<optgroup>` label) for anything
+  contrast-sensitive — its rendering isn't under your stylesheet's control at all.
+- A scrollable region gets exactly one scroll affordance. Two competing ones (a native scrollbar
+  plus a custom one, say) read as a rendering bug even when each is individually correct.
+- A custom-drawn interactive element (a scrollbar thumb, a custom control) needs its contrast
+  checked by hand — automated scanners only hold *recognized controls* to contrast requirements,
+  and a `<div>` styled to act like a scrollbar isn't one as far as they're concerned
+  ([scrollbar contrast](#scrollbar-contrast)).
+- A dialog/modal needs centering that's robust to whatever spacing context it's rendered inside —
+  test it by toggling the parent's own layout classes with the dialog open, not just by eyeballing
+  one page ([modal centring](#modal-centring)).
+- Every visual variant of the same control keeps the same box model contributors (border width,
+  etc.) even where a border is invisible — otherwise variants silently differ in height
+  ([control height](#control-height)).
+- A CSS custom property that fails to resolve (a typo, a token removed from a later version of a
+  framework) fails **silently** — nothing renders wrong in an obviously broken way, a declaration
+  is just dropped. Worth actually verifying that every custom property your CSS references
+  resolves in the running app, at least once ([the pill-radius incident](#rail-radius)).
+- A status belongs on the same line as the thing it describes, not mixed into a list of actions —
+  a status isn't an action, and placing it among actions makes it read as one that's been disabled.
+- Two independent variables (e.g. "how long a view covers" and "how it's laid out") deserve two
+  independent controls. Conflating them into fewer buttons that each encode multiple dimensions
+  produces a control that's inert or mislabeled in some combination you didn't think through
+  ([one label answers one question](#one-label-one-view)).
+- State that changes what's rendered belongs in the URL, not client-only storage, so a view is
+  something you can link, bookmark, and share — and land on the same thing the sender saw.
+- When several related pieces of state are shown/changeable together, changing one should write
+  all of them to the URL — leaving the others to an ambient default (like viewport width) means
+  the same link renders differently for different people.
+- A view that silently omits empty entries needs to say what range it covers and how much of that
+  range is empty — one visible row is otherwise indistinguishable from "there has only ever been
+  one."
+- Prefer a native form control over a custom widget when you can't actually verify the custom
+  one's cross-browser behavior in your own testing setup — a claim about a widget you tested in
+  one engine isn't a claim about the browsers you didn't have installed.
+- Check a third-party library's *actual installed version* against the option/API names your code
+  passes it — a renamed or removed option is silently ignored by most libraries, not an error, so
+  the failure is invisible until someone measures the actual behavior.
+- A vendored stylesheet injected outside your normal cascade layers needs restyling that accounts
+  for that — matching its own unlayered specificity or reaching for `!important` — because a
+  normally-layered override loses to unlayered CSS regardless of selector specificity.
+
+The rest of this section is the Local, heavily-measured detail behind each of those, plus this
+app's own filter-select classes, its FullCalendar and select2 restyling, its Service Area card,
+and its scroll-rail implementation — read on for the case study; read the list above for what
+travels.
 
 **One filter: apply on change, no button.** Several filters: keep the Filter button. Auto-applying
 each of five controls fires a query per control while the user is still describing what they
