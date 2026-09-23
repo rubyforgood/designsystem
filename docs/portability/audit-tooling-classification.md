@@ -7,8 +7,10 @@ their descriptions in `bin/design/README.md`.
 ## The seam is already adopted — measured, not assumed
 
 `bin/design/targets.js` is the adapter: it owns `targets()` (route enumeration), `signIn()`,
-`visit()`, and the role predicates (`BANK`/`PARTNER`/`ADMIN`). Everything above that seam is a
-design rule; everything inside `targets.js` is Rails.
+`visit()`, and the role predicates (`PRIMARY`/`SECONDARY`/`ADMIN` — renamed from this project's
+original `BANK`/`PARTNER`/`ADMIN` on 2026-09-23; see `adapter-reference-app.md`'s "resolved" note
+for why and how). Everything above that seam is a design rule; everything inside `targets.js` is
+Rails.
 
 ```
 $ ruby bin/design/seam-check.rb

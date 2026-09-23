@@ -69,22 +69,29 @@ function targets() {
 /*
  * Who can see what.
  *
- * `/partners/...` is the partner portal, except `/partners/12`, which is a bank user looking at a
+ * Exported as PRIMARY/SECONDARY/ADMIN -- the generic contract names every audit imports by
+ * identifier, per docs/portability/audit-tooling-classification.md's finding that the old
+ * BANK/PARTNER/ADMIN names were Human Essentials' own vocabulary leaking into what's meant to be
+ * a portable contract. What they check is still this app's own domain: PRIMARY is a bank user
+ * (the default authenticated role, everything not ADMIN or SECONDARY), SECONDARY is the partner
+ * portal. `/partners/...` is that portal, except `/partners/12`, which is a bank user looking at a
  * partner record -- the two live under one prefix and are different applications.
  */
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
+const SECONDARY = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) || p === "/partners/profile";
 const ADMIN = (p) => p.startsWith("/admin");
-const BANK = (p) => !ADMIN(p) && !PARTNER(p);
+const PRIMARY = (p) => !ADMIN(p) && !SECONDARY(p);
 
 // The three passes an audit makes if it wants to see the whole app.
 //
-// Env overrides (`BANK_EMAIL`, `PARTNER_EMAIL`, `SUPER_EMAIL`) exist because several audits had
-// independently invented them before this was centralized -- consolidating the duplicates without
-// keeping the overrides would have been a silent behaviour change for anyone using them.
+// Env overrides (`PRIMARY_EMAIL`, `SECONDARY_EMAIL`, `ADMIN_EMAIL`) exist because several audits
+// had independently invented them before this was centralized -- consolidating the duplicates
+// without keeping the overrides would have been a silent behaviour change for anyone using them.
+// (Renamed from BANK_EMAIL/PARTNER_EMAIL/SUPER_EMAIL alongside the exports below -- SUPER_EMAIL
+// was already inconsistent with the ADMIN predicate it fed, which this rename also fixes.)
 const RUNS = [
-  [process.env.BANK_EMAIL || "org_admin1@example.com", BANK],
-  [process.env.PARTNER_EMAIL || "verified@example.com", PARTNER],
-  [process.env.SUPER_EMAIL || "superadmin@example.com", ADMIN]
+  [process.env.PRIMARY_EMAIL || "org_admin1@example.com", PRIMARY],
+  [process.env.SECONDARY_EMAIL || "verified@example.com", SECONDARY],
+  [process.env.ADMIN_EMAIL || "superadmin@example.com", ADMIN]
 ];
 
 /*
@@ -138,4 +145,4 @@ async function visit(page, urlPath, { timeout = 60000 } = {}) {
   return res;
 }
 
-module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, PARTNER, ADMIN, BANK };
+module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, SECONDARY, ADMIN, PRIMARY };

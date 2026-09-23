@@ -18,15 +18,15 @@
 // Usage: pw bin/design/row-actions-audit.js
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets: allTargets, BASE, RUNS, BANK, ADMIN } = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, PRIMARY, ADMIN } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
 // This audit only needs two of the seam's three roles -- derived from RUNS rather than
 // hardcoded, so it stays correct if the seam's emails or env overrides ever change.
 const ROLES = Object.fromEntries(
-  RUNS.filter(([, p]) => p === BANK || p === ADMIN)
-    .map(([email, p]) => [p === BANK ? "bank" : "super", email])
+  RUNS.filter(([, p]) => p === PRIMARY || p === ADMIN)
+    .map(([email, p]) => [p === PRIMARY ? "bank" : "super", email])
 );
 
 

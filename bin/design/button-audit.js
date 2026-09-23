@@ -26,9 +26,9 @@ const { chromium } = require("playwright");
  * appears. The module supplies the three standard passes; the fourth is composed here because it is
  * this audit's concern, not everybody's.
  */
-const { targets, signIn, visit, RUNS, BANK, BASE } = require("./targets");
+const { targets, signIn, visit, RUNS, PRIMARY, BASE } = require("./targets");
 
-const PASSES = [...RUNS, ["user_1@example.com", BANK]];
+const PASSES = [...RUNS, ["user_1@example.com", PRIMARY]];
 
 
 async function auditPage(page, path) {

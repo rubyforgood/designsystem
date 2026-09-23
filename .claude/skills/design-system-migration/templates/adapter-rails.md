@@ -3,6 +3,15 @@
 One worked example of `adapter.md`, taken from a real suite of **34 audit scripts covering 155
 screens**. Everything here is copied from something that runs, not designed for this document.
 
+**Role names updated from the source project's own.** The original suite exported `BANK`/
+`PARTNER`/`ADMIN` — its own domain's terms for "the default authenticated role" and "a second,
+distinct portal audience." This document now uses the generic contract names
+(`PRIMARY`/`SECONDARY`/`ADMIN`) this repository's own `bin/design/targets.js` and
+`bin/design/adapters/reference-app/targets.js` actually export, after
+`docs/portability/audit-tooling-classification.md` flagged the original names as exactly the kind
+of vocabulary leak a portable contract shouldn't have. What each predicate *checks* below is still
+the source project's own domain — that part doesn't generalize and isn't meant to.
+
 **What this is not.** It is not evidence that the *interface* generalises. It is a sample of one
 stack, and `adapter.md` above describes the shape it fits; whether that shape survives contact with
 Django or Next.js is unknown until somebody tries. Read this as "here is how one team did it",
@@ -11,7 +20,7 @@ not as a specification.
 ## The seam is a module, and it is small
 
 ```js
-module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, PARTNER, ADMIN, BANK };
+module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, SECONDARY, ADMIN, PRIMARY };
 ```
 
 Nine exports, ~120 lines. Every audit that imports it stops knowing what framework the app is.
@@ -76,16 +85,17 @@ Four details that were each a bug first:
 Predicates over the path, one per audience:
 
 ```js
-const PARTNER = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) ||
-                       p === "/partners/profile";
-const ADMIN   = (p) => p.startsWith("/admin");
-const BANK    = (p) => !ADMIN(p) && !PARTNER(p);
-const RUNS = [["bank@example.com", BANK], ["partner@example.com", PARTNER],
+const SECONDARY = (p) => (p.startsWith("/partners/") && !/^\/partners\/\d+/.test(p)) ||
+                         p === "/partners/profile";
+const ADMIN     = (p) => p.startsWith("/admin");
+const PRIMARY   = (p) => !ADMIN(p) && !SECONDARY(p);
+const RUNS = [["bank@example.com", PRIMARY], ["partner@example.com", SECONDARY],
               ["admin@example.com", ADMIN]];
 ```
 
-The awkward case earns its comment: `/partners/12` is a *bank* user looking at a partner record,
-while `/partners/requests` is the partner portal. Two applications under one prefix.
+The awkward case earns its comment: `/partners/12` is a *bank* user (this project's PRIMARY role)
+looking at a partner record, while `/partners/requests` is the partner portal (SECONDARY). Two
+applications under one prefix.
 
 ## Visiting
 

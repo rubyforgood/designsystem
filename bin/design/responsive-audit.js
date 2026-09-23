@@ -16,7 +16,7 @@
  */
 const { chromium } = require("playwright");
 const { execSync } = require("child_process");
-const { signIn, targets, BASE, RUNS, BANK, PARTNER } = require("./targets");
+const { signIn, targets, BASE, RUNS, PRIMARY, SECONDARY } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Tailwind's breakpoints, the two sides of each switch, and the ends. A layout that breaks
@@ -360,7 +360,7 @@ if (require.main === module) {
   // Derived from the seam's RUNS, not hardcoded -- see targets.js. Matches predicates rather
   // than trusting RUNS' order, so it stays correct if the seam's role list is ever reordered.
   const users = Object.fromEntries(
-    RUNS.map(([email, p]) => [p === BANK ? "bank" : p === PARTNER ? "partner" : "super", email])
+    RUNS.map(([email, p]) => [p === PRIMARY ? "bank" : p === SECONDARY ? "partner" : "super", email])
   );
   const notChecked = [];
   const findings = [];

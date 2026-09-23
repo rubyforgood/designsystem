@@ -19,7 +19,7 @@
 //
 // Usage: pw bin/design/tab-set-audit.js
 const { chromium } = require("playwright");
-const { targets, signIn, visit, BANK, BASE, RUNS } = require("./targets");
+const { targets, signIn, visit, PRIMARY, BASE, RUNS } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
@@ -72,7 +72,7 @@ const MEASURE = () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await context.newPage();
-  await signIn(page, RUNS.find(([, p]) => p === BANK)?.[0]);
+  await signIn(page, RUNS.find(([, p]) => p === PRIMARY)?.[0]);
 
   const findings = [];
   let checked = 0;
@@ -80,7 +80,7 @@ const MEASURE = () => {
   // Pass one: every screen, looking for a strip.
   const seen = new Map();
   const landedAlready = new Set();
-  for (const { path } of targets().filter((t) => BANK(t.path))) {
+  for (const { path } of targets().filter((t) => PRIMARY(t.path))) {
     const res = await visit(page, path);
     if (!res) continue;
     /*

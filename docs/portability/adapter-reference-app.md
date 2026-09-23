@@ -84,12 +84,25 @@ Three distinct portability problems, not one, now with real instances of each:
    itself. Needs its own treatment — likely: the adapter directory supplies its own version of the
    file, the same way it supplies its own `targets.js`.
 
-Also unresolved, surfaced again by actually building a second adapter (first noted in
-`audit-tooling-classification.md`): **the contract's export *names* are Human Essentials'
-vocabulary** (`BANK`/`PARTNER`/`ADMIN`), not generic ones. This adapter had to export under those
+**Resolved 2026-09-23, in a later session.** This section originally read: "Also unresolved,
+surfaced again by actually building a second adapter (first noted in
+`audit-tooling-classification.md`): the contract's export *names* are Human Essentials'
+vocabulary (`BANK`/`PARTNER`/`ADMIN`), not generic ones. This adapter had to export under those
 same names for the copied audit files' destructuring to resolve at all, even though this app's
-actual roles are "member" and "admin." Renaming the contract itself is a bigger, separate decision
-— noted, not done here.
+actual roles are 'member' and 'admin.' Renaming the contract itself is a bigger, separate decision
+— noted, not done here." Per evidence-discipline, annotated rather than deleted: the finding was
+real, and this is the record of it having been acted on rather than just noticed.
+
+The contract now exports `PRIMARY`/`SECONDARY`/`ADMIN` — both adapters (`bin/design/targets.js`
+and this one) and every one of the 13 audit files that destructured the old names by identifier
+were updated together, in the same pass, specifically because a partial rename (some files on the
+old names, some on the new) would have silently broken imports rather than just leaking
+vocabulary. Verified with the full `known-outcomes.js` harness before and after: all 8 documented
+outcomes unchanged, confirming the rename was a pure identifier change with no behavioral side
+effects. `PARTNER` becoming `SECONDARY` rather than something tied to this reference app's own
+"member" vocabulary was deliberate — the contract's names describe the *shape* of a role (the
+default/primary audience, an optional second distinct portal, an admin tier), not any one
+adopter's domain words for it.
 
 ## Reproducing this
 

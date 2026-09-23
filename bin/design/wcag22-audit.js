@@ -23,7 +23,7 @@
 // Usage: bin/rails runner bin/design/route-targets.rb > /tmp/targets.json && pw bin/design/wcag22-audit.js
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets, BASE, RUNS: runs, BANK } = require("./targets");
+const { signIn, targets, BASE, RUNS: runs, PRIMARY } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 // Targets come from the seam, which regenerates the list when it is older than the routes
@@ -379,7 +379,7 @@ if (require.main === module) {
 
   const bankCtx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const bankPage = await bankCtx.newPage();
-  await signIn(bankPage, runs.find(([, p]) => p === BANK)?.[0]);
+  await signIn(bankPage, runs.find(([, p]) => p === PRIMARY)?.[0]);
   await redundantEntry(bankPage, processes);
   await bankCtx.close();
 

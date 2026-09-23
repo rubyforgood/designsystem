@@ -44,8 +44,8 @@ deliberate, not a packaging shortcut: `bin/design/adapters/reference-app/` and
 `bin/design/targets.js` are two full worked examples of exactly this.
 
 1. Write a `targets.js` (or whatever you name it) implementing the nine-export contract —
-   `BASE`, `PASSWORD`, `targets()`, `signIn()`, `visit()`, `RUNS`, `PARTNER`, `ADMIN`, `BANK`. See
-   `bin/design/targets.js` (a Rails/Devise adapter) and
+   `BASE`, `PASSWORD`, `targets()`, `signIn()`, `visit()`, `RUNS`, `SECONDARY`, `ADMIN`, `PRIMARY`.
+   See `bin/design/targets.js` (a Rails/Devise adapter) and
    `bin/design/adapters/reference-app/targets.js` (a zero-framework Node adapter) for two
    different real implementations of the same contract.
 2. Copy the audit(s) you want from `bin/design/` into the same directory as your adapter.

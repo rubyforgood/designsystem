@@ -3,17 +3,16 @@
 // question: does "swap the adapter and the audit runs unmodified" actually hold?
 //
 // Deliberately NOT a copy of targets.js with s/rails/node/. The reference app has two roles, not
-// three -- there is no partner-equivalent audience -- and PARTNER below is an honest `() => false`
+// three -- there is no secondary-portal audience -- and SECONDARY below is an honest `() => false`
 // rather than an invented third tier to make the shapes match.
 //
-// **A naming leak, not fixed here.** Every audit that imports a role predicate does it by the
-// literal identifiers `BANK`/`PARTNER`/`ADMIN` -- see
-// docs/portability/audit-tooling-classification.md. Those names are Human Essentials' own
-// (bank/partner/admin), not generic ones (e.g. primary/secondary/admin), and this adapter has to
-// export under those same names for the unmodified audit copies below to resolve their imports at
-// all. That's a second, separate portability problem from anything an adapter can fix on its own
-// -- renaming the *contract itself* is a bigger, riskier change than swapping what a name points
-// at, and is out of scope for this pass. Noted in the findings doc, not silently worked around.
+// **The naming leak this file used to document is fixed.** Every audit imports a role predicate by
+// the literal identifiers `PRIMARY`/`SECONDARY`/`ADMIN` now, not `BANK`/`PARTNER`/`ADMIN` -- see
+// docs/portability/audit-tooling-classification.md and ADR-equivalent reasoning in the commit that
+// renamed the contract. Both adapters (this one and bin/design/targets.js) and every audit that
+// destructures these names by identifier were updated together, in one pass, specifically because
+// a partial rename is worse than the leak it was meant to fix -- half the suite importing the old
+// names and half the new would silently break rather than silently leak vocabulary.
 const BASE = process.env.BASE_URL || "http://127.0.0.1:4100";
 const PASSWORD = process.env.SEED_PASSWORD || "letmein";
 
@@ -43,17 +42,17 @@ function targets() {
   return cached;
 }
 
-// This app has one audience beyond ADMIN, not two. PARTNER is an honest "no such role here"
+// This app has one audience beyond ADMIN, not two. SECONDARY is an honest "no such role here"
 // rather than a second invented tier -- the point of this exercise is to see what an audit does
 // with a role that has zero pages, not to manufacture a third role to keep the shape familiar.
 const ADMIN = (p) => p.startsWith("/admin");
-const PARTNER = () => false;
-const BANK = (p) => !ADMIN(p) && !PARTNER(p);
+const SECONDARY = () => false;
+const PRIMARY = (p) => !ADMIN(p) && !SECONDARY(p);
 
 const RUNS = [
-  [process.env.MEMBER_EMAIL || "member@example.org", BANK],
+  [process.env.PRIMARY_EMAIL || "member@example.org", PRIMARY],
   [process.env.ADMIN_EMAIL || "admin@example.org", ADMIN]
-  // No PARTNER entry -- RUNS only lists roles that exist. An audit iterating RUNS naturally gets
+  // No SECONDARY entry -- RUNS only lists roles that exist. An audit iterating RUNS naturally gets
   // two passes instead of three; one that hardcodes "three roles" elsewhere would not.
 ];
 
@@ -78,4 +77,4 @@ async function visit(page, urlPath, { timeout = 30000 } = {}) {
   return res;
 }
 
-module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, PARTNER, ADMIN, BANK };
+module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, SECONDARY, ADMIN, PRIMARY };

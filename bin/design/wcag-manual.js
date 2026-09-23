@@ -18,7 +18,7 @@
 // nothing about the other hundred and forty. Widening the cheap checks took 2.4.2 from "0 failures
 // on 8 pages" to 14 on 92, which is the same lesson arriving early.
 const { chromium } = require("playwright");
-const { signIn, targets, BASE, RUNS: ROLES, PARTNER, ADMIN } = require("./targets");
+const { signIn, targets, BASE, RUNS: ROLES, SECONDARY, ADMIN } = require("./targets");
 
 // The expensive checks -- reflow, zoom, text spacing, a full tab traverse -- resize the viewport
 // several times per page, so they run over a representative sample rather than the whole app: one
@@ -395,7 +395,7 @@ if (require.main === module) {
     // The cheap pass over the rest, for the default run. Under `--all` there is no rest.
     if (!ALL && email === ROLES[0][0]) {
       for (const path of targets) {
-        if (ADMIN(path) || PARTNER(path)) continue;
+        if (ADMIN(path) || SECONDARY(path)) continue;
         await inspect(page, path, false);
       }
     }

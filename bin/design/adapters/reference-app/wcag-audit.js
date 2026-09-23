@@ -9,7 +9,7 @@
 // Run:           pw bin/design/wcag-audit.js [--json]
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets: allTargets, BASE, RUNS, BANK, PARTNER, ADMIN } = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, PRIMARY, SECONDARY, ADMIN } = require("./targets");
 
 const AXE = "/tmp/axe/node_modules/axe-core/axe.min.js";
 const JSON_OUT = process.argv.includes("--json");
@@ -69,18 +69,21 @@ async function audit(page, label, path) {
     .map((t) => [t.path, t.path]);
 
   // Emails come from the seam's RUNS; the role-name classification just above is this audit's
-  // own (controller-based, not path-based like targets.js's PARTNER/ADMIN) and is left alone --
-  // unifying the two classification schemes is a separate concern from de-duplicating credentials.
+  // own (controller-based, not path-based like targets.js's PRIMARY/SECONDARY/ADMIN) and is left
+  // alone -- unifying the two classification schemes is a separate concern from de-duplicating
+  // credentials. (Comment updated alongside the PRIMARY/SECONDARY rename -- the classification
+  // still uses "bank"/"partner"/"super" as its own internal labels, unrelated to the contract's
+  // export names. See docs/portability/audit-tooling-classification.md.)
   //
   // Optional-chained: an adapter is not required to have all three roles -- RUNS lists only the
   // roles that exist (see bin/design/adapters/reference-app/targets.js, which has two) -- and
   // `.find()` returning undefined for a role this app doesn't have must not crash the run. A
-  // version of this without the `?.` did exactly that against a second adapter with no PARTNER
+  // version of this without the `?.` did exactly that against a second adapter with no SECONDARY
   // entry, which is the sort of thing only trying a second adapter actually catches.
   const emailFor = {
-    bank: RUNS.find(([, p]) => p === BANK)?.[0],
+    bank: RUNS.find(([, p]) => p === PRIMARY)?.[0],
     super: RUNS.find(([, p]) => p === ADMIN)?.[0],
-    partner: RUNS.find(([, p]) => p === PARTNER)?.[0]
+    partner: RUNS.find(([, p]) => p === SECONDARY)?.[0]
   };
 
   for (const [email, pages] of [

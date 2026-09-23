@@ -32,7 +32,7 @@ const nodePath = require("path");
 const manual = require(nodePath.join(__dirname, "wcag-manual.js"));
 const wcag22 = require(nodePath.join(__dirname, "wcag22-audit.js"));
 const responsive = require(nodePath.join(__dirname, "responsive-audit.js"));
-const { signIn, BASE, RUNS, BANK } = require("./targets");
+const { signIn, BASE, RUNS, PRIMARY } = require("./targets");
 
 const PASSWORD = process.env.SEED_PASSWORD || "password!";
 
@@ -306,7 +306,7 @@ const CONTROLS = [
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: VIEWPORT });
   const page = await ctx.newPage();
-  await signIn(page, RUNS.find(([, p]) => p === BANK)?.[0]);
+  await signIn(page, RUNS.find(([, p]) => p === PRIMARY)?.[0]);
 
   const wrong = [];
   let ran = 0;
