@@ -65,6 +65,16 @@ claims to cover before trusting a clean scan — this is the same "vacuous pass"
 region entirely, one level more specific: the container exists and is correctly structured, it's
 what's supposed to repeat inside it that was never exercised.
 
+**The mirror image of the rule above: deliberately test the empty and error branches too, not
+just the populated one.** A test suite that always creates fixture records before visiting a page
+gives the empty-state code path — what renders when there's genuinely nothing yet, or when a
+request fails — zero coverage of its own, the same way an audit that only ever sees populated data
+gives the empty case zero coverage. One project's every admin index page returned 200 while
+rendering a broken empty state, invisible for exactly this reason: nothing in the suite ever
+looked at any of them with zero records. Populated-only and empty-only are the same blind spot
+pointed in opposite directions — a check that only ever runs one of the two has a real gap, whichever
+one it is.
+
 **Widening what a check reads can require widening what it discounts.** An audit that finds dead
 CSS classes read the templates and not the helpers, and reported zero for an entire migration while
 a live page rendered three classes the stylesheet did not define. Adding the helpers to its file
@@ -118,6 +128,20 @@ firing together. Seeing that specific cluster is a strong signal you're auditing
 a real design defect, and worth checking before spending time on any one of those findings
 individually. This doesn't replace fixing whatever produced the crash — it's a way to recognize
 fast that the four violations in front of you are one problem, not four.
+
+**A framework or major-dependency version bump can silently change what a class name or utility
+means, or make it compile to nothing at all — an audit's scope claim ("we check for this class")
+can stay true in the letter while going false in the spirit.** Two concrete real shapes this took:
+a CSS framework removing an opacity-modifier utility outright between major versions, so every
+call site using the old name compiled to nothing and a component that used to render translucent
+silently rendered fully opaque with no build error; and a colour-space change in the same
+framework's compiled output shifting what a previously-measured value actually renders as, so a
+contrast figure recorded against the old build quietly stopped describing the current one. Neither
+produces a failing build or a visible error — the class still parses, the audit still finds the
+class name it's looking for, and the finding is "clean" precisely because nothing about the
+*search* changed, only what the thing found actually does. After any major version bump to a CSS
+framework or design-token pipeline, re-verify anything version-sensitive against the actually
+compiled output, not against what the same class name meant last time it was checked.
 
 **When a count flickers, stop comparing counts.** Four attempts at one non-deterministic audit
 failed while comparing "8 findings" against "9 findings". The fix was to make it print the *names*

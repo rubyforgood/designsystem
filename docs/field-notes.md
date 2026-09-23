@@ -72,6 +72,19 @@ two genuinely unrelated teams agreeing would be. Before citing a match with a si
 the reason to upgrade a tag, check whether it's actually a second data point or the same process
 running twice.
 
+A second comparison, against [Stocks in the Future](https://github.com/rubyforgood/stocks-in-the-future)'s
+`design.md` (2026-09), sharpened this further rather than just repeating it — that document states
+its own provenance outright: it began as a reconciled copy of CASA's `design.md`, and explicitly
+marks one closing section as *its own, not inherited*. Everything matching in the inherited
+portion is the same caveat as above, not new evidence. But its `scroll-padding`/WCAG 2.4.11 (Focus
+Not Obscured) mechanism — sized to fixed chrome's height via named CSS custom properties, the same
+technique this repo's own `#focus-not-obscured` rule uses for the table rail — sits in that
+explicitly-own section. If that self-report is accurate, this is the one genuinely independent
+match found across both comparisons so far: two unrelated apps, in different domains, arriving at
+the identical mechanism for the same WCAG 2.2 criterion without one copying the other. Worth
+naming as the actual example of what real corroboration looks like, next to everything above that
+isn't.
+
 ## Related, not migration-specific
 
 Two more documents in `docs/` describe the Human Essentials *application* rather than the
