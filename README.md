@@ -36,14 +36,19 @@ WCAG 2.2 conformance specifically.
 
 ## Using the tokens
 
+Not on the npm registry yet (see Status below), but installable right now straight from GitHub:
+
 ```bash
-npm install @rubyforgood/design-system
+npm install github:rubyforgood/designsystem
 ```
 
 ```css
 /* your Tailwind entry point */
 @import "@rubyforgood/design-system/tokens/theme.css";
 ```
+
+Once this is published to the registry, `npm install @rubyforgood/design-system` will work the
+same way and this page will be updated to lead with that instead.
 
 That gives you the shipped default palette (indigo, Figtree, a 4px scale). Retheme by overriding
 the same token names; see [`tokens/README.md`](tokens/README.md) for which parts are load-bearing
@@ -77,7 +82,8 @@ has real, measured portability evidence for 22 of ~40 scripts (see
 documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml` runs syntax
 checks, a doc-link audit, and a regression check against the reference app on every push.
 
-This has not been published to the npm registry yet.
+This has not been published to the npm registry yet — install straight from GitHub in the meantime
+(see "Using the tokens" above).
 
 ## History
 
