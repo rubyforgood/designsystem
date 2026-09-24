@@ -1,12 +1,12 @@
 {
   "name": "@rubyforgood/design-system",
   "version": "0.1.0",
-  "description": "A portable design system extracted from Human Essentials: a normative spec tagged Portable/Local, Tailwind v4 design tokens, and an audit suite proven against a second, non-Rails adapter.",
+  "description": "Ruby For Good's global design system: a normative spec tagged Portable/Local, Tailwind v4 design tokens, and an audit suite for migrating any app onto it.",
   "license": "MIT",
-  "homepage": "https://github.com/rubyforgood/design-system#readme",
+  "homepage": "https://github.com/rubyforgood/designsystem#readme",
   "repository": {
     "type": "git",
-    "url": "TODO: set once this repo has a real remote -- see the Phase 6 summary for why this is a placeholder"
+    "url": "git+https://github.com/rubyforgood/designsystem.git"
   },
   "keywords": [
     "design-system",
