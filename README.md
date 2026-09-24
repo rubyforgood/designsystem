@@ -72,7 +72,7 @@ before assuming one that hasn't been tested against a second adapter will just w
 ## Status
 
 Early. `design.md` has been fully passed over once for the Portable/Local split; the audit suite
-has real, measured portability evidence for 8 of ~40 scripts (see
+has real, measured portability evidence for 22 of ~40 scripts (see
 [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md)) and
 documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml` runs syntax
 checks, a doc-link audit, and a regression check against the reference app on every push.

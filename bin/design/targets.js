@@ -94,6 +94,43 @@ const RUNS = [
   [process.env.ADMIN_EMAIL || "superadmin@example.com", ADMIN]
 ];
 
+// Optional: a second seeded user with PRIMARY's role, distinct from RUNS's own PRIMARY pass. Only
+// button-audit.js uses this today, to check that the same action renders the same way for two
+// different users of one role, not just once. Adapters without a second PRIMARY-role user simply
+// don't export this; an audit that wants it treats its absence as "skip that check," not a failure.
+const PRIMARY_ALT_EMAIL = process.env.PRIMARY_ALT_EMAIL || "user_1@example.com";
+
+/*
+ * Modal forms, which `targets()`'s route sweep cannot reach: a modal lives on an index page,
+ * behind a button, and its <form> is not on a route of its own -- nothing in `targets()` can
+ * derive it, so it's hand-catalogued here. Four of them existed and none had ever been audited --
+ * which is how "(phone or email required)" sat in a label, making the field's accessible *name*
+ * carry the condition, twice per pair.
+ *
+ * Optional, like PRIMARY_ALT_EMAIL above: this is this app's own inventory of its own modals, not
+ * a portable contract. form-validation-audit.js treats an absent or empty list as "this app has no
+ * modal forms," not as N false "could not be opened" findings the way a list hardcoded into the
+ * audit itself would produce on an app that was never going to have Human Essentials' four modals.
+ *
+ * `open` is how the modal is triggered: either a `dialog#open` action carrying an id, or a link
+ * that fetches the form and injects it. Triggers verified by opening each one by hand; a modal is
+ * not reachable from a route, so there is nothing to derive them from.
+ */
+const MODALS = [
+  { role: "bank", path: "/donations/new", name: "New product drive participant",
+    open: (page) => page.evaluate(() => document.getElementById("new_participant").click()) },
+  // The modal lives on the organization page. It used to be reachable from /users as well; that
+  // page was deleted as a weaker duplicate of the organization page's own users table.
+  { role: "bank", path: "/organization", name: "Invite a new user",
+    open: (page) => page.click("[data-dialog-id-param='add-user-modal']") },
+  { role: "bank", path: "/requests", name: "New quantity request",
+    open: (page) => page.click("[data-dialog-id-param='new-request']") },
+  // /partners, because four of the five pages that carry this modal only render its trigger when
+  // the list is empty -- import is for seeding, and Export takes the slot once there is data.
+  { role: "bank", path: "/partners", name: "Import from CSV",
+    open: (page) => page.click("[data-dialog-id-param='csv-import-modal']") },
+];
+
 /*
  * Sign in as somebody.
  *
@@ -145,4 +182,6 @@ async function visit(page, urlPath, { timeout = 60000 } = {}) {
   return res;
 }
 
-module.exports = { BASE, PASSWORD, targets, signIn, visit, RUNS, SECONDARY, ADMIN, PRIMARY };
+module.exports = {
+  BASE, PASSWORD, targets, signIn, visit, RUNS, SECONDARY, ADMIN, PRIMARY, PRIMARY_ALT_EMAIL, MODALS
+};

@@ -104,6 +104,38 @@ effects. `PARTNER` becoming `SECONDARY` rather than something tied to this refer
 default/primary audience, an optional second distinct portal, an admin tier), not any one
 adopter's domain words for it.
 
+## Results: second batch (14 more scripts, 2026-09-24)
+
+Phase 2's remaining "likely portable" scripts from `docs/portability/audit-tooling-classification.md`,
+run the same way: copied unmodified into this adapter directory, executed against the running
+reference app, every "clean" result checked against `examples/reference-app/server.js`'s actual
+markup before being trusted (per `audit-suite`'s provenance rule — a green exit is not, by itself,
+evidence of anything).
+
+| Audit | Outcome | Why |
+| --- | --- | --- |
+| `address-audit.js` | **Vacuous pass.** 0 address fields found, 0 findings. | The reference app has no address form at all — genuinely nothing to check, not a coupling failure. Confirmed against `server.js`: no address fields exist anywhere. |
+| `confirm-audit.js` | **Vacuous pass.** 0 confirmations on 0 pages. | Reference app has no destructive/`data-confirm` actions. Genuine absence, not coupling. |
+| `flash-of-hidden-audit.js` | **Clean.** 3 pages checked, nothing painted then hidden. | No client-side JS on the reference app to cause a flash — real, if unexciting, clean result. |
+| `layout-shift-audit.js` | **Clean.** Every screen under Chrome's 0.02 noise floor. | Genuinely portable measurement (Cumulative Layout Shift is a browser-native metric, not a Local value). |
+| `overlay-audit.js` | **Vacuous pass.** 0 dialogs/popovers opened across 3 screens (0 with anything to open). | No modal/overlay UI on the reference app. Same "nothing there to check" shape as `address-audit.js`. |
+| `responsive-audit.js` | **Real findings, portable.** 12 findings across 2 pages: horizontal swipe at 320px on `/dashboard`, and a 152×18 `<input>` under the 24px target-size minimum on `/settings` at every width tested. | Both are genuine WCAG issues (1.4.10 Reflow, 2.5.8 Target Size Minimum) on the reference app's own unstyled markup — confirmed by reading `server.js`: `#notify-email` on `/settings` has no sizing applied at all. Detection is fully portable; exits 0 regardless of findings (this audit doesn't gate its own exit code on finding count — worth knowing before wiring it into CI as a pass/fail gate). |
+| `route-sweep.js` | **Real finding, portable.** 3/3 screens flagged: "font sans-serif". | The reference app never loads a brand font — real, correctly-detected gap. Same exit-code caveat as `responsive-audit.js`: findings present, exit 0. |
+| `tab-set-audit.js` | **Vacuous pass.** 0 tabs across 0 discovered sets. | No tab UI on the reference app. Genuine absence. |
+| `wayfinding-audit.js` | **Clean.** 3 screens, every one either a nav root or carries a breadcrumb. | Portable structural check; reference app's nav happens to satisfy it. |
+| `wcag-manual.js` | **Real findings, portable, exit 1.** Flags 1.4.4/1.4.10/1.4.12/2.4.7 zoom/reflow/spacing checks and 2.4.1/2.4.2 bypass-blocks/page-title checks. | Confirmed against `server.js`: the skip link's target (`<main id="main">`) has no `tabindex="-1"`, so it's a real 2.4.1 Bypass Blocks defect, not a false positive. Manual-technique checks, no Local values embedded. |
+| `wcag22-audit.js` | **Real findings, portable, exit 1.** WCAG 2.2-specific criteria (2.4.11 Focus Not Obscured, 2.5.7 Dragging, 3.2.6 Consistent Help, 3.3.7/3.3.8). | Same skip-link defect surfaces here too (2.4.11-adjacent), confirmed genuine, not coupling. |
+| `button-audit.js` | **Fixed.** Was a hard crash (~30s timeout signing in as a hardcoded, Human-Essentials-only literal, `user_1@example.com`, that doesn't exist on any other app). Now exits 0, 2 roles checked, 0 findings. | The audit's own fourth pass (checking that the same action renders the same way for two *different* users of PRIMARY's role) needed a second identity the adapter contract never provided. Fixed by adding an **optional** `PRIMARY_ALT_EMAIL` export to `targets.js` — the Rails adapter provides it (keeping the original check), this adapter doesn't (it has only one PRIMARY-role user), and the audit now degrades to its three standard passes instead of crashing when it's absent. Also wrapped the sign-in step itself in a try/catch, matching the audit's own existing per-path skip pattern, as defense in depth. |
+| `audit-selftest.js` | **Fixed.** Was a hard crash (5s timeout in `ensureRail`, waiting on `.table-rail-track`, a Human Essentials-specific scroll-rail component this app doesn't have). Now exits 1 (see below), 5/13 controls ran, 8 skipped, 1 genuine FAIL. | This file is inherently HE-coupled by design — it's a regression harness for the *checking library's logic*, exercised against real HE markup fixtures (a scroll rail, a specific help-link, frozen columns), not meant to be a portable audit in the same sense as the others. The fix wasn't to make it portable (that would mean synthesizing every fixture, out of scope here) but to make it **fail honestly**: `ensureRail` now throws a clear, specific error instead of an opaque Playwright timeout when `.table-scroll` doesn't exist, and every control runs inside a try/catch that turns a missing-fixture error into a logged `SKIP`, not a crash that kills the other 12 controls. The one surviving FAIL (2.4.7, focus-indicator-suppression) is a genuine, newly surfaced finding worth a follow-up — not yet investigated. |
+| `form-validation-audit.js` | **Fixed.** Was 4 false "could not be opened" findings (a hardcoded `MODALS` list of 4 Human-Essentials-specific modal triggers — CSV import, invite-user, etc. — none of which exist on any other app). Now exits 0, 0 forms/0 modals checked, 0 findings (this app currently has no `new`-route forms or modals at all). | Same reparameterize-against-the-adapter fix as `button-audit.js`: `MODALS` moved out of the audit script and into `targets.js` as an **optional** export, with the audit falling back to `[]` when an adapter doesn't provide one. The Rails adapter keeps its four hand-catalogued modals; this adapter reports zero, honestly, instead of four false negatives. |
+
+Combined with the original 8, that's **22 of ~40** scripts with real, measured portability evidence.
+Of the 14 in this batch: 4 are vacuous passes on an app that genuinely has no matching UI at all
+(address, confirm, overlay, tab-set), 3 are clean passes on a real check (flash-of-hidden,
+layout-shift, wayfinding), 4 surface real, confirmed findings (responsive, route-sweep, wcag-manual,
+wcag22-audit — the latter two share one underlying skip-link defect), and 3 needed an actual code
+fix, now applied (button, audit-selftest, form-validation).
+
 ## Reproducing this
 
 ```bash

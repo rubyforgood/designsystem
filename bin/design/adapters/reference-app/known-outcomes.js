@@ -31,7 +31,23 @@ const EXPECTED = {
   "row-actions-audit.js": { exit: 0, why: "same vacuous pass, same cause" },
   "copy-audit.js": { exit: 1, why: "catches the two deliberately planted copy violations" },
   "icon-audit.js": { exit: 1, why: "crash -- missing icon-lexicon.json, a content dependency, not adapter coupling" },
-  "tooltip-audit.js": { exit: 1, why: "crash -- hardcoded /donations path plus an unguarded null deref" }
+  "tooltip-audit.js": { exit: 1, why: "crash -- hardcoded /donations path plus an unguarded null deref" },
+
+  // Second batch -- docs/portability/adapter-reference-app.md's "second batch" section.
+  "address-audit.js": { exit: 0, why: "vacuous pass -- no address fields on this app" },
+  "confirm-audit.js": { exit: 0, why: "vacuous pass -- no destructive/confirm actions on this app" },
+  "flash-of-hidden-audit.js": { exit: 0, why: "clean -- no client-side JS to cause a flash" },
+  "layout-shift-audit.js": { exit: 0, why: "clean -- every screen under Chrome's 0.02 CLS noise floor" },
+  "overlay-audit.js": { exit: 0, why: "vacuous pass -- no dialogs/popovers on this app" },
+  "responsive-audit.js": { exit: 0, why: "12 real findings (reflow, target size), but this audit doesn't gate exit code on findings" },
+  "route-sweep.js": { exit: 0, why: "1 real finding (no brand font loaded), but this audit doesn't gate exit code on findings" },
+  "tab-set-audit.js": { exit: 0, why: "vacuous pass -- no tab UI on this app" },
+  "wayfinding-audit.js": { exit: 0, why: "clean -- every screen is a nav root or carries a breadcrumb" },
+  "wcag-manual.js": { exit: 1, why: "real findings -- confirmed skip-link/tabindex defect, not coupling" },
+  "wcag22-audit.js": { exit: 1, why: "real findings -- same skip-link defect wcag-manual.js finds" },
+  "button-audit.js": { exit: 0, why: "fixed -- PRIMARY_ALT_EMAIL is now an optional adapter export" },
+  "audit-selftest.js": { exit: 1, why: "fixed from a crash to a graceful run -- 8/13 controls skip (no rail fixture), 1 genuine FAIL (2.4.7, not yet investigated)" },
+  "form-validation-audit.js": { exit: 0, why: "fixed -- MODALS is now an optional adapter export, this app has none" }
 };
 
 let drift = 0;
