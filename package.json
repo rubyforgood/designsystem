@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Ruby For Good's global design system: a normative spec tagged Portable/Local, Tailwind v4 design tokens, and an audit suite for migrating any app onto it.",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/rubyforgood/designsystem#readme",
   "repository": {
     "type": "git",
