@@ -54,6 +54,12 @@ jobs:
       - name: Doc link audit
         run: ruby bin/design/doc-link-audit.rb
 
+      # Catches new industry-precedent claims whose form outruns the checking behind them (see
+      # bin/design/citation-audit.py's own header) before they sit undetected for a month, the way
+      # the previous three did.
+      - name: Citation audit
+        run: python3 bin/design/citation-audit.py --check
+
   reference-app-control-harness:
     name: reference-app audits match their documented outcome
     runs-on: ubuntu-latest

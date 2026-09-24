@@ -2812,8 +2812,9 @@ default — often the most destructive action on the page, arrived at by elimina
 intent. This
 said *exactly* one for months and the app has never worked that way: measured across 101 bank
 pages, **63 have no header actions at all**, and of the 38 that do, **11 have no primary** — almost
-all of them record pages, whose job is to be read. Polaris's `primaryAction`, Material's FAB and
-Carbon's and Atlassian's page headers are all optional in the same way; none of them requires one.
+all of them record pages, whose job is to be read. Polaris's `primaryAction`, Material's FAB, and
+Carbon's and Atlassian's `PageHeader` components (`@carbon/ibm-products`, `@atlaskit/page-header`)
+each leave their action slot optional; none of the four forces a page to show one.
 
 The cost of requiring one is concrete. `/product_drives/:id` had `[Export] [Make a correction]
 [Delete]` and no primary, so **Delete inherited the last slot** — the most destructive action on the

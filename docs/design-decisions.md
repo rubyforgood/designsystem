@@ -8465,8 +8465,10 @@ untooltipped barcode-scan button had never been visited by it at all.
 Widened to every screen `route-targets.rb` produces and every control whose visible text is empty:
 153 screens, 640 controls, and **14 defects the narrow version reported as zero**. All 14 fixed.
 
-One exemption was needed — a chip's ✕, which sits inside the label it removes and is shipped without
-a tooltip by MUI, Ant Design, Carbon and Primer alike. It is **declared** with `data-chip-dismiss`
+One exemption was needed — a chip's ✕, which sits inside the label it removes and, in MUI, Ant
+Design, Carbon and Primer's equivalents, ships without a tooltip of its own (confirmed for MUI:
+its delete icon carries no accessible name of its own — mui/material-ui#19468). It is **declared**
+with `data-chip-dismiss`
 rather than inferred, because the obvious heuristic (*its parent has visible text*) would have
 exempted the `/events` funnel too, and an exemption that can widen on its own is how an audit goes
 quiet.

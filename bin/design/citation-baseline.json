@@ -1,4 +1,4 @@
 {
-  "outstanding": 2,
-  "note": "Claims asserting agreement across 4+ systems with no artefact named. The two that remain are the proximity test's known limit -- absolutes about this app sitting next to a system's name. See design.md, \"Citing another system\"."
+  "outstanding": 1,
+  "note": "Claims asserting agreement across 4+ systems with no artefact named. The one that remains (design.md, \"a tab keeps the rail honest\") is the proximity test's known limit -- an absolute about this app's own active_on config sitting next to a system's name, not a claim about the named systems. See design.md, \"Citing another system\"."
 }
