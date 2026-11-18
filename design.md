@@ -1,4 +1,4 @@
-# Human Essentials Design System
+# Ruby for Good: Global Design System
 
 This is the design system for Human Essentials. It is normative:
 [ADR 0010](docs/architecture/decisions/0010-adopt-a-documented-design-system.md) makes this
