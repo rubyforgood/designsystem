@@ -107,3 +107,30 @@ assumed:
 flip/shift positioning — the same "prefer a correct, maintained implementation over reimplementing
 a known-hard problem" reasoning this ADR already gives for `<dialog>` over a hand-rolled modal,
 applied to collision detection instead of dialog mechanics.
+
+**Update, next batch:** four more components (`field`, `error-summary`, `table`,
+`date-range-picker` — fifteen total), covering `design.md`'s Forms, Tables, and Date range picker
+sections. These three sections are the most Local-heavy remaining in the catalog, so each was
+scoped deliberately rather than ported wholesale:
+
+- `table` implements only the clearly Portable table primitives (scroll-not-squeeze, top-aligned
+  cells, column-type classes); frozen columns, row selection, and batch-action bars are left out
+  entirely, not merely unported — design.md's own tagging pass already calls that material "a
+  single, fully-worked case study," not something to generalize.
+- `date-range-picker` keeps the Portable interaction behaviors (commit-on-selection for presets,
+  350ms debounce on custom edits, silent inversion correction) but takes `presets` as host-supplied
+  data and emits a generic `rfg-change` event, rather than carrying over Human Essentials' specific
+  server-computed presets and URL wire format.
+
+The light-DOM fix from `<rfg-tabs>` recurred, with a new wrinkle: `<rfg-field>` needed the same
+fix (a shadow-rendered `<label for>` can't label a light-DOM `<input>`), but the fix itself
+introduced a second bug — `updated()` repositions the pre-existing control into the rendered
+wrapper, which demotes it from a direct child to a grandchild, silently breaking a
+`:scope > input`-scoped re-query watching for exactly that element. Fixed by querying the whole
+subtree instead. Recorded as a general lesson for this codebase, not a one-off: a light-DOM
+component that moves a pre-existing child must not assume that child stays at the same tree depth
+on a later query.
+
+`date-range-picker` also composes `<rfg-popover>` directly (rendering one in its own template)
+rather than reimplementing anchored-panel behavior a third time — the first case of one component
+in this layer reusing another's interaction logic rather than tokens/styling alone.

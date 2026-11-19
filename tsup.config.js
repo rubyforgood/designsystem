@@ -19,6 +19,10 @@ const ENTRY = {
   "page-tabs": "components/page-tabs.js",
   modal: "components/modal.js",
   popover: "components/popover.js",
+  field: "components/field.js",
+  "error-summary": "components/error-summary.js",
+  table: "components/table.js",
+  "date-range-picker": "components/date-range-picker.js",
 };
 
 export default defineConfig([

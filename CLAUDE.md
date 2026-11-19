@@ -41,16 +41,21 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   via `npm run build` (`tsup.config.js`) into `dist/components/` (npm import, `lit` external) and
   `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Each component
   has a `*.stories.js` file (`npm run storybook`), with `@storybook/addon-a11y` running axe-core
-  against every story. Eleven exist so far (`button`, `status-pill`, `icon-tile`, `avatar`,
-  `card`, `flash-message`, `page-header`, `tabs`/`page-tabs`, `modal`, `popover`); the rest of
-  `design.md`'s ~25 documented components are not yet ported. `@floating-ui/dom` (popover
-  positioning) is this layer's second runtime dependency after `lit`. Several real defects were
-  found by actually running axe-core against every story, not assumed from the token values or
-  the markup shape: tone-coloured-text-on-tinted-background combinations (status pill, flash
-  message) failing WCAG AA contrast, fixed to neutral text + a tone-coloured accent; and
-  `<rfg-tabs>`'s `aria-controls`/`aria-labelledby` failing `aria-valid-attr-value` because the ID
-  references crossed a shadow boundary — fixed by rendering `<rfg-tabs>` into light DOM instead
-  of a shadow root (`createRenderRoot()` returns `this`), the one component here that does.
+  against every story. Fifteen exist so far (`button`, `status-pill`, `icon-tile`, `avatar`,
+  `card`, `flash-message`, `page-header`, `tabs`/`page-tabs`, `modal`, `popover`, `field`,
+  `error-summary`, `table`, `date-range-picker`); the rest of `design.md`'s ~25 documented
+  components are not yet ported (frozen columns, row selection, and batch-action bars — Tables'
+  most Local-heavy pieces — are deliberately not part of `table`'s scope at all, not merely
+  unported). `@floating-ui/dom` (popover positioning) is this layer's second runtime dependency
+  after `lit`. Several real defects were found by actually running axe-core against every story,
+  not assumed from the token values or the markup shape: tone-coloured-text-on-tinted-background
+  combinations (status pill, flash message) failing WCAG AA contrast, fixed to neutral text + a
+  tone-coloured accent; `<rfg-tabs>`'s `aria-controls`/`aria-labelledby` failing
+  `aria-valid-attr-value` because the ID references crossed a shadow boundary; and the same
+  shadow-boundary problem again in `<rfg-field>`'s `<label for>`, fixed the same way
+  (`createRenderRoot()` returns `this`) but with a second-order bug of its own — moving the
+  pre-existing control into the rendered wrapper broke a `:scope >`-scoped re-query watching for
+  it, since the move itself changes which element counts as a "direct child."
 - `bin/design/adapters/storybook/` — a third audit adapter (alongside Rails and
   `examples/reference-app/`), pointed at the built Storybook site rather than a whole app. Only
   `wcag-audit.js` and `keyboard-audit.js` are wired into CI here; `button-audit.js` audits

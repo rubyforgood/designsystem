@@ -97,6 +97,30 @@
     },
     "./components/popover/standalone": {
       "default": "./dist/standalone/popover.mjs"
+    },
+    "./components/field": {
+      "default": "./dist/components/field.mjs"
+    },
+    "./components/field/standalone": {
+      "default": "./dist/standalone/field.mjs"
+    },
+    "./components/error-summary": {
+      "default": "./dist/components/error-summary.mjs"
+    },
+    "./components/error-summary/standalone": {
+      "default": "./dist/standalone/error-summary.mjs"
+    },
+    "./components/table": {
+      "default": "./dist/components/table.mjs"
+    },
+    "./components/table/standalone": {
+      "default": "./dist/standalone/table.mjs"
+    },
+    "./components/date-range-picker": {
+      "default": "./dist/components/date-range-picker.mjs"
+    },
+    "./components/date-range-picker/standalone": {
+      "default": "./dist/standalone/date-range-picker.mjs"
     }
   },
   "scripts": {

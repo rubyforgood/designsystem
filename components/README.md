@@ -253,6 +253,93 @@ implementation over reimplementing a known-hard problem — applies just as dire
 detection; Floating UI is the maintained successor to Popper and what Shoelace/Radix use for the
 same thing.
 
+## `<rfg-field>` and `<rfg-error-summary>`
+
+Implements "Forms: required fields and validation errors" — one of design.md's densest,
+most-portable sections (form validation UX barely varies by framework).
+
+`<rfg-field>` wraps a host-provided native control (any `<input>`, `<select>`, `<textarea>` — not
+a reimplemented one; the spec's job here is the label/marker/error conventions *around* a
+control). `aria-required`, `aria-invalid`, and `aria-describedby` are proxied onto the control
+automatically.
+
+| Attribute | Values | Notes |
+| --- | --- | --- |
+| `label` | text | |
+| `required` | boolean | Renders a red `<abbr title="required">*</abbr>` in the label. |
+| `optional` | boolean | Mark optional fields too on a form that mixes both — design.md's rule: a lone asterisk convention leaves every unmarked field ambiguous. |
+| `error` | text | Renders the message (neutral-700 text, danger-coloured glyph — "the glyph signals and the sentence reads") and wires `aria-invalid`/`aria-describedby`. |
+
+`<rfg-error-summary>` is the page-level counterpart (`essentials_error_summary`): `role="alert"`,
+a heading, and the host's own message list (plain `<li>` text, deliberately **not** links —
+design.md borrows GOV.UK's linked-error-summary *reasoning*, not its implementation, since
+underlined block-level links would violate this system's own established rule; every message is
+still reachable at its own field via `<rfg-field>`'s `aria-describedby`, so nothing is lost).
+
+**Found by axe-core, fixed, not assumed — the same lesson as `<rfg-tabs>`, with a new wrinkle:**
+`<rfg-field>` renders into light DOM (a shadow-rendered `<label for>` can't label a light-DOM
+`<input>`, the same shadow-boundary problem tabs.js already has a fix for). But a *second* bug
+followed from that fix itself: `updated()` moves the pre-existing `<input>` child from being
+`<rfg-field>`'s own direct child into the newly-rendered `.rfg-field` wrapper div (so it lands
+between the label and the error message, not wherever it happened to originally sit). That move
+itself fires the element's own `MutationObserver`, which was querying `:scope > input` — a
+direct-child-only query that stopped matching the instant the control moved one level deeper,
+clearing `aria-required`/the label's `for` on every render after the first. Fixed by relaxing the
+query to search the whole subtree instead of direct children only. The general lesson for any
+future light-DOM-rendered component here: if it repositions a pre-existing child, re-query for it
+without assuming it stays at the same tree depth.
+
+## `<rfg-table>`
+
+Implements the clearly Portable core of "Tables": a scroll-not-squeeze container (WCAG 1.4.10's
+data-table exemption), top-aligned cells (`vertical-align: middle` is invisible until a cell
+wraps, then every single-line cell in that row floats off the baseline), and three column-type
+utility classes (`.numeric`/`.quantity`/`.percent`, `.date`, `.notes`) applied consistently. Warns
+in development if the host's `<table>` has no `<caption>` (WCAG/semantics requirement, not style).
+
+**Deliberately out of scope**, named rather than silently omitted: frozen/pinned columns, row
+selection with a batch-action bar, and the scroll rail's own affordances (edge shadows, overflow
+indicators). design.md's own tagging pass already calls the Row actions/Table sections "a single,
+fully-worked case study" rather than something to generalize wholesale — those pieces are measured
+against one app's specific layout (pixel-exact scroll offsets, a dark floating bar's `bottom-12`)
+and aren't a good first candidate to port as-is.
+
+The host supplies the actual `<table>` markup (caption, thead, tbody) via the default slot; this
+element doesn't dictate column count or structure, only wraps, scrolls, and supplies the shared
+classes a host's own cells opt into.
+
+## `<rfg-date-range-picker>`
+
+Implements "Date range picker": one trigger showing the current range, a popover (composing
+`<rfg-popover>` — reuse, not reimplementation) with presets on one side and two native
+`<input type="date">` fields on the other.
+
+| Attribute | Notes |
+| --- | --- |
+| `presets` | Array property: `[{ label, start, end }]` — see below for why this is data, not server logic. |
+| `start` / `end` | Current range, ISO date strings. |
+
+Dispatches `rfg-change` with `{ start, end, label }` (`label` is `null` for a custom range that
+doesn't match a preset).
+
+**Local in the original, made Portable here:** design.md's own implementation computes presets
+server-side and serializes them into Human Essentials' specific wire format
+(`filters[date_range]`, a single parsed string). None of that belongs in a generic component —
+`presets` is just data the host supplies, and `rfg-change` is generic; turning that into a
+specific backend's query params is the host's job, not this element's.
+
+Portable behaviors kept and verified in a real browser: selecting a preset commits immediately and
+closes the popover (a preset is a complete answer); editing a custom date debounces 350ms (so
+setting From then To costs one commit, not two) and leaves the popover open; an inverted custom
+range (End before Start) is silently swapped rather than blocked with an error — checked across
+two separate inversions in the same session, not just one.
+
+design.md's documented fix for the From/To fields' `change` event bubbling into a wrapping filter
+form's own submit doesn't apply here: these inputs render inside this element's own shadow DOM
+(not slotted from light DOM), and a native `change` event's `composed` flag is `false` by
+default — it already can't cross the shadow boundary to reach a host page's form listener. Same
+shadow-DOM-makes-a-documented-gotcha-moot shape as `<rfg-modal>`'s `margin: auto` note.
+
 ## Preview
 
 ```bash
