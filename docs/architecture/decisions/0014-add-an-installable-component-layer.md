@@ -159,6 +159,32 @@ With this batch, every component in the originally-scoped Phase 5 ordering plus 
 identified genuinely-portable remainder of the catalog is built, except Charts (out of scope by
 design) and the handful of sections (Row actions, most of Filters, most of Conditional reveal)
 this project's own tagging pass already calls worked case studies rather than generalizable
-rules. Still ahead, named rather than assumed complete: Breadcrumbs, the conditional-reveal
-show/hide mechanism, Filter bar, Pagination, and Tag input — concrete, buildable pieces
-extracted from otherwise heavily-Local "mega-sections," not yet built.
+rules. Still ahead at that point: Breadcrumbs, the conditional-reveal show/hide mechanism, Filter
+bar, Pagination, and Tag input — concrete, buildable pieces extracted from otherwise
+heavily-Local "mega-sections."
+
+**Update, fifth and final batch:** those five built (`breadcrumbs`, `conditional-reveal`,
+`filter-bar`, `pagination`, `tag-input` — twenty-five components total). This completes every
+genuinely portable component in `design.md`'s catalog; Charts remains the one deliberate
+exclusion.
+
+Two things worth recording from this batch specifically:
+
+1. `<rfg-filter-bar>` composes `<rfg-disclosure>` for its fold-behind-a-trigger case (>2
+   controls) rather than reimplementing toggle behavior a second time — the same reuse pattern
+   `<rfg-date-range-picker>` established with `<rfg-popover>`. Verified in a real browser: two
+   controls render with no disclosure wrapper at all; four render behind one.
+2. `<rfg-tag-input>` is this layer's first **form-associated custom element**
+   (`static formAssociated = true`, `ElementInternals.setFormValue()`) — the modern,
+   platform-native way to make a custom element participate in a real `<form>` submission, used
+   here for design.md's "the native form control remains the actual source of truth" rule.
+   Verified by actually submitting a real `<form>` and reading the result back from `FormData`,
+   not just trusting the API exists: it returned exactly `[name, "comma,separated,values"]`, the
+   same shape a plain native input would have produced.
+
+A story-content bug (not a component bug) also surfaced here and is worth naming as a pattern to
+watch for: `filter-bar`'s demo markup had a `<label>` floating next to a `<select>` with no
+`for`/`id` connecting them, which `<rfg-filter-bar>` itself has no reason to touch (it only lays
+out whatever the host provides) — axe caught it anyway, correctly, since the story's own markup
+is real, rendered HTML like any other. Every story in this repo is real test material, not just
+documentation; a demo that's wrong is a defect in the same sense a component bug is.

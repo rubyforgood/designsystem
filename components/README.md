@@ -413,6 +413,82 @@ own three-flavour table (nothing exists yet → offer to create; a filter matche
 clear it; genuinely nothing to do → reassurance, not an action), and so a future audit can check
 the right action is present for the right kind.
 
+## `<rfg-breadcrumbs>`
+
+Implements the breadcrumb rule surfaced from "Conditional reveal": follows the real W3C ARIA APG
+breadcrumb pattern rather than inventing a shape — an ordered list (order carries hierarchy),
+ancestor links, the current page as plain text with `aria-current="page"`, never a link to
+itself.
+
+`items` is `[{ label, href? }]`; an entry with no `href` is the current page — presence of `href`
+is the signal, not array position, so a host can't accidentally render the current page as a
+self-link.
+
+## `<rfg-conditional-reveal>`
+
+Implements the conditional-reveal mechanism surfaced from the same section: a field that only
+applies to one answer in a set is revealed directly below the control that reveals it (DOM order,
+so keyboard focus reaches it next), with a visual marker (a left rule + indent) tying it to the
+specific option — unmarked, it reads as belonging to every option in the group.
+
+**Deliberately has no opinion on the trigger's ARIA at all** — design.md's own caution:
+`aria-expanded` isn't valid on every role, so there's no single state attribute this element
+could apply uniformly to a trigger it doesn't control. The host wires whatever triggered it (a
+radio, a checkbox, a select) to this element's `shown` property directly.
+
+## `<rfg-filter-bar>`
+
+Implements "Filter bar": filters submit as a real GET request — a filtered view is a shareable,
+bookmarkable URL, never client-only state — and a bar whose controls fit on one line shows them;
+only a bar that doesn't fold. Two is design.md's own measured threshold: a disclosure in front of
+one or two controls is a click that buys nothing.
+
+Composes `<rfg-disclosure>` for the folded case (reuse, not a second accordion implementation).
+Slots: `fields` (each filter control, counted via `slotchange` to decide fold vs. inline — verified
+in a real browser: two controls render inline with no disclosure at all, four render behind one),
+`actions` (right end of the row).
+
+## `<rfg-pagination>`
+
+Implements "Pagination". **States the range, not the page** — "Showing 31–45 of 272", never "Page
+3 of 19," because a page number's meaning changes with page size and answers a different question
+than how big the result set actually is. Renders for every non-empty collection, including one
+that fits on a single page (just the label, no pager chrome) — verified the single-page case
+renders no `<nav>` at all, and the empty case renders "No {entries}".
+
+| Attribute | Notes |
+| --- | --- |
+| `total` / `page` / `page-size` | |
+| `entry-name` | Singular noun, e.g. `"donation"` — pluralized automatically in the label. |
+| `hrefFor` | Property (function `page => href`): real, bookmarkable per-page URLs. Without it, controls only dispatch `rfg-navigate`, a degraded mode, not the default path. |
+
+**First/Last/Prev/Next don't change the control set's width** — present and disabled at the
+boundaries rather than disappearing, except First/Last specifically, which are absent entirely on
+a single-page collection (verified) and present-but-disabled on a longer one at the ends
+(verified). An unavailable control is a real `<a>` with no `href` and `aria-disabled="true"` —
+non-interactive by the absence of `href` itself, not a `disabled` attribute anchors don't have —
+never a disabled-looking-but-still-functional link.
+
+## `<rfg-tag-input>`
+
+Implements "Tag input": a free-form list of short values. Enter, comma, or Tab commits the typed
+word as a chip; Backspace on an empty box removes the last chip; duplicates are rejected
+case-insensitively (`Pack` cannot join `pack`) — all verified against the real component, not
+just read off the code.
+
+**The native form control remains the actual source of truth and the thing that submits.**
+Implemented as a *form-associated custom element* (`static formAssociated = true`,
+`ElementInternals.setFormValue()`) — verified by actually submitting a real `<form>` containing
+one and reading the result back from `FormData`, which returned exactly `[name, "comma,separated"]`
+the way a plain native input would have. This is the modern, platform-native equivalent of "the
+underlying control is exactly the control it always was," done through the browser's own
+form-participation API instead of a hidden input a host has to wire up.
+
+**Not a disguised `<select>`**, on purpose — design.md's own incident: a free-tagging control that
+visually resembled select2 got clicked expecting a dropdown, and nothing opened. No chevron, no
+dropdown affordance anywhere in this element. Each chip's remove button is a real 24×24px target
+(WCAG 2.5.8), measured against the specific prior incident design.md records (9×21).
+
 ## Preview
 
 ```bash

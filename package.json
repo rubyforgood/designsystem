@@ -151,6 +151,36 @@
     },
     "./components/empty-state/standalone": {
       "default": "./dist/standalone/empty-state.mjs"
+    },
+    "./components/breadcrumbs": {
+      "default": "./dist/components/breadcrumbs.mjs"
+    },
+    "./components/breadcrumbs/standalone": {
+      "default": "./dist/standalone/breadcrumbs.mjs"
+    },
+    "./components/conditional-reveal": {
+      "default": "./dist/components/conditional-reveal.mjs"
+    },
+    "./components/conditional-reveal/standalone": {
+      "default": "./dist/standalone/conditional-reveal.mjs"
+    },
+    "./components/filter-bar": {
+      "default": "./dist/components/filter-bar.mjs"
+    },
+    "./components/filter-bar/standalone": {
+      "default": "./dist/standalone/filter-bar.mjs"
+    },
+    "./components/pagination": {
+      "default": "./dist/components/pagination.mjs"
+    },
+    "./components/pagination/standalone": {
+      "default": "./dist/standalone/pagination.mjs"
+    },
+    "./components/tag-input": {
+      "default": "./dist/components/tag-input.mjs"
+    },
+    "./components/tag-input/standalone": {
+      "default": "./dist/standalone/tag-input.mjs"
     }
   },
   "scripts": {

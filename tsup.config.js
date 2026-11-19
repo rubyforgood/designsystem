@@ -28,6 +28,11 @@ const ENTRY = {
   callout: "components/callout.js",
   disclosure: "components/disclosure.js",
   "empty-state": "components/empty-state.js",
+  breadcrumbs: "components/breadcrumbs.js",
+  "conditional-reveal": "components/conditional-reveal.js",
+  "filter-bar": "components/filter-bar.js",
+  pagination: "components/pagination.js",
+  "tag-input": "components/tag-input.js",
 };
 
 export default defineConfig([
