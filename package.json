@@ -73,6 +73,30 @@
     },
     "./components/page-header/standalone": {
       "default": "./dist/standalone/page-header.mjs"
+    },
+    "./components/tabs": {
+      "default": "./dist/components/tabs.mjs"
+    },
+    "./components/tabs/standalone": {
+      "default": "./dist/standalone/tabs.mjs"
+    },
+    "./components/page-tabs": {
+      "default": "./dist/components/page-tabs.mjs"
+    },
+    "./components/page-tabs/standalone": {
+      "default": "./dist/standalone/page-tabs.mjs"
+    },
+    "./components/modal": {
+      "default": "./dist/components/modal.mjs"
+    },
+    "./components/modal/standalone": {
+      "default": "./dist/standalone/modal.mjs"
+    },
+    "./components/popover": {
+      "default": "./dist/components/popover.mjs"
+    },
+    "./components/popover/standalone": {
+      "default": "./dist/standalone/popover.mjs"
     }
   },
   "scripts": {
@@ -90,6 +114,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.8.0",
     "lit": "^3.3.3"
   }
 }

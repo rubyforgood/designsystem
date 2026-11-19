@@ -179,6 +179,80 @@ separate attribute to keep in sync by hand: no subtitle aligns the row to `flex-
 action button sits on the `h1`'s baseline); a subtitle aligns it to `flex-start` (so the action
 can't be dragged down to the subtitle's baseline instead) — design.md's own measured shape rule.
 
+## `<rfg-tabs>` + `<rfg-tab-panel>`, and `<rfg-page-tabs>`
+
+Implements "Tabs" — design.md documents **two** components here, not one, and using the wrong
+one for a given case is an accessibility bug, not a style choice: `role="tab"` promises assistive
+tech that activating it swaps a panel in the current document, so a tab that actually navigates
+must not use it (it would also steal arrow keys from what should be a plain link list).
+
+`<rfg-tabs>` (wrapping `<rfg-tab-panel>` children, each with a `label` attribute) is the real ARIA
+Tabs pattern for **panel tabs** — panels swap in place, same URL: a true tablist, roving tabindex,
+arrow keys move *and* activate (automatic activation, the shape Ant Design/Material/Carbon's own
+Tabs components use), Home/End jump to the first/last tab.
+
+`<rfg-page-tabs>` is a styled `<nav>` of real `<a>` links for **page tabs** — each tab its own
+URL. No ARIA tab roles, no keyboard management: it's just a `<nav>`, and the host sets
+`aria-current="page"` on whichever link is current (this element has no way to know the current
+URL itself).
+
+**Found by axe-core, fixed, not assumed:** `<rfg-tabs>` renders into **light DOM**
+(`createRenderRoot()` returns `this`), not a shadow root. A first version rendered the tablist in
+shadow DOM with `aria-controls`/`aria-labelledby` pointing at the light-DOM `<rfg-tab-panel>`
+elements (which must stay in light DOM so their content can be arbitrary host markup) — axe-core's
+`aria-valid-attr-value` check failed, because an ID reference can't reliably cross the shadow
+boundary. Rendering the tabs themselves into light DOM puts both ends of every ID reference in one
+scope; styles are scoped by a `.rfg-tabs` wrapper class instead of `:host`.
+
+## `<rfg-modal>`
+
+Implements "Modals": wraps native `<dialog>` + `showModal()` rather than reimplementing focus
+trapping, Escape handling, background inertness and top-layer stacking — all of which `<dialog>`
+gives correctly for free. Public API mirrors what it wraps: `.show()` / `.close()`, not an `open`
+attribute a host toggles (a plain attribute can't invoke `showModal()`, which is what actually
+grants the top-layer/focus-trap behavior).
+
+| Attribute | Default |
+| --- | --- |
+| `heading` | — |
+
+Slots: default (body, scrollable — `tabindex="0"` for WCAG 2.1.1 keyboard reachability), `footer`
+(renders only if it has content). Clicking the backdrop closes it; so does Escape, natively.
+Dispatches `rfg-close` (re-dispatched from the native, non-composed `close` event so it's audible
+from outside the shadow root).
+
+design.md's one documented gotcha for this pattern — a global CSS reset's `margin: 0` defeating
+`<dialog>`'s own centring `margin: auto` — can't actually happen here: the shadow boundary already
+isolates this element's `<dialog>` from whatever reset the host page runs.
+
+## `<rfg-popover>`
+
+Implements "Popovers": an anchored floating panel (the account menu, a filter) sharing one
+interaction contract — Escape closes and returns focus to the trigger; an outside click closes
+*without* moving focus (the click already put focus wherever the user meant); expanded state is a
+real `aria-expanded` attribute; the panel is actually removed from the accessibility tree while
+closed (`hidden`, not just visually hidden); and it repositions (flips/shifts) to stay inside the
+viewport.
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `label` | text | `"Popover"` (the panel's `aria-label`) |
+| `placement` | any Floating UI placement (`bottom-start`, `bottom-end`, …) | `bottom-start` |
+
+Slots: `trigger` (the host's own button — `aria-haspopup`/`aria-expanded`/`aria-controls` are
+proxied onto it, the same pattern `<rfg-button>` uses for `aria-label`) and default (the panel
+body).
+
+**Not a modal**, and the distinction is functional, not visual: it must never trap focus or make
+the rest of the page inert, since a popover's point is usually to stay in context with what it's
+acting on.
+
+**First new dependency beyond `lit`:** `@floating-ui/dom`, for the viewport flip/shift math.
+design.md's own reasoning for `<dialog>` over a hand-rolled modal — prefer a correct, maintained
+implementation over reimplementing a known-hard problem — applies just as directly to collision
+detection; Floating UI is the maintained successor to Popper and what Shoelace/Radix use for the
+same thing.
+
 ## Preview
 
 ```bash

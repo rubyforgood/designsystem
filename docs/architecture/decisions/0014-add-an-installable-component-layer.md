@@ -86,3 +86,24 @@ Still ahead: porting the rest of `design.md`'s ~25 documented components in roug
 Portable-tag-density order, and — eventually — migrating Human Essentials' own button-rendering
 helper onto `<rfg-button>` as the real "any app" portability proof, the same role
 `examples/reference-app` already played for the audit suite.
+
+**Update, later the same project phase:** ten more components ported (status-pill, icon-tile,
+avatar, card, flash-message, page-header, tabs, page-tabs, modal, popover — eleven total with
+button). Two more real defects found by actually running axe-core against every story, not
+assumed:
+
+1. Status pill and flash message both put tone-coloured text on their own tone-tinted background,
+   which drops below WCAG AA 4.5:1 for the four semantic tones — those tokens are measured to
+   clear 4.5:1 against *pure* white only (danger by a 0.01 margin, `tokens/README.md`). Fixed to
+   neutral-900 text, tone carried by the background/accent instead.
+2. `<rfg-tabs>`'s `aria-controls`/`aria-labelledby` failed `aria-valid-attr-value`: the tablist
+   was shadow-rendered, pointing at light-DOM `<rfg-tab-panel>` elements, and an ID reference
+   can't reliably cross that boundary. Fixed by rendering `<rfg-tabs>` into light DOM instead
+   (`createRenderRoot()` returns `this`) — the one component so far that doesn't use shadow DOM,
+   and a real design constraint for any future component needing cross-element ARIA ID
+   references, not a one-off.
+
+`@floating-ui/dom` was added as a second runtime dependency, for `<rfg-popover>`'s viewport
+flip/shift positioning — the same "prefer a correct, maintained implementation over reimplementing
+a known-hard problem" reasoning this ADR already gives for `<dialog>` over a hand-rolled modal,
+applied to collision detection instead of dialog mechanics.

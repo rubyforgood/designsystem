@@ -15,6 +15,10 @@ const ENTRY = {
   card: "components/card.js",
   "flash-message": "components/flash-message.js",
   "page-header": "components/page-header.js",
+  tabs: "components/tabs.js",
+  "page-tabs": "components/page-tabs.js",
+  modal: "components/modal.js",
+  popover: "components/popover.js",
 };
 
 export default defineConfig([
@@ -23,7 +27,7 @@ export default defineConfig([
     entry: ENTRY,
     outDir: "dist/components",
     format: ["esm"],
-    external: ["lit"],
+    external: ["lit", "@floating-ui/dom"],
     dts: false,
     sourcemap: true,
     clean: true,
@@ -33,7 +37,7 @@ export default defineConfig([
     entry: ENTRY,
     outDir: "dist/standalone",
     format: ["esm"],
-    noExternal: ["lit"],
+    noExternal: ["lit", "@floating-ui/dom"],
     // Each standalone file must be genuinely self-contained — that's the whole point of this
     // mode (copy one file, no resolution). Without this, esbuild shares a `lit` chunk across
     // entries, silently turning "one file" into "one file plus a chunk it imports."
