@@ -5,10 +5,13 @@ This file provides guidance to Claude Code when working in this repository.
 ## What this repo is
 
 Ruby For Good's global design system: [`design.md`](design.md), Tailwind v4 design [tokens](tokens/),
-and an executable audit suite, meant for any Ruby For Good app (or any app at all) to migrate its
-UI onto — not just Human Essentials, the app it started inside. See [README.md](README.md) for the
-adoption-facing pitch and [ADR 13](docs/architecture/decisions/0013-genericize-the-design-system.md)
-for the fork-and-genericize decision and what it actually involved.
+an installable [Web Components](components/) layer, and an executable audit suite, meant for any
+Ruby For Good app (or any app at all) to migrate its UI onto — not just Human Essentials, the app
+it started inside. See [README.md](README.md) for the adoption-facing pitch,
+[ADR 13](docs/architecture/decisions/0013-genericize-the-design-system.md) for the
+fork-and-genericize decision, and
+[ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md) for the component
+layer and why it's Web Components rather than React/Vue.
 
 `design.md` is the normative reference document. Every rule in it is tagged **Portable** (holds on
 any app) or **Local** (this project's own specific answer — the practice of deciding may transfer,
@@ -33,6 +36,12 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   run unmodified against whatever the adapter points at. `bin/design/targets.js` is the original
   Rails/Devise adapter (this suite's origin app); `bin/design/README.md` documents what every
   script checks and why it's built the way it is.
+- `components/` — the installable component layer (ADR 14): Web Components built with Lit, one
+  source file per component, consuming `tokens/tokens.css` only (never a hardcoded value). Built
+  via `npm run build` (`tsup.config.js`) into `dist/components/` (npm import, `lit` external) and
+  `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Only
+  `<rfg-button>` exists so far; the rest of `design.md`'s ~25 documented components are not yet
+  ported.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target
   (`bin/design/adapters/reference-app/targets.js`), built specifically to test whether the adapter
   seam's portability claim actually holds, not just to have a demo app.
@@ -83,5 +92,9 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   value as an optional adapter export with a graceful fallback, rather than hardcoding it in the
   audit or silently swallowing the failure.
 - This has not been published to npm yet (see `README.md`'s Status section for the current state).
+- `lit` (runtime) and `tsup`/`typescript` (build) are this repo's first non-`playwright`
+  dependencies, added for `components/` (ADR 14). `package.json` deliberately has no
+  `"type": "module"` — `bin/design/`'s 24 audit scripts are CommonJS, so build output uses the
+  unambiguous `.mjs` extension instead of changing the whole package's module system.
 - Load `design-system-migration` before any nontrivial change to how the system is documented or
   organized — it's the playbook this whole repo's structure follows.

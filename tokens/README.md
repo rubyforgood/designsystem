@@ -12,6 +12,15 @@ the left): design.md's component rules refer to roles (`brand-600`, `--color-suc
 "indigo" or "emerald" by name, so as long as every role still resolves to *something*, retheming
 is a find-and-replace in one file, not an edit to the spec.
 
+`tokens.css` is the same values as plain `:root` custom properties, with no `@theme` at-rule —
+for an app with no Tailwind at all (including the `components/` package, which imports this file
+rather than `theme.css`, since it can't assume Tailwind is present on every adopter's page). It
+was generated once by compiling `theme.css` through the real Tailwind v4 engine and reading off
+the resolved values, not hand-transcribed — see the file's own header comment. If `theme.css`
+changes, regenerate `tokens.css` the same way (`@import "tailwindcss"; @import "./theme.css";`
+through `@tailwindcss/cli`, forcing every role utility class into scope with a throwaway
+`@source` file so nothing gets tree-shaken) rather than hand-editing it to match a guess.
+
 ## Rules vs. defaults, by category
 
 ### Colour
@@ -85,8 +94,9 @@ is a find-and-replace in one file, not an edit to the spec.
 
 ## Retheming checklist
 
-1. Edit `theme.css`'s values. Leave the role names alone unless you're also rewriting which
-   component rules reference which role.
+1. Edit `theme.css`'s values, then regenerate `tokens.css` from it (see above) so the two never
+   drift apart. Leave the role names alone unless you're also rewriting which component rules
+   reference which role.
 2. Re-check contrast for anything at the `-700`-equivalent step against your actual background —
    don't assume a different hue clears 4.5:1 at the same scale step Human Essentials measured.
 3. If you change spacing scale, radius, or elevation counts, revisit the Portable rules above —

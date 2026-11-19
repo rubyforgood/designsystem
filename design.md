@@ -1,6 +1,7 @@
 # Ruby for Good: Global Design System
 
-This is the design system for Human Essentials. It is normative:
+This is Ruby for Good's global design system, originally built inside and still used by Human
+Essentials. It is normative:
 [ADR 0010](docs/architecture/decisions/0010-adopt-a-documented-design-system.md) makes this
 document the reference for UI work, and
 [ADR 0011](docs/architecture/decisions/0011-adopt-the-ruby-for-good-design-system.md) makes

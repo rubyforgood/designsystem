@@ -2,7 +2,8 @@
 
 Ruby For Good's global design system. Any application in the Ruby For Good ecosystem (or outside
 it) can migrate its UI onto this system using [`design.md`](design.md), the [design
-tokens](tokens/), the [executable audit suite](bin/design/README.md), and the Claude Code skills in
+tokens](tokens/), an installable [component layer](components/) built as Web Components, the
+[executable audit suite](bin/design/README.md), and the Claude Code skills in
 [`.claude/skills/`](.claude/skills/). Start with the `design-system-migration` skill: it's the
 step-by-step playbook (spec first, research precedent, preview before building, apply app-wide,
 enforce with an executable audit) for migrating an app onto this system.
@@ -19,6 +20,7 @@ portable beyond the app it was first found on, including where it turned out *no
 | --- | --- |
 | [`design.md`](design.md) | The spec. Every rule is tagged **Portable** (holds on any app) or **Local** (this project's own answer: the practice of deciding may transfer, the specific value doesn't). See [`docs/portability/design-md-tagging.md`](docs/portability/design-md-tagging.md) for the full breakdown. |
 | [`tokens/`](tokens/) | Design tokens as a Tailwind v4 `@theme` block: colour, type, spacing, radius, elevation, with the Portable rule and the Local default value stated separately for each. |
+| [`components/`](components/README.md) | An installable Web Components layer (Lit) implementing `design.md`'s Components section in code — `npm install`-able or copy a single standalone file. Early: only `<rfg-button>` exists so far. See [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md). |
 | [`bin/design/`](bin/design/README.md) | ~40 executable audits (WCAG conformance, copy quality, dead code, and more) built on an adapter seam: point one small file (`targets.js`) at your app and most of the suite runs unmodified. |
 | [`examples/reference-app/`](examples/reference-app/) | A second, deliberately non-Rails adapter target: proof (and, honestly, some disproof) that the adapter claim holds. See [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md). |
 | [`docs/field-notes.md`](docs/field-notes.md) | The evidence index: what's measured, what's historical, and the rule for not citing another app's own numbers as claims about your app. |
@@ -80,7 +82,11 @@ Early. `design.md` has been fully passed over once for the Portable/Local split;
 has real, measured portability evidence for 22 of ~40 scripts (see
 [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md)) and
 documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml` runs syntax
-checks, a doc-link audit, and a regression check against the reference app on every push.
+checks, a doc-link audit, and a regression check against the reference app on every push. The
+component layer is newer still: one component (`<rfg-button>`) built, verified in a real browser
+against the accessibility rules its `design.md` section documents, and not yet wired into either
+Storybook or the audit suite — see `components/README.md` and
+[ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
 This has not been published to the npm registry yet; install straight from GitHub in the meantime
 (see "Using the tokens" above).

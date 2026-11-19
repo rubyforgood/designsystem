@@ -60,6 +60,25 @@ jobs:
       - name: Citation audit
         run: python3 bin/design/citation-audit.py --check
 
+  components-build:
+    name: component package builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Catches a broken component before it ships — see components/README.md. Not yet running the
+      # built output against the audit suite (that needs a Storybook/preview adapter, ADR 14's
+      # named next step); this just confirms the package still compiles.
+      - name: Build components
+        run: npm run build
+
   reference-app-control-harness:
     name: reference-app audits match their documented outcome
     runs-on: ubuntu-latest

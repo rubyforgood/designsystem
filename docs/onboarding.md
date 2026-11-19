@@ -1,6 +1,10 @@
 # Onboarding
 
-For anyone new to Human Essentials. Two halves, depending on why you are here.
+This is Human Essentials' own onboarding doc, carried over as reference material: it's the app
+this design system was built inside, measured against, and the one `bin/design/targets.js`'s
+adapter still points at. It is not onboarding for this repository itself — for that, see
+[`CLAUDE.md`](../CLAUDE.md) and [`README.md`](../README.md). Two halves, depending on why you are
+here.
 
 - **[Part 1 — Maintaining the app](#part-1--maintaining-the-app)**: the domain, the code, how to
   run it and test it. For contributors and maintainers.

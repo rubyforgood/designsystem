@@ -27,9 +27,27 @@
     "docs/portability/",
     "docs/field-notes.md",
     "design.md",
-    "LICENSE"
+    "LICENSE",
+    "components/README.md",
+    "dist/"
   ],
+  "exports": {
+    "./components/button": {
+      "default": "./dist/components/button.mjs"
+    },
+    "./components/button/standalone": {
+      "default": "./dist/standalone/button.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup"
+  },
   "devDependencies": {
-    "playwright": "^1.55.0"
+    "playwright": "^1.55.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "lit": "^3.3.3"
   }
 }
