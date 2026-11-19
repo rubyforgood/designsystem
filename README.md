@@ -85,13 +85,13 @@ documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml`
 checks, a doc-link audit, a regression check against the reference app, and (since the component
 layer) a components/Storybook build plus a real accessibility/keyboard audit run — all on every
 push. The
-component layer is newer still: one component (`<rfg-button>`) built, verified in a real browser
-against the accessibility rules its `design.md` section documents, previewable via Storybook
+component layer is newer still: seven components built (`button`, `status-pill`, `icon-tile`,
+`avatar`, `card`, `flash-message`, `page-header`), each verified in a real browser against the
+accessibility rules its `design.md` section documents, previewable via Storybook
 (`npm run storybook`) with an axe-core a11y gate on every story, and audited for real —
-`wcag-audit.js` and `keyboard-audit.js` now run against the built Storybook site in CI (a third
-adapter, `bin/design/adapters/storybook/`, see `docs/portability/adapter-storybook.md`). Only one
-component exists, so this is one audited component, not an audited library yet. See
-`components/README.md` and
+`wcag-audit.js` and `keyboard-audit.js` run against the built Storybook site in CI (a third
+adapter, `bin/design/adapters/storybook/`, see `docs/portability/adapter-storybook.md`). Still
+early: 7 of `design.md`'s ~25 documented components exist. See `components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
 This has not been published to the npm registry yet; install straight from GitHub in the meantime

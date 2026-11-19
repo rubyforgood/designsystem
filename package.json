@@ -37,6 +37,42 @@
     },
     "./components/button/standalone": {
       "default": "./dist/standalone/button.mjs"
+    },
+    "./components/status-pill": {
+      "default": "./dist/components/status-pill.mjs"
+    },
+    "./components/status-pill/standalone": {
+      "default": "./dist/standalone/status-pill.mjs"
+    },
+    "./components/icon-tile": {
+      "default": "./dist/components/icon-tile.mjs"
+    },
+    "./components/icon-tile/standalone": {
+      "default": "./dist/standalone/icon-tile.mjs"
+    },
+    "./components/avatar": {
+      "default": "./dist/components/avatar.mjs"
+    },
+    "./components/avatar/standalone": {
+      "default": "./dist/standalone/avatar.mjs"
+    },
+    "./components/card": {
+      "default": "./dist/components/card.mjs"
+    },
+    "./components/card/standalone": {
+      "default": "./dist/standalone/card.mjs"
+    },
+    "./components/flash-message": {
+      "default": "./dist/components/flash-message.mjs"
+    },
+    "./components/flash-message/standalone": {
+      "default": "./dist/standalone/flash-message.mjs"
+    },
+    "./components/page-header": {
+      "default": "./dist/components/page-header.mjs"
+    },
+    "./components/page-header/standalone": {
+      "default": "./dist/standalone/page-header.mjs"
     }
   },
   "scripts": {

@@ -7,10 +7,20 @@ import { defineConfig } from "tsup";
 //   dist/standalone/<name>.js   — `lit` bundled in. Copy this single file into a project with no
 //                                 package manager at all, mirroring bin/design/'s existing
 //                                 "copy the audit file in" distribution pattern (see root README).
+const ENTRY = {
+  button: "components/button.js",
+  "status-pill": "components/status-pill.js",
+  "icon-tile": "components/icon-tile.js",
+  avatar: "components/avatar.js",
+  card: "components/card.js",
+  "flash-message": "components/flash-message.js",
+  "page-header": "components/page-header.js",
+};
+
 export default defineConfig([
   {
     name: "components",
-    entry: { button: "components/button.js" },
+    entry: ENTRY,
     outDir: "dist/components",
     format: ["esm"],
     external: ["lit"],
@@ -20,10 +30,14 @@ export default defineConfig([
   },
   {
     name: "standalone",
-    entry: { button: "components/button.js" },
+    entry: ENTRY,
     outDir: "dist/standalone",
     format: ["esm"],
     noExternal: ["lit"],
+    // Each standalone file must be genuinely self-contained — that's the whole point of this
+    // mode (copy one file, no resolution). Without this, esbuild shares a `lit` chunk across
+    // entries, silently turning "one file" into "one file plus a chunk it imports."
+    splitting: false,
     dts: false,
     sourcemap: true,
     clean: true,

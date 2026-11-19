@@ -84,6 +84,101 @@ from the host's light DOM into this element's shadow DOM the way `aria-label` (a
 can. Use `aria-label` with the label text directly until this is revisited with
 `ElementInternals`/`ariaLabelledByElements`, which doesn't have solid cross-browser support yet.
 
+## `<rfg-status-pill>`
+
+Implements the "Status pills" section: communicates state, never an action — never focusable,
+never looks pressable.
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `tone` | `neutral` \| `info` \| `success` \| `warning` \| `danger` \| `brand` | `neutral` |
+
+Default slot is the label; a named `icon` slot is decorative (`aria-hidden`) and, per design.md,
+"only earns its place when the pill itself is rare" — most pills should just be a tinted word.
+
+**Found by axe-core, fixed, not assumed:** the four semantic tones (info/success/warning/danger)
+render `neutral-900` text, not the tone colour — those tokens are measured to clear WCAG AA 4.5:1
+against *pure* white (danger by a 0.01 margin, see `tokens/README.md`), and any background tint
+drops below that. The tone still shows in the background; `neutral` and `brand` are unaffected
+(their tokens have a larger margin) and keep tone-coloured text.
+
+## `<rfg-icon-tile>` and `<rfg-avatar>`
+
+Implements "Icon tiles and avatars" — two separate elements, not one with a `shape` switch,
+because design.md reserves two visual vocabularies ("a stat or status" vs. "a person") and says
+never let them overlap.
+
+`<rfg-icon-tile>` (`tone`: `brand` default \| `neutral` \| `info` \| `success` \| `warning` \|
+`danger`; `size`: `md` default \| `sm`, reusing `<rfg-button>`'s size names) holds one icon in its
+default slot, always `aria-hidden` — it's always paired with a heading/figure that already names
+it.
+
+`<rfg-avatar>` (`name`, `size`) computes initials from `name` and, unlike the icon tile, carries
+an accessible name *by default* (`aria-label`, falling back to `name`) — design.md's own example
+uses a bare avatar as an account-menu trigger with no visible name nearby, so it can't be
+unconditionally decorative. Set `aria-hidden="true"` on the host when embedding it inside a
+control that already announces the person's name (see the `Decorative` story) — and if that
+control's own label doesn't contain the avatar's *visible* initials text, a voice-control user
+saying the visible label won't match it (WCAG 2.5.3 Label in Name, found the same way, via
+axe-core against that exact story).
+
+## `<rfg-card>`
+
+Implements "Cards": the shared surface (hairline border, one elevation step), plus an optional
+header (`heading`/`subtitle` attributes, an `actions` slot) and `footer` slot — each rendered only
+when there's something in it, via `slotchange`, not assumed from attributes alone.
+
+| Attribute | Values | Default | Notes |
+| --- | --- | --- | --- |
+| `heading` / `subtitle` | text | — | Header renders only if either is set or `actions` has content. |
+| `padded` | boolean | `true` | `false` when the body (e.g. a table) should meet the card edges. |
+
+Slots: default (body), `actions` (header, right-aligned), `footer`.
+
+design.md separates the bare surface (`.card-surface`, visual-only) from the full component on
+purpose — something that only needs the look shouldn't be forced through a header it doesn't want.
+This element doesn't yet expose that lighter surface-only primitive separately; reach for the
+default slot with no `heading`/`subtitle`/`actions` in the meantime (see the `SurfaceOnly` story).
+
+## `<rfg-flash-message>`
+
+Implements "Flash messages": severity decides the ARIA role (`warning`/`danger` → `role="alert"`,
+interrupts; `info`/`success` → `role="status"`, announces politely), and an optional auto-dismiss
+timer pauses on hover and on focus (WCAG 2.2.1 Timing Adjustable).
+
+| Attribute | Values | Default | Notes |
+| --- | --- | --- | --- |
+| `tone` | `info` \| `success` \| `warning` \| `danger` | `info` | |
+| `dismissible` | boolean | `true` | Shows a close button; firing it dispatches `rfg-dismiss`. |
+| `dismiss-after` | milliseconds | — | Absent = stays until dismissed. See below before setting it. |
+
+Dispatches `rfg-dismiss` (detail: `{ reason: "manual" \| "auto" }`) for the host to remove the
+element from the DOM / a Turbo frame — removal itself is silent for sighted users, only arrival is
+worth interrupting for.
+
+**Judgment call this component does not make for you:** design.md's rule is that whether a message
+may auto-dismiss depends on whether its *content* stays needed for as long as the timer runs, not
+its tone — a "success" message carrying a one-time credential must not auto-dismiss even though
+success messages usually can. Decide per message, not per tone, before setting `dismiss-after`.
+
+**Same `color-mix` contrast fix as the status pill**, for the same reason: message text is
+`neutral-900`, not the tone colour; the tone shows in the background tint and a left border.
+
+## `<rfg-page-header>`
+
+Implements "Page header". Owns the page's only `<h1>` — a host shouldn't render its own elsewhere.
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `heading` | text | — |
+| `subtitle` | text | — |
+| `back-href` / `back-label` | a URL / text | — |
+
+Slot: `actions` (right-aligned). Alignment is derived from whether `subtitle` is set, not a
+separate attribute to keep in sync by hand: no subtitle aligns the row to `flex-end` (a 40px
+action button sits on the `h1`'s baseline); a subtitle aligns it to `flex-start` (so the action
+can't be dragged down to the subtitle's baseline instead) — design.md's own measured shape rule.
+
 ## Preview
 
 ```bash
@@ -96,9 +191,11 @@ variant/state — this is the "preview before building, as a rendered page" step
 `design-system-migration` skill already asks for, made durable instead of ad hoc. The
 `@storybook/addon-a11y` addon runs axe-core against every story automatically
 (`.storybook/preview.js` sets `a11y.test: "error"`, so a real violation fails the story, not just
-logs a warning) — complementary to, not a replacement for, pointing `bin/design/`'s own audits
-(`wcag-audit.js`, `keyboard-audit.js`, `button-audit.js`) at the built Storybook site, which is
-still a later step (see [ADR 14](../docs/architecture/decisions/0014-add-an-installable-component-layer.md)).
+logs a warning) — complementary to, not a replacement for, `bin/design/adapters/storybook/`, which
+points `wcag-audit.js` and `keyboard-audit.js` (not `button-audit.js` — see
+[docs/portability/adapter-storybook.md](../docs/portability/adapter-storybook.md) for why) at the
+*built* Storybook site in CI. The a11y addon catches a regression locally while you're building;
+the CI job is what actually gates a push.
 
 ## Building
 

@@ -41,8 +41,11 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   via `npm run build` (`tsup.config.js`) into `dist/components/` (npm import, `lit` external) and
   `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Each component
   has a `*.stories.js` file (`npm run storybook`), with `@storybook/addon-a11y` running axe-core
-  against every story. Only `<rfg-button>` exists so far; the rest of `design.md`'s ~25 documented
-  components are not yet ported.
+  against every story. Seven exist so far (`button`, `status-pill`, `icon-tile`, `avatar`, `card`,
+  `flash-message`, `page-header`); the rest of `design.md`'s ~25 documented components are not yet
+  ported. Several tone-coloured-text-on-tinted-background combinations (status pill, flash
+  message) failed real WCAG AA contrast and were fixed to neutral text + a tone-coloured accent —
+  found by running axe-core against every story, not assumed from the token values.
 - `bin/design/adapters/storybook/` — a third audit adapter (alongside Rails and
   `examples/reference-app/`), pointed at the built Storybook site rather than a whole app. Only
   `wcag-audit.js` and `keyboard-audit.js` are wired into CI here; `button-audit.js` audits
