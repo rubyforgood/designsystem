@@ -134,3 +134,31 @@ on a later query.
 `date-range-picker` also composes `<rfg-popover>` directly (rendering one in its own template)
 rather than reimplementing anchored-panel behavior a third time — the first case of one component
 in this layer reusing another's interaction logic rather than tokens/styling alone.
+
+**Update, fourth batch:** five more components (`stats`, `numbered-step`, `callout`,
+`disclosure`, `empty-state` — twenty total), covering design.md's Stats, Numbered steps,
+Callouts, Disclosures, and Empty states sections, plus an explicit decision **not** to port
+Charts: that section defers entirely to Highcharts ("Local: Highcharts, through
+`shared/_highcharts`"), so there's no generic rule underneath it to extract — only usage
+guidance (pair a chart with its table; one chart answers one question), which belongs in
+`design.md`'s prose, not in a component.
+
+Two more real defects found by axe-core, both fixed:
+
+1. `<rfg-stats>`'s per-figure-count responsive column mapping was first written as an inline
+   `style` binding containing `@media` rules — invalid; an inline `style` attribute can't contain
+   an at-rule at all. Fixed by reflecting `count` as a host attribute and moving the `@media`
+   rules into the component's real stylesheet, selected by `:host([count="n"])`.
+2. `<rfg-callout>`'s `role="none"` case (opting out of the live-region role entirely, for plain
+   page furniture) returned `undefined` from the role-computation method, which Lit's attribute
+   binding turned into a literal `role=""` rather than removing the attribute — a different,
+   wrong claim ("this has an empty role") from the intended one. Fixed with Lit's `nothing`
+   sentinel, verified by checking `getAttribute("role")` actually returns `null`.
+
+With this batch, every component in the originally-scoped Phase 5 ordering plus the newly
+identified genuinely-portable remainder of the catalog is built, except Charts (out of scope by
+design) and the handful of sections (Row actions, most of Filters, most of Conditional reveal)
+this project's own tagging pass already calls worked case studies rather than generalizable
+rules. Still ahead, named rather than assumed complete: Breadcrumbs, the conditional-reveal
+show/hide mechanism, Filter bar, Pagination, and Tag input — concrete, buildable pieces
+extracted from otherwise heavily-Local "mega-sections," not yet built.

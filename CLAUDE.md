@@ -41,21 +41,26 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   via `npm run build` (`tsup.config.js`) into `dist/components/` (npm import, `lit` external) and
   `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Each component
   has a `*.stories.js` file (`npm run storybook`), with `@storybook/addon-a11y` running axe-core
-  against every story. Fifteen exist so far (`button`, `status-pill`, `icon-tile`, `avatar`,
+  against every story. Twenty exist so far (`button`, `status-pill`, `icon-tile`, `avatar`,
   `card`, `flash-message`, `page-header`, `tabs`/`page-tabs`, `modal`, `popover`, `field`,
-  `error-summary`, `table`, `date-range-picker`); the rest of `design.md`'s ~25 documented
-  components are not yet ported (frozen columns, row selection, and batch-action bars — Tables'
-  most Local-heavy pieces — are deliberately not part of `table`'s scope at all, not merely
-  unported). `@floating-ui/dom` (popover positioning) is this layer's second runtime dependency
-  after `lit`. Several real defects were found by actually running axe-core against every story,
-  not assumed from the token values or the markup shape: tone-coloured-text-on-tinted-background
+  `error-summary`, `table`, `date-range-picker`, `stats`, `numbered-step`, `callout`,
+  `disclosure`, `empty-state`). `design.md`'s Charts section is deliberately **not** ported —
+  it defers entirely to Highcharts itself ("Local: Highcharts, through `shared/_highcharts`"),
+  so there's no generic rule to extract beyond usage guidance (pair a chart with its table; one
+  chart answers one question). Frozen columns, row selection, and batch-action bars — Tables'
+  most Local-heavy pieces — are similarly out of `table`'s scope entirely, not merely unported.
+  `@floating-ui/dom` (popover positioning) is this layer's second runtime dependency after
+  `lit`. Several real defects were found by actually running axe-core against every story, not
+  assumed from the token values or the markup shape: tone-coloured-text-on-tinted-background
   combinations (status pill, flash message) failing WCAG AA contrast, fixed to neutral text + a
   tone-coloured accent; `<rfg-tabs>`'s `aria-controls`/`aria-labelledby` failing
-  `aria-valid-attr-value` because the ID references crossed a shadow boundary; and the same
+  `aria-valid-attr-value` because the ID references crossed a shadow boundary; the same
   shadow-boundary problem again in `<rfg-field>`'s `<label for>`, fixed the same way
   (`createRenderRoot()` returns `this`) but with a second-order bug of its own — moving the
   pre-existing control into the rendered wrapper broke a `:scope >`-scoped re-query watching for
-  it, since the move itself changes which element counts as a "direct child."
+  it; and `<rfg-callout>`'s `role="none"` case returning `undefined` from an attribute binding,
+  which set a literal `role=""` instead of removing the attribute — fixed with Lit's `nothing`
+  sentinel.
 - `bin/design/adapters/storybook/` — a third audit adapter (alongside Rails and
   `examples/reference-app/`), pointed at the built Storybook site rather than a whole app. Only
   `wcag-audit.js` and `keyboard-audit.js` are wired into CI here; `button-audit.js` audits

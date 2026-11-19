@@ -121,6 +121,36 @@
     },
     "./components/date-range-picker/standalone": {
       "default": "./dist/standalone/date-range-picker.mjs"
+    },
+    "./components/stats": {
+      "default": "./dist/components/stats.mjs"
+    },
+    "./components/stats/standalone": {
+      "default": "./dist/standalone/stats.mjs"
+    },
+    "./components/numbered-step": {
+      "default": "./dist/components/numbered-step.mjs"
+    },
+    "./components/numbered-step/standalone": {
+      "default": "./dist/standalone/numbered-step.mjs"
+    },
+    "./components/callout": {
+      "default": "./dist/components/callout.mjs"
+    },
+    "./components/callout/standalone": {
+      "default": "./dist/standalone/callout.mjs"
+    },
+    "./components/disclosure": {
+      "default": "./dist/components/disclosure.mjs"
+    },
+    "./components/disclosure/standalone": {
+      "default": "./dist/standalone/disclosure.mjs"
+    },
+    "./components/empty-state": {
+      "default": "./dist/components/empty-state.mjs"
+    },
+    "./components/empty-state/standalone": {
+      "default": "./dist/standalone/empty-state.mjs"
     }
   },
   "scripts": {

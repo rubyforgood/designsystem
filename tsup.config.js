@@ -23,6 +23,11 @@ const ENTRY = {
   "error-summary": "components/error-summary.js",
   table: "components/table.js",
   "date-range-picker": "components/date-range-picker.js",
+  stats: "components/stats.js",
+  "numbered-step": "components/numbered-step.js",
+  callout: "components/callout.js",
+  disclosure: "components/disclosure.js",
+  "empty-state": "components/empty-state.js",
 };
 
 export default defineConfig([

@@ -340,6 +340,79 @@ form's own submit doesn't apply here: these inputs render inside this element's 
 default — it already can't cross the shadow boundary to reach a host page's form listener. Same
 shadow-DOM-makes-a-documented-gotcha-moot shape as `<rfg-modal>`'s `margin: auto` note.
 
+## `<rfg-stats>`
+
+Implements "Stats": a figure/label pair is a `<dt>`/`<dd>` description-list relationship, never a
+generic `<div>` pair, and the value is never marked up as a heading — a statistic is data, not a
+section name, and a heading on it puts the figure in the page's navigable outline.
+
+| Attribute | Notes |
+| --- | --- |
+| `heading` / `subtitle` | Optional; a bare row of numbers with no header reads as ambiguous or as belonging to whatever's printed above it. |
+| `figures` | Array property: `[{ label, value }]`. |
+
+A `gap-px` grid shows a neutral-200 backdrop through every pair of neighbours — rows as well as
+columns, which `divide-x` alone can't do once a band wraps to more than one row. The column count
+maps to figure count (1/2/3/4/5/6 figures get their own breakpoint schedule, design.md's own
+measured table) so a flat responsive class never orphans a lone cell at a breakpoint it actually
+ships — reflected as a `count` host attribute, since the per-count rules need `@media`, which a
+plain inline `style` binding can't contain at all (found by actually trying it).
+
+## `<rfg-numbered-step>`
+
+Implements "Numbered steps": a visual step-number disc is decorative and `aria-hidden` — the
+number is already carried by the enclosing `<ol>`'s own semantics, so showing it to assistive tech
+too would announce the position twice. The host wraps instances in a real `<ol>`/`<li>`; this
+renders the number-plus-content row meant to sit *inside* an `<li>`, not as the list item itself.
+
+Deliberately a separate element from `<rfg-avatar>`, even though both are a short circular label —
+design.md keeps them apart on purpose: visual similarity alone isn't reason enough to share one
+implementation when merging them would need a size-and-semantics argument at every call site.
+
+## `<rfg-callout>`
+
+Implements "Callouts": a notice about the page/record's *persistent* state ("this is how things
+are here"), distinct from `<rfg-flash-message>`'s one-time, per-event notice ("that worked") — no
+auto-dismiss here at all, on purpose. Same tone/role mapping as flash-message
+(`warning`/`danger` → `alert`, otherwise `status`), plus a full opt-out: `role="none"` removes the
+live-region role entirely, for plain page furniture that shouldn't announce.
+
+**Placement is deliberately not this element's concern** — design.md: "a reusable component
+shouldn't know or assume where it sits on the page; spacing relative to siblings stays the
+caller's responsibility." No margin is set here.
+
+**Found by axe-core, fixed, not assumed:** `role="none"` first returned `undefined` from the
+internal role-computation method, which Lit's attribute binding turned into a literal `role=""`
+rather than removing the attribute — a real, different claim ("this has an empty role") from the
+intended one ("this has no role attribute"). Fixed by returning Lit's `nothing` sentinel instead,
+verified by checking `getAttribute("role")` actually returns `null`, not `""`.
+
+## `<rfg-disclosure>`
+
+Implements "Disclosures": a real, focusable `<button>` with real ARIA state, never a link with a
+fragment identifier pretending to navigate. **The trigger's accessible name describes what it
+controls, never its current action or state** — the WAI-ARIA APG disclosure pattern's own naming
+rule, and why this element takes a single `label` that stays constant across both states ("More
+filters", never "Show"/"Hide" toggling against `aria-expanded`, which already carries that state
+programmatically). There's deliberately no separate open/closed-label API, since that shape would
+invite exactly the mistake design.md calls out.
+
+| Attribute | Notes |
+| --- | --- |
+| `label` | Constant across open/closed. |
+| `open` | Boolean, reflected. |
+
+Dispatches `rfg-toggle` with `{ open }`.
+
+## `<rfg-empty-state>`
+
+Implements "Empty states": never bare empty collection chrome. `kind` (`cold-start` \|
+`no-results` \| `all-clear`) doesn't change rendering — there's nothing visually different between
+the three — it exists so a host's markup states which case it's handling, matching design.md's
+own three-flavour table (nothing exists yet → offer to create; a filter matched nothing → offer to
+clear it; genuinely nothing to do → reassurance, not an action), and so a future audit can check
+the right action is present for the right kind.
+
 ## Preview
 
 ```bash
