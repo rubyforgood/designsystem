@@ -61,7 +61,7 @@ jobs:
         run: python3 bin/design/citation-audit.py --check
 
   components-build:
-    name: component package builds
+    name: components build, Storybook builds, audits run clean
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,6 +85,48 @@ jobs:
       # just confirms the static build succeeds, not that every story is still accessible.
       - name: Build Storybook
         run: npm run build-storybook
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      # wcag-audit.js's hardcoded path — see the audit's own header. Same convention the
+      # reference-app-control-harness job below uses.
+      - name: Install axe-core at the path wcag-audit.js expects
+        run: npm install --no-save --prefix /tmp/axe axe-core
+
+      - name: Serve the built Storybook site
+        run: node bin/design/adapters/storybook/serve.js 4300 &
+
+      - name: Wait for it
+        run: |
+          for i in $(seq 1 20); do
+            curl -sf "http://127.0.0.1:4300/iframe.html?id=components-button--primary" > /dev/null && exit 0
+            sleep 0.5
+          done
+          echo "storybook server never came up"; exit 1
+
+      # Only wcag-audit.js and keyboard-audit.js — not button-audit.js, which audits page-header
+      # button-group composition and has nothing to check on an isolated component story. See
+      # docs/portability/adapter-storybook.md for why, and for the real keyboard-audit.js bug this
+      # run found and fixed (a path/query-string comparison that silently skipped every target,
+      # reporting "0 screens checked" rather than failing).
+      #
+      # wcag-audit.js fails this step on a real violation (process.exit(rules.length ? 1 : 0)).
+      # keyboard-audit.js does not gate its exit code on findings at all — same as
+      # responsive-audit.js/route-sweep.js elsewhere in this suite — so this step only guards
+      # against it crashing or silently checking 0 screens again, not against a real keyboard
+      # regression; read its printed output, don't trust a green exit alone.
+      - name: Run wcag-audit.js and keyboard-audit.js against the component stories
+        working-directory: bin/design/adapters/storybook
+        env:
+          BASE_URL: http://127.0.0.1:4300
+        run: |
+          cp ../../wcag-audit.js ../../keyboard-audit.js .
+          node wcag-audit.js
+          node keyboard-audit.js | tee /tmp/keyboard-audit.out
+          # keyboard-audit.js itself always exits 0 (see the comment above) — this at least fails
+          # on the exact regression this adapter found once already: 0 screens silently checked.
+          grep -qE "^[1-9][0-9]* screens checked" /tmp/keyboard-audit.out
 
   reference-app-control-harness:
     name: reference-app audits match their documented outcome

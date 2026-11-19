@@ -82,11 +82,15 @@ Early. `design.md` has been fully passed over once for the Portable/Local split;
 has real, measured portability evidence for 22 of ~40 scripts (see
 [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md)) and
 documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml` runs syntax
-checks, a doc-link audit, and a regression check against the reference app on every push. The
+checks, a doc-link audit, a regression check against the reference app, and (since the component
+layer) a components/Storybook build plus a real accessibility/keyboard audit run — all on every
+push. The
 component layer is newer still: one component (`<rfg-button>`) built, verified in a real browser
-against the accessibility rules its `design.md` section documents, and previewable via Storybook
-(`npm run storybook`) with an axe-core a11y gate on every story — not yet wired into the audit
-suite itself, and not yet enforced in CI beyond "the build still compiles." See
+against the accessibility rules its `design.md` section documents, previewable via Storybook
+(`npm run storybook`) with an axe-core a11y gate on every story, and audited for real —
+`wcag-audit.js` and `keyboard-audit.js` now run against the built Storybook site in CI (a third
+adapter, `bin/design/adapters/storybook/`, see `docs/portability/adapter-storybook.md`). Only one
+component exists, so this is one audited component, not an audited library yet. See
 `components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 

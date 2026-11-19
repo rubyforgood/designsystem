@@ -70,9 +70,19 @@ configured. That gate is only enforced in the interactive dev server so far; CI
 (`components-build`) only confirms the static build still compiles, not that every story stays
 accessible — wiring `@storybook/test-runner` or an equivalent into CI is still open.
 
-Still ahead: pointing the already-portable audits (`wcag-audit.js`, `keyboard-audit.js`,
-`button-audit.js`) at the built Storybook site the same way they're already pointed at
-`examples/reference-app/`, porting the rest of `design.md`'s ~25 documented components in roughly
+**Update, same day:** the audit suite is now pointed at the built Storybook site
+(`bin/design/adapters/storybook/`), a third worked adapter alongside Rails and the reference app
+— see `docs/portability/adapter-storybook.md`. Two of the three audits originally named here
+(`wcag-audit.js`, `keyboard-audit.js`) are genuinely meaningful against an isolated component and
+are wired into CI; the third (`button-audit.js`) turned out to audit page-header button-group
+*composition*, which doesn't exist on a bare component story, so running it there is a vacuous
+pass and it's deliberately left out, not hidden. Building this adapter also found and fixed a real
+bug in `keyboard-audit.js` itself (a path/query-string comparison that silently skipped every
+Storybook target) — a genuine adapter-contract gap, not something specific to this project,
+verified non-regressing against the reference app's own 22/22 `known-outcomes.js` harness before
+being trusted.
+
+Still ahead: porting the rest of `design.md`'s ~25 documented components in roughly
 Portable-tag-density order, and — eventually — migrating Human Essentials' own button-rendering
 helper onto `<rfg-button>` as the real "any app" portability proof, the same role
 `examples/reference-app` already played for the audit suite.

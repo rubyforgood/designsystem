@@ -138,7 +138,13 @@ const roleFor = (c) => (c.startsWith("partners/") ? "partner" : c.startsWith("ad
       if (roleFor(t.controller) !== role) continue;
       try {
         const r = await page.goto(BASE + t.path, { waitUntil: "domcontentloaded", timeout: 40000 });
-        if (r.status() >= 400 || new URL(page.url()).pathname !== t.path) continue;
+        const landed = new URL(page.url());
+        // Compares against pathname + search, not pathname alone: a target whose own addressing
+        // scheme is query-string-based (e.g. Storybook's `/iframe.html?id=...`, see
+        // bin/design/adapters/storybook/targets.js) landed correctly but always failed this check
+        // when it only compared pathname, silently auditing 0 screens rather than reporting an
+        // error -- found by actually pointing this at a third adapter, not assumed.
+        if (r.status() >= 400 || landed.pathname + landed.search !== t.path) continue;
       } catch {
         try { await page.close(); } catch {}
         page = await browser.newPage({ viewport: VIEWPORT });

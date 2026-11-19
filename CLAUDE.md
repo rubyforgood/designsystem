@@ -42,7 +42,14 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Each component
   has a `*.stories.js` file (`npm run storybook`), with `@storybook/addon-a11y` running axe-core
   against every story. Only `<rfg-button>` exists so far; the rest of `design.md`'s ~25 documented
-  components are not yet ported, and the audit suite isn't pointed at Storybook yet either.
+  components are not yet ported.
+- `bin/design/adapters/storybook/` — a third audit adapter (alongside Rails and
+  `examples/reference-app/`), pointed at the built Storybook site rather than a whole app. Only
+  `wcag-audit.js` and `keyboard-audit.js` are wired into CI here; `button-audit.js` audits
+  page-header button-group composition, which doesn't exist on an isolated component story, so
+  running it there is a vacuous pass by construction, not a check — see
+  `docs/portability/adapter-storybook.md` for the measured outcomes, including a real
+  `keyboard-audit.js` bug this adapter found and fixed.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target
   (`bin/design/adapters/reference-app/targets.js`), built specifically to test whether the adapter
   seam's portability claim actually holds, not just to have a demo app.
