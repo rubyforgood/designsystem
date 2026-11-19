@@ -84,8 +84,10 @@ has real, measured portability evidence for 22 of ~40 scripts (see
 documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml` runs syntax
 checks, a doc-link audit, and a regression check against the reference app on every push. The
 component layer is newer still: one component (`<rfg-button>`) built, verified in a real browser
-against the accessibility rules its `design.md` section documents, and not yet wired into either
-Storybook or the audit suite — see `components/README.md` and
+against the accessibility rules its `design.md` section documents, and previewable via Storybook
+(`npm run storybook`) with an axe-core a11y gate on every story — not yet wired into the audit
+suite itself, and not yet enforced in CI beyond "the build still compiles." See
+`components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
 This has not been published to the npm registry yet; install straight from GitHub in the meantime

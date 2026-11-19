@@ -79,6 +79,13 @@ jobs:
       - name: Build components
         run: npm run build
 
+      # Catches a broken story or a config regression (e.g. an addon that fails to load) before
+      # it ships. The a11y addon (.storybook/preview.js, a11y.test: "error") runs axe-core against
+      # every story on open, but that only fails interactively in the dev server right now — this
+      # just confirms the static build succeeds, not that every story is still accessible.
+      - name: Build Storybook
+        run: npm run build-storybook
+
   reference-app-control-harness:
     name: reference-app audits match their documented outcome
     runs-on: ubuntu-latest

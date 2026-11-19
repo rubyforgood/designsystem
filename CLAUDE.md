@@ -39,9 +39,10 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
 - `components/` — the installable component layer (ADR 14): Web Components built with Lit, one
   source file per component, consuming `tokens/tokens.css` only (never a hardcoded value). Built
   via `npm run build` (`tsup.config.js`) into `dist/components/` (npm import, `lit` external) and
-  `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Only
-  `<rfg-button>` exists so far; the rest of `design.md`'s ~25 documented components are not yet
-  ported.
+  `dist/standalone/` (single file, `lit` bundled in) — see `components/README.md`. Each component
+  has a `*.stories.js` file (`npm run storybook`), with `@storybook/addon-a11y` running axe-core
+  against every story. Only `<rfg-button>` exists so far; the rest of `design.md`'s ~25 documented
+  components are not yet ported, and the audit suite isn't pointed at Storybook yet either.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target
   (`bin/design/adapters/reference-app/targets.js`), built specifically to test whether the adapter
   seam's portability claim actually holds, not just to have a demo app.

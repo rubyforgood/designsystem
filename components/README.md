@@ -84,6 +84,22 @@ from the host's light DOM into this element's shadow DOM the way `aria-label` (a
 can. Use `aria-label` with the label text directly until this is revisited with
 `ElementInternals`/`ariaLabelledByElements`, which doesn't have solid cross-browser support yet.
 
+## Preview
+
+```bash
+npm run storybook        # live dev server, http://localhost:6006
+npm run build-storybook  # static site, storybook-static/
+```
+
+One story file per component (`components/<name>.stories.js`) covering every documented
+variant/state — this is the "preview before building, as a rendered page" step the
+`design-system-migration` skill already asks for, made durable instead of ad hoc. The
+`@storybook/addon-a11y` addon runs axe-core against every story automatically
+(`.storybook/preview.js` sets `a11y.test: "error"`, so a real violation fails the story, not just
+logs a warning) — complementary to, not a replacement for, pointing `bin/design/`'s own audits
+(`wcag-audit.js`, `keyboard-audit.js`, `button-audit.js`) at the built Storybook site, which is
+still a later step (see [ADR 14](../docs/architecture/decisions/0014-add-an-installable-component-layer.md)).
+
 ## Building
 
 ```bash

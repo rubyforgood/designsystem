@@ -40,10 +40,16 @@
     }
   },
   "scripts": {
-    "build": "tsup"
+    "build": "tsup",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.6.7",
+    "@storybook/web-components": "^10.6.7",
+    "@storybook/web-components-vite": "^10.6.7",
     "playwright": "^1.55.0",
+    "storybook": "^10.6.7",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },

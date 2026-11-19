@@ -61,10 +61,18 @@ The cost: this repo now has a real runtime dependency (`lit`) and a build step
 everything before this was either zero-dependency audit scripts or a single CSS file. That's a
 real increase in what "adopting this system" can mean, not a free addition.
 
-This ADR does not claim the component layer is complete — one component exists. The plan this
-decision came from names the rest explicitly: a Storybook-based preview site, pointing the
-already-portable audits (`wcag-audit.js`, `keyboard-audit.js`, `button-audit.js`) at the new
-components the same way they're already pointed at `examples/reference-app/`, porting the rest of
-`design.md`'s ~25 documented components in roughly Portable-tag-density order, and — eventually —
-migrating Human Essentials' own button-rendering helper onto `<rfg-button>` as the real "any app"
-portability proof, the same role `examples/reference-app` already played for the audit suite.
+This ADR does not claim the component layer is complete — one component exists. A
+Storybook-based preview site (`@storybook/web-components-vite`, one story per documented
+variant/state) is now in place, with the `@storybook/addon-a11y` addon running axe-core against
+every story — verified against both a correct and a deliberately broken button (an icon-only
+button with no `aria-label`) to confirm it actually catches the defect, not just that it's
+configured. That gate is only enforced in the interactive dev server so far; CI
+(`components-build`) only confirms the static build still compiles, not that every story stays
+accessible — wiring `@storybook/test-runner` or an equivalent into CI is still open.
+
+Still ahead: pointing the already-portable audits (`wcag-audit.js`, `keyboard-audit.js`,
+`button-audit.js`) at the built Storybook site the same way they're already pointed at
+`examples/reference-app/`, porting the rest of `design.md`'s ~25 documented components in roughly
+Portable-tag-density order, and — eventually — migrating Human Essentials' own button-rendering
+helper onto `<rfg-button>` as the real "any app" portability proof, the same role
+`examples/reference-app` already played for the audit suite.
