@@ -188,3 +188,48 @@ watch for: `filter-bar`'s demo markup had a `<label>` floating next to a `<selec
 out whatever the host provides) — axe caught it anyway, correctly, since the story's own markup
 is real, rendered HTML like any other. Every story in this repo is real test material, not just
 documentation; a demo that's wrong is a defect in the same sense a component bug is.
+
+**Update, dogfooding on Human Essentials:** converted `<rfg-button>` to light DOM
+(`createRenderRoot()` returns `this`), the same fix `<rfg-tabs>`/`<rfg-field>` already needed, but
+found here for three further, more general reasons — measured against Human Essentials before any
+of its real call sites were touched, not assumed:
+
+1. A shadow-rendered `<button type="submit">` does not participate in an ancestor `<form>`'s
+   submission at all. Confirmed with a real Chromium page: clicking a shadow-rendered submit
+   button never fired the ancestor form's submit event; an identical light-DOM button did.
+2. A tag/attribute-CSS-selector-based progressive-enhancement library never recognizes a custom
+   element as the control it's enhancing. Confirmed against the actual pinned `@rails/ujs@7.0.4`
+   build Human Essentials loads: its confirm-dialog and disable-with guards are wired via
+   `Element.prototype.matches(el, "button[data-confirm]")`-style delegation, which a
+   `<rfg-button>` tag can never match.
+3. Capybara's default finders (`click_link`, `click_button`, `have_link`) cannot see into a shadow
+   root. Confirmed against Human Essentials' own pinned `capybara`/`cuprite`/`ferrum` versions in
+   an isolated harness: `has_link?` found a plain light-DOM anchor and missed an identical
+   shadow-rendered one.
+
+All three are real consequences of the shadow boundary itself, not Rails-specific or
+Capybara-specific quirks — any adopter relying on native form participation, a tag-selector-based
+JS library, or a shadow-blind test tool would hit the same wall. Light DOM resolves all three at
+once, re-verified afterward with the same fix.
+
+A naive flip wasn't enough on its own: Lit's light-DOM render leaves pre-existing slotted content
+as an inert sibling, since `<slot>` only projects inside a real shadow root — the first attempt
+produced an `<a>` with no text inside it at all, the real label sitting as a dangling sibling text
+node instead. Fixed with `<rfg-field>`'s already-established technique: capture the host's
+original children once (split into icon-slotted vs. label content) and re-parent them into the
+rendered control via marker elements, generalized here from field's single node to an ordered list
+— re-tested afterward and confirmed working even through the hardest case, the control's element
+type switching entirely (disabled `<span role="link">` ↔ `<a>`) when `disabled` toggles at
+runtime.
+
+One further cost specific to button, not shared by `tabs`/`field`: those typically appear a
+handful of times per page; a button can appear dozens of times on one table-heavy page. Rather
+than inject a `<style>` tag per instance (which those two components do and accept), this injects
+the stylesheet once per document, keyed by element id, checked idempotently in
+`connectedCallback`.
+
+Re-verified the full existing pipeline before any Human Essentials call site was touched: all 91
+stories (including every other component that composes `<rfg-button>` —
+`card`/`date-range-picker`/`empty-state`/`filter-bar`/`modal`/`popover`/`page-header`) still
+render with zero console errors, `wcag-audit.js` and `keyboard-audit.js` both still exit clean
+against the rebuilt Storybook site.
