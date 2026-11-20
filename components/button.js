@@ -64,6 +64,7 @@ const STYLES = css`
   rfg-button .control {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.375rem;
     font-family: var(--font-sans);
     font-weight: 500;
@@ -73,6 +74,11 @@ const STYLES = css`
     cursor: pointer;
     text-decoration: none;
     box-sizing: border-box;
+    /* The host (rfg-button) is inline-flex and sizes to content by default, so this changes
+       nothing in the common case — 100% of "exactly as wide as my content" stays that width.
+       A caller who wants a full-width button sets a width on the host itself (e.g. a "w-full"
+       utility class) and the control follows it, rather than needing its own special case. */
+    width: 100%;
   }
 
   rfg-button .control:focus-visible {
