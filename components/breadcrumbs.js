@@ -11,9 +11,18 @@
 // render the current page as a link to itself.
 import { LitElement, html, css } from "lit";
 
+/**
+ * Breadcrumb trail following the W3C ARIA APG breadcrumb pattern — design.md's breadcrumb
+ * rule under "Conditional reveal". An ordered list because order carries hierarchy: ancestor
+ * links, and the current page as plain text carrying `aria-current="page"`.
+ *
+ * @element rfg-breadcrumbs
+ */
 export class RfgBreadcrumbs extends LitElement {
   static properties = {
+    /** `[{ label, href? }]` — an entry with no `href` is the current page. */
     items: { type: Array },
+    /** The accessible name for the enclosing `<nav>`. */
     label: { type: String },
   };
 

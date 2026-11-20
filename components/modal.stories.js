@@ -9,6 +9,20 @@ function openModal(e) {
 
 export default {
   title: "Components/Modal",
+  component: "rfg-modal",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Wraps native `<dialog>` + `showModal()` rather than reimplementing focus trapping, " +
+          'Escape handling, background inertness and top-layer stacking by hand — design.md\'s ' +
+          '"Modals" section. Public API mirrors the native element it wraps: `.show()`/' +
+          "`.close()`, not an `open` attribute, since `showModal()` is what actually gives the " +
+          "top-layer/focus-trap behavior.",
+      },
+    },
+  },
   render: () => html`
     <rfg-button variant="primary" @click=${openModal}>Import CSV</rfg-button>
     <rfg-modal heading="Import vendors">

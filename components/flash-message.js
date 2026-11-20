@@ -13,11 +13,25 @@ import { LitElement, html, css } from "lit";
 
 const TONES = new Set(["info", "success", "warning", "danger"]);
 
+/**
+ * A one-time, per-event notice ("that worked") — design.md's "Flash messages" section.
+ * Severity decides the ARIA role; an auto-dismiss timer, if used, pauses on hover/focus
+ * (WCAG 2.2.1 Timing Adjustable).
+ *
+ * @element rfg-flash-message
+ * @slot icon - Optional decorative icon content.
+ * @slot - The message body.
+ * @fires rfg-dismiss - `{ reason }`, dispatched when the message is dismissed (manually or by the timer).
+ */
 export class RfgFlashMessage extends LitElement {
   static properties = {
+    /** Decides the ARIA role: warning/danger interrupt (`role="alert"`), info/success announce politely (`role="status"`). */
     tone: { type: String, reflect: true },
+    /** Shows a manual close control, independent of the auto-dismiss timer. */
     dismissible: { type: Boolean },
+    /** Milliseconds before auto-dismiss; a judgment call for the host, since it depends on whether the message's content stays needed that long, not its tone. */
     dismissAfter: { type: Number, attribute: "dismiss-after" },
+    /** @ignore */
     _remaining: { state: true },
   };
 

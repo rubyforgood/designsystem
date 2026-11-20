@@ -15,13 +15,27 @@
 // and looks like one.
 import { LitElement, html, css } from "lit";
 
+/**
+ * A free-form list of short values — design.md's "Tag input" section. Type a word and press
+ * Enter; comma and Tab also commit; Backspace on an empty box removes the last chip.
+ * Duplicates are refused case-insensitively. Form-associated (`ElementInternals`), so the
+ * native form control stays the actual source of truth and the thing that submits.
+ *
+ * @element rfg-tag-input
+ * @fires rfg-change - `{ values }`, dispatched whenever the chip list changes.
+ */
 export class RfgTagInput extends LitElement {
+  /** @ignore */
   static formAssociated = true;
 
   static properties = {
+    /** The field's label text. */
     label: { type: String },
+    /** A one-line hint shown below the label (e.g. "Type a unit and press Enter."). */
     hint: { type: String },
+    /** The committed chip values. */
     values: { type: Array },
+    /** @ignore */
     _draft: { state: true },
   };
 

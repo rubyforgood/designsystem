@@ -4,6 +4,24 @@ import "./button.js";
 
 export default {
   title: "Components/Popover",
+  component: "rfg-popover",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "An anchored floating panel (the account menu, a filter) sharing one interaction " +
+          'contract — design.md\'s "Popovers" section: Escape closes and returns focus, outside ' +
+          "click closes without moving focus, expanded state is real ARIA, the panel is " +
+          "actually removed from the accessibility tree while closed (`hidden`, not just " +
+          "visually hidden), and it repositions to stay in the viewport. Uses `@floating-ui/dom` " +
+          "for that last, genuinely hard, collision-detection math rather than reimplementing " +
+          "it — the same maintained-library-over-reimplementation reasoning design.md gives for " +
+          "`<dialog>` in Modals. Unlike `<rfg-modal>`, this does **not** trap focus or make the " +
+          "rest of the page inert.",
+      },
+    },
+  },
   render: () => html`
     <rfg-popover label="Filter options">
       <rfg-button slot="trigger" variant="secondary" size="sm">Filter</rfg-button>

@@ -3,6 +3,23 @@ import "./table.js";
 
 export default {
   title: "Components/Table",
+  component: "rfg-table",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Implements the clearly Portable core of design.md\'s "Tables" section: a scroll-' +
+          "not-squeeze container (WCAG 1.4.10's data-table exemption) and top-aligned cells " +
+          "(`vertical-align: middle` is invisible until a cell wraps, then every single-line " +
+          "cell in the row floats off the baseline). The host provides the actual `<table>` " +
+          "markup via the default slot; this element only wraps, scrolls, and supplies shared " +
+          "classes the host's own cells opt into. Frozen columns, row selection/batch action " +
+          "bars, and the scroll rail's own affordances are deliberately out of scope — see " +
+          "design.md's Row actions / Tables sections.",
+      },
+    },
+  },
   render: () => html`
     <rfg-table>
       <table>

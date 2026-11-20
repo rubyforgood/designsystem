@@ -205,17 +205,33 @@ function placeInOrder(nodes, marker) {
   placeable.forEach((node) => marker.before(node));
 }
 
+/**
+ * A button that renders as a real `<button>` or a real `<a>`, never a styled `<div>` —
+ * design.md's "Buttons" and "Where a button goes" sections. Renders into light DOM so the
+ * control participates in native form submission and is matchable by tag/attribute CSS
+ * selectors (rails-ujs, Capybara's default finders).
+ *
+ * @element rfg-button
+ * @slot icon - Decorative icon content, marked with `slot="icon"`; sized and positioned ahead of the label.
+ * @slot - The button's label (default slot).
+ */
 export class RfgButton extends LitElement {
   createRenderRoot() {
     return this;
   }
 
   static properties = {
+    /** What the action means — not decided per-button. See design.md's Buttons table. */
     variant: { type: String, reflect: true },
+    /** What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions. */
     size: { type: String, reflect: true },
+    /** Switches the component to link mode: a real `<a>`, for navigation (a GET), never a state-changing action. */
     href: { type: String },
+    /** Native `disabled` in button mode. In link mode, renders "inert on arrival" instead — a focusable `aria-disabled` control. */
     disabled: { type: Boolean, reflect: true },
+    /** Visually-hidden text explaining why a disabled link is unavailable — only meaningful alongside `href` and `disabled`. */
     reason: { type: String },
+    /** The native `type` attribute in button mode (`button`/`submit`/`reset`). Ignored in link mode. */
     type: { type: String },
   };
 
@@ -225,8 +241,11 @@ export class RfgButton extends LitElement {
     this.size = "md";
     this.disabled = false;
     this.type = "button";
+    /** @ignore */
     this._warnedMissingName = false;
+    /** @ignore */
     this._iconNodes = [];
+    /** @ignore */
     this._labelNodes = [];
   }
 

@@ -4,6 +4,19 @@ import "../components/button.js";
 
 export default {
   title: "Components/Card",
+  component: "rfg-card",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The surface everything sits on — design.md's \"Cards\" section: hairline border, " +
+          "rounded, single elevation step — plus an optional title/subtitle/actions header and " +
+          "footer. The header and footer regions render only when there's something to put in " +
+          "them, checked via `slotchange`, not assumed from an attribute merely being declared.",
+      },
+    },
+  },
   render: (args) =>
     html`
       <rfg-card heading=${args.heading || undefined} subtitle=${args.subtitle || undefined} ?padded=${args.padded}>
@@ -13,7 +26,10 @@ export default {
   argTypes: {
     heading: { control: "text" },
     subtitle: { control: "text" },
-    padded: { control: "boolean" },
+    padded: {
+      control: "boolean",
+      description: "When false, the body meets the card edges (e.g. a table) instead of relying on whitespace alone.",
+    },
   },
   args: { heading: "Filters", subtitle: "Narrow this list down.", padded: true },
 };

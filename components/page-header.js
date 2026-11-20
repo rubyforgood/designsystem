@@ -9,12 +9,25 @@
 
 import { LitElement, html, css } from "lit";
 
+/**
+ * Owns the page's only `<h1>` — design.md's "Page header" section; the host should not also
+ * render its own `<h1>` elsewhere on the page. Alignment is derived from whether `subtitle`
+ * is set, rather than kept in sync by hand.
+ *
+ * @element rfg-page-header
+ * @slot actions - Page-level actions, shown beside the title.
+ */
 export class RfgPageHeader extends LitElement {
   static properties = {
+    /** The page's `<h1>` text. */
     heading: { type: String },
+    /** When set, aligns the header row with `items-start`; absent, uses `items-end` so an action sits on the heading's own baseline. */
     subtitle: { type: String },
+    /** Renders a breadcrumb-style back link above the `<h1>`. */
     backHref: { type: String, attribute: "back-href" },
+    /** The back link's text, by convention `Back to <noun>`. */
     backLabel: { type: String, attribute: "back-label" },
+    /** @ignore */
     _hasActions: { state: true },
   };
 

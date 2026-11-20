@@ -18,9 +18,18 @@ function initialsFor(name) {
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
+/**
+ * Circular initials avatar — design.md's "Icon tiles and avatars" section, the avatar half.
+ * Carries an accessible name by default, computed from `name`, since an avatar is sometimes
+ * the only visible indicator of who it represents.
+ *
+ * @element rfg-avatar
+ */
 export class RfgAvatar extends LitElement {
   static properties = {
+    /** The person's full name — used to compute initials and the default accessible name. */
     name: { type: String },
+    /** Reuses the shared sm/md size vocabulary. */
     size: { type: String, reflect: true },
   };
 

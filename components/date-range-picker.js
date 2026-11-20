@@ -25,12 +25,24 @@ import { LitElement, html, css } from "lit";
 import "./popover.js";
 import "./button.js";
 
+/**
+ * One trigger showing the current range, a popover of presets and two native date inputs —
+ * design.md's "Date range picker" section. No calendar widget; composes `<rfg-popover>`.
+ *
+ * @element rfg-date-range-picker
+ * @fires rfg-change - `{ start, end, label }`, dispatched on commit; the host decides how to turn it into its own query params.
+ */
 export class RfgDateRangePicker extends LitElement {
   static properties = {
+    /** `[{ label, start, end }]` — selecting one commits immediately and closes the popover. */
     presets: { type: Array },
+    /** The range start, ISO `YYYY-MM-DD`. */
     start: { type: String },
+    /** The range end, ISO `YYYY-MM-DD`. */
     end: { type: String },
+    /** @ignore */
     _draftStart: { state: true },
+    /** @ignore */
     _draftEnd: { state: true },
   };
 

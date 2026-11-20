@@ -8,14 +8,25 @@
 // well as columns, which `divide-x` alone can't do in a multi-row grid.
 import { LitElement, html, css } from "lit";
 
+/**
+ * A figure/label pair as a real description list (`<dt>`/`<dd>`) — design.md's "Stats"
+ * section — never a generic `<div>` pair or a heading on the value. The summary band reads
+ * as one band, not N separate cards.
+ *
+ * @element rfg-stats
+ */
 export class RfgStats extends LitElement {
   static properties = {
+    /** The band's heading text. */
     heading: { type: String },
+    /** Shown below the heading (e.g. the date range the figures cover). */
     subtitle: { type: String },
+    /** `[{ label, value }]` — one figure/label pair per entry. */
     figures: { type: Array },
     // Reflected so the stylesheet's `:host([count="n"])` selectors (below) can pick the right
     // column mapping — can't be done as an inline `style`, since the per-count rules need
     // `@media`, which an inline style attribute can't contain at all.
+    /** Derived from `figures.length`; reflected only so the stylesheet's `:host([count="n"])` selectors can pick the right column mapping. Not meant to be set directly. */
     count: { type: Number, reflect: true },
   };
 

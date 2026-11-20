@@ -7,6 +7,20 @@ const fieldStyle = "width:100%; font-family: var(--font-sans); padding: 0.375rem
 
 export default {
   title: "Components/Filter bar",
+  component: "rfg-filter-bar",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Filters submit as a real GET request — a filtered view stays a shareable, " +
+          'bookmarkable URL, never client-only state or POST — design.md\'s "Filter bar" ' +
+          "section. A bar whose controls fit on one line shows them; only a bar that doesn't " +
+          "fold composes `<rfg-disclosure>` for the folded case rather than a second accordion " +
+          "implementation.",
+      },
+    },
+  },
   render: () => html`
     <rfg-filter-bar>
       <div slot="fields">

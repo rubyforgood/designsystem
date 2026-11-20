@@ -12,8 +12,17 @@
 // and the glyph-in-its-own-column layout.
 import { LitElement, html, css } from "lit";
 
+/**
+ * Sits above a form, `role="alert"`, naming every failing field in one place — design.md's
+ * `essentials_error_summary`. Each message is also duplicated at its own field via
+ * `<rfg-field>`'s `aria-describedby`, so nothing is lost by not linking (GOV.UK's pattern).
+ *
+ * @element rfg-error-summary
+ * @slot - The message list, typically a `<ul>` of `<li>` text (no anchors).
+ */
 export class RfgErrorSummary extends LitElement {
   static properties = {
+    /** The heading above the message list, defaults to "There is a problem". */
     heading: { type: String },
   };
 

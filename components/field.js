@@ -66,11 +66,23 @@ const STYLES = css`
   }
 `;
 
+/**
+ * Wraps a host-provided native control with the label/required-marker/error conventions
+ * around it — design.md's "Forms: required fields and validation errors" section. Renders
+ * into light DOM so a `<label for>` can reach a light-DOM `<input id>`.
+ *
+ * @element rfg-field
+ * @slot - The native control to wrap (an `<input>`, `<select>`, `<textarea>` — anything).
+ */
 export class RfgField extends LitElement {
   static properties = {
+    /** The field's label text. */
     label: { type: String },
+    /** Adds the required marker and `aria-required` on the wrapped control. */
     required: { type: Boolean },
+    /** Marks the field optional instead, for forms where most fields are required. */
     optional: { type: Boolean },
+    /** Validation error text, associated to the control via `aria-describedby`/`aria-invalid`. */
     error: { type: String },
   };
 

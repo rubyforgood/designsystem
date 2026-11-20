@@ -17,8 +17,17 @@
 // applies to the flash-of-hidden case and the table rail.
 import { LitElement, html, css } from "lit";
 
+/**
+ * Reveals a field that only applies to one answer in a set, directly below/after the control
+ * that reveals it — design.md's "conditional reveal" mechanism. Deliberately doesn't touch
+ * the trigger's own ARIA at all; the host wires its own trigger to `shown`.
+ *
+ * @element rfg-conditional-reveal
+ * @slot - The revealed content.
+ */
 export class RfgConditionalReveal extends LitElement {
   static properties = {
+    /** Whether the content is revealed. Read directly on first render, not defaulted hidden-then-corrected after mount. */
     shown: { type: Boolean, reflect: true },
   };
 

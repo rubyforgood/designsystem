@@ -13,9 +13,21 @@
 // behavior, and a plain attribute toggle can't invoke it.
 import { LitElement, html, css } from "lit";
 
+/**
+ * Wraps native `<dialog>` + `showModal()` rather than reimplementing focus trapping, Escape
+ * handling, background inertness and top-layer stacking by hand — design.md's "Modals"
+ * section. Public API mirrors the native element: `.show()`/`.close()`.
+ *
+ * @element rfg-modal
+ * @slot - The dialog body.
+ * @slot footer - Footer actions, shown below the body when present.
+ * @fires rfg-close - Dispatched when the dialog closes, by any means (Escape, backdrop click, or `.close()`).
+ */
 export class RfgModal extends LitElement {
   static properties = {
+    /** The dialog's heading text. */
     heading: { type: String },
+    /** @ignore */
     _hasFooter: { state: true },
   };
 

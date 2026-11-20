@@ -8,6 +8,23 @@ import "./button.js";
 
 export default {
   title: "Components/Button",
+  component: "rfg-button",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Implements design.md's \"Buttons\" and \"Where a button goes\" sections (variant × " +
+          "size as two independent axes, never decided fresh per button) and the \"inert on " +
+          "arrival\" accessibility rule from the Accessibility section. Renders into light DOM " +
+          "— not a shadow root — found necessary while dogfooding this component on Human " +
+          "Essentials (ADR 14): a shadow-rendered `<button type=\"submit\">` doesn't participate " +
+          "in an ancestor `<form>`'s submission, a tag/attribute-CSS-selector progressive-" +
+          "enhancement library (rails-ujs) can never match the custom element, and Capybara's " +
+          "default finders can't see into a shadow root at all.",
+      },
+    },
+  },
   render: (args) =>
     html`
       <rfg-button
@@ -21,11 +38,29 @@ export default {
       </rfg-button>
     `,
   argTypes: {
-    variant: { control: "select", options: ["primary", "secondary", "danger", "ghost"] },
-    size: { control: "select", options: ["sm", "md"] },
-    disabled: { control: "boolean" },
-    href: { control: "text" },
-    reason: { control: "text" },
+    variant: {
+      control: "select",
+      options: ["primary", "secondary", "danger", "ghost"],
+      description: "What the action means — not decided per-button. See design.md's Buttons table.",
+    },
+    size: {
+      control: "select",
+      options: ["sm", "md"],
+      description: "What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions.",
+    },
+    disabled: {
+      control: "boolean",
+      description:
+        "Native `disabled` in button mode. In link mode (`href` set), renders \"inert on arrival\" instead — a focusable `aria-disabled` control, since a real `<a>` has no native disabled state.",
+    },
+    href: {
+      control: "text",
+      description: "Switches the component to link mode: a real `<a>`, for navigation (a GET), never a state-changing action.",
+    },
+    reason: {
+      control: "text",
+      description: "Visually-hidden text explaining why a disabled link is unavailable — only meaningful alongside `href` and `disabled`.",
+    },
     label: { control: "text" },
   },
   args: { variant: "primary", size: "md", disabled: false, label: "Button" },

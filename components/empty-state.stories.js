@@ -4,6 +4,19 @@ import "./button.js";
 
 export default {
   title: "Components/Empty state",
+  component: "rfg-empty-state",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Never a bare empty collection (table headers and nothing else) — design.md's " +
+          '"Empty states" section. Distinguishes the actual *cause* of emptiness and messages ' +
+          'each deliberately, since one generic "no results" conflates three situations that ' +
+          '`kind` (`cold-start`/`no-results`/`all-clear`) calls for three different next steps.',
+      },
+    },
+  },
   render: () => html`
     <rfg-empty-state kind="no-results" heading="No donations found" body="Nothing matched these filters.">
       <rfg-button variant="secondary" size="sm">Clear filters</rfg-button>

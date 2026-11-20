@@ -12,10 +12,21 @@ import { LitElement, html, css } from "lit";
 
 const KINDS = new Set(["cold-start", "no-results", "all-clear"]);
 
+/**
+ * Never a bare empty collection (table headers and nothing else) — design.md's "Empty
+ * states" section. Distinguishes the actual *cause* of emptiness, so each case gets its own
+ * message and next step.
+ *
+ * @element rfg-empty-state
+ * @slot - An optional action (e.g. a `<rfg-button>`) appropriate to `kind`.
+ */
 export class RfgEmptyState extends LitElement {
   static properties = {
+    /** `cold-start` | `no-results` | `all-clear` — documents intent for the host and future audits; doesn't itself change rendering. */
     kind: { type: String, reflect: true },
+    /** The empty state's heading text. */
     heading: { type: String },
+    /** The explanatory body text, naming the next step. */
     body: { type: String },
   };
 

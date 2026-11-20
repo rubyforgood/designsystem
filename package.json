@@ -185,20 +185,24 @@
   },
   "scripts": {
     "build": "tsup",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "analyze": "cem analyze --config custom-elements-manifest.config.mjs",
+    "storybook": "npm run analyze && storybook dev -p 6006",
+    "build-storybook": "npm run analyze && storybook build"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^10.6.7",
-    "@storybook/web-components": "^10.6.7",
-    "@storybook/web-components-vite": "^10.6.7",
+    "@custom-elements-manifest/analyzer": "^0.11.0",
+    "@storybook/addon-a11y": "^10.6.8",
+    "@storybook/addon-docs": "^10.6.8",
+    "@storybook/web-components": "^10.6.8",
+    "@storybook/web-components-vite": "^10.6.8",
     "playwright": "^1.55.0",
-    "storybook": "^10.6.7",
+    "storybook": "^10.6.8",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
     "lit": "^3.3.3"
-  }
+  },
+  "customElements": "custom-elements.json"
 }

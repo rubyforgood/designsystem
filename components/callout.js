@@ -16,10 +16,22 @@ import { LitElement, html, css, nothing } from "lit";
 
 const TONES = new Set(["info", "success", "warning", "danger"]);
 
+/**
+ * A notice about the page/record's *persistent* state ("this is how things are here") —
+ * design.md's "Callouts" section — distinct from `<rfg-flash-message>`'s one-time, per-event
+ * notice. No auto-dismiss, on purpose. Placement is deliberately not this element's job.
+ *
+ * @element rfg-callout
+ * @slot icon - Optional decorative icon content.
+ * @slot - The callout's body.
+ */
 export class RfgCallout extends LitElement {
   static properties = {
+    /** Maps to the ARIA role: warning/danger interrupt (`role="alert"`), info/success announce politely (`role="status"`). */
     tone: { type: String, reflect: true },
+    /** Optional heading text above the body. */
     heading: { type: String },
+    /** Override the ARIA role entirely, e.g. `role="none"` to opt out of being a live region (plain page furniture). */
     role: { type: String },
   };
 

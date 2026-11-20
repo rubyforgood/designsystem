@@ -13,8 +13,17 @@
 // item's own semantics.
 import { LitElement, html, css } from "lit";
 
+/**
+ * A visual step number disc beside an ordered-list item — design.md's "Numbered steps"
+ * section. Decorative and hidden from assistive tech, since the position is already carried
+ * by the list's own `<ol>` semantics. Renders as a flex row meant to sit inside an `<li>`.
+ *
+ * @element rfg-numbered-step
+ * @slot - The step's content.
+ */
 export class RfgNumberedStep extends LitElement {
   static properties = {
+    /** The step number, shown in the disc. */
     number: { type: Number },
   };
 

@@ -3,10 +3,31 @@ import "./avatar.js";
 
 export default {
   title: "Components/Avatar",
+  component: "rfg-avatar",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Circular initials avatar — design.md's \"Icon tiles and avatars\" section, the " +
+          "avatar half, kept as its own element rather than a `shape` switch on `<rfg-icon-tile>` " +
+          "(\"reserve two distinct visual vocabularies ... and never let them overlap\"). Carries " +
+          "an accessible name by default, computed from `name`, since an avatar is sometimes the " +
+          "only visible indicator of who it represents.",
+      },
+    },
+  },
   render: (args) => html`<rfg-avatar name=${args.name} size=${args.size}></rfg-avatar>`,
   argTypes: {
-    name: { control: "text" },
-    size: { control: "select", options: ["sm", "md"] },
+    name: {
+      control: "text",
+      description: "The person's full name — used to compute initials and the default accessible name.",
+    },
+    size: {
+      control: "select",
+      options: ["sm", "md"],
+      description: "Reuses the shared sm/md size vocabulary.",
+    },
   },
   args: { name: "Jamie Diaz", size: "md" },
 };

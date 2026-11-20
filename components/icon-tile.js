@@ -12,9 +12,19 @@ import { LitElement, html, css } from "lit";
 const TONES = new Set(["brand", "neutral", "info", "success", "warning", "danger"]);
 const SIZES = new Set(["sm", "md"]);
 
+/**
+ * The icon half of design.md's "Icon tiles and avatars" section — reuses `<rfg-button>`'s
+ * size vocabulary rather than inventing a second scale. Deliberately a separate element from
+ * `<rfg-avatar>`, so the two visual vocabularies can't blur together by accident.
+ *
+ * @element rfg-icon-tile
+ * @slot - The icon content (an inline SVG).
+ */
 export class RfgIconTile extends LitElement {
   static properties = {
+    /** Reuses the system's shared semantic tone vocabulary. */
     tone: { type: String, reflect: true },
+    /** Reuses `<rfg-button>`'s size vocabulary rather than a tile-specific scale. */
     size: { type: String, reflect: true },
   };
 

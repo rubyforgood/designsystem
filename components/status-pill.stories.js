@@ -3,9 +3,26 @@ import "./status-pill.js";
 
 export default {
   title: "Components/Status pill",
+  component: "rfg-status-pill",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Communicates state, never an action — design.md\'s "Status pills" section. Never ' +
+          "focusable, never looks pressable. Tones reuse the same semantic vocabulary as the " +
+          "rest of the system (neutral/info/success/warning/danger/brand) rather than a pill-" +
+          "specific palette.",
+      },
+    },
+  },
   render: (args) => html`<rfg-status-pill tone=${args.tone}>${args.label}</rfg-status-pill>`,
   argTypes: {
-    tone: { control: "select", options: ["neutral", "info", "success", "warning", "danger", "brand"] },
+    tone: {
+      control: "select",
+      options: ["neutral", "info", "success", "warning", "danger", "brand"],
+      description: "Reuses the system's shared semantic tone vocabulary rather than a pill-specific palette.",
+    },
     label: { control: "text" },
   },
   args: { tone: "neutral", label: "Pending" },

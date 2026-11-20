@@ -16,12 +16,27 @@
 
 import { LitElement, html, css } from "lit";
 
+/**
+ * The surface everything sits on — design.md's "Cards" section: hairline border, rounded,
+ * single elevation step — plus an optional title/subtitle/actions header and footer. The
+ * header and footer regions render only when there's something to put in them.
+ *
+ * @element rfg-card
+ * @slot - The card body.
+ * @slot actions - Header actions, shown beside the title when present.
+ * @slot footer - Footer content, shown below the body when present.
+ */
 export class RfgCard extends LitElement {
   static properties = {
+    /** The card's heading text; the header region doesn't render at all without one (or actions/subtitle/footer content). */
     heading: { type: String },
+    /** Shown below the heading. */
     subtitle: { type: String },
+    /** When false, the body meets the card edges (e.g. a table) instead of relying on whitespace alone. */
     padded: { type: Boolean },
+    /** @ignore */
     _hasActions: { state: true },
+    /** @ignore */
     _hasFooter: { state: true },
   };
 

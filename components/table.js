@@ -17,6 +17,14 @@
 // shared classes a host's own cells opt into.
 import { LitElement, html, css } from "lit";
 
+/**
+ * The Portable core of design.md's "Tables" section: a scroll-not-squeeze container and
+ * top-aligned cells. The host provides the actual `<table>` markup; this element only wraps,
+ * scrolls, and supplies shared classes the host's own cells opt into.
+ *
+ * @element rfg-table
+ * @slot - The host's own `<table>` markup (caption, thead, tbody).
+ */
 export class RfgTable extends LitElement {
   static styles = css`
     :host {

@@ -9,10 +9,32 @@ const BOX_ICON = html`
 
 export default {
   title: "Components/Icon tile",
+  component: "rfg-icon-tile",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The icon half of design.md's \"Icon tiles and avatars\" section — reuses " +
+          '`<rfg-button>`\'s size vocabulary (sm/md) rather than inventing a second scale. ' +
+          "Deliberately a separate element from `<rfg-avatar>`, so the two distinct visual " +
+          'vocabularies ("a stat or status" vs. "a person") can\'t blur together by accident at ' +
+          "a call site.",
+      },
+    },
+  },
   render: (args) => html`<rfg-icon-tile tone=${args.tone} size=${args.size}>${BOX_ICON}</rfg-icon-tile>`,
   argTypes: {
-    tone: { control: "select", options: ["brand", "neutral", "info", "success", "warning", "danger"] },
-    size: { control: "select", options: ["sm", "md"] },
+    tone: {
+      control: "select",
+      options: ["brand", "neutral", "info", "success", "warning", "danger"],
+      description: "Reuses the system's shared semantic tone vocabulary.",
+    },
+    size: {
+      control: "select",
+      options: ["sm", "md"],
+      description: "Reuses `<rfg-button>`'s size vocabulary rather than a tile-specific scale.",
+    },
   },
   args: { tone: "brand", size: "md" },
 };

@@ -10,9 +10,19 @@
 // design.md calls out.
 import { LitElement, html, css } from "lit";
 
+/**
+ * A real, focusable, toggleable `<button>` with real ARIA state — design.md's "Disclosures"
+ * section. The trigger's accessible name describes what it controls, never its current state.
+ *
+ * @element rfg-disclosure
+ * @slot - The panel content, shown when `open`.
+ * @fires rfg-toggle - `{ open }`, dispatched whenever the panel opens or closes.
+ */
 export class RfgDisclosure extends LitElement {
   static properties = {
+    /** The trigger's accessible name — stays constant across both states (e.g. "More filters", not "Show"/"Hide"). */
     label: { type: String },
+    /** Whether the panel is currently expanded. */
     open: { type: Boolean, reflect: true },
   };
 

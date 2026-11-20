@@ -4,6 +4,19 @@ import "./button.js";
 
 export default {
   title: "Components/Page header",
+  component: "rfg-page-header",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Owns the page\'s only `<h1>` — design.md\'s "Page header" section; the host should ' +
+          "not also render its own `<h1>` elsewhere on the page. The back link and title sit as " +
+          "one block with an 8px gap, carries the breadcrumb (`back-href`/`back-label`), and " +
+          "alignment is derived from whether `subtitle` is set rather than kept in sync by hand.",
+      },
+    },
+  },
   render: (args) =>
     html`
       <rfg-page-header
@@ -15,7 +28,10 @@ export default {
     `,
   argTypes: {
     heading: { control: "text" },
-    subtitle: { control: "text" },
+    subtitle: {
+      control: "text",
+      description: "When set, aligns the header row with `items-start` (so an action can't be dragged down to the subtitle's baseline); absent, uses `items-end` so an action sits on the heading's own baseline.",
+    },
     backHref: { control: "text" },
     backLabel: { control: "text" },
   },

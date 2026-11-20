@@ -22,12 +22,25 @@
 // ever disagreeing.
 import { LitElement, html, css, nothing } from "lit";
 
+/**
+ * States the range, not the page number ("Showing 31–45 of 272") — design.md's "Pagination"
+ * section. Real `<a>` links so a paginated view stays a shareable URL; the control set
+ * doesn't change width as pages run out.
+ *
+ * @element rfg-pagination
+ * @fires rfg-navigate - `{ page }`, dispatched when no `hrefFor` is supplied (a degraded mode, not the default path).
+ */
 export class RfgPagination extends LitElement {
   static properties = {
+    /** The total number of entries in the collection. */
     total: { type: Number },
+    /** The current page number (1-indexed). */
     page: { type: Number },
+    /** How many entries are shown per page — used to compute the range label. */
     pageSize: { type: Number, attribute: "page-size" },
+    /** The noun for one entry, e.g. "donation" — used in the range label. */
     entryName: { type: String, attribute: "entry-name" },
+    /** `(page) => href` — supplies a real per-page URL; without it, falls back to dispatching `rfg-navigate` only. */
     hrefFor: { attribute: false },
   };
 

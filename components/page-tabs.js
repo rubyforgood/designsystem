@@ -7,8 +7,17 @@
 // way to know the current URL itself.
 import { LitElement, html, css } from "lit";
 
+/**
+ * Each tab is its own URL, styled as a `<nav>` of real links, not the ARIA tablist pattern —
+ * design.md's "Tabs" section, the page-tabs half. The host sets `aria-current="page"` on
+ * whichever link is current. See `<rfg-tabs>` for the panel-tabs half.
+ *
+ * @element rfg-page-tabs
+ * @slot - The tab links (`<a>` elements), with `aria-current="page"` set by the host on the current one.
+ */
 export class RfgPageTabs extends LitElement {
   static properties = {
+    /** The accessible name for the enclosing `<nav>`. */
     label: { type: String },
   };
 

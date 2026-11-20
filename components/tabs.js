@@ -25,6 +25,13 @@ import { LitElement, html, css } from "lit";
 // role/tabindex a tabpanel needs. Its content is the host's own light-DOM markup, rendered
 // in-place; a shadow root here would add an unnecessary boundary for something that isn't
 // rendering anything itself.
+/**
+ * A single panel inside `<rfg-tabs>`. Takes its tab label from a `label` attribute, read by
+ * the parent `<rfg-tabs>` to build the tablist.
+ *
+ * @element rfg-tab-panel
+ * @slot - The panel's content, shown when its tab is selected.
+ */
 export class RfgTabPanel extends HTMLElement {
   connectedCallback() {
     if (!this.hasAttribute("role")) this.setAttribute("role", "tabpanel");
@@ -73,10 +80,21 @@ const STYLES = css`
   }
 `;
 
+/**
+ * Panels swap in place at the same URL, using the full ARIA Tabs pattern — design.md's
+ * "Tabs" section, the panel-tabs half. Roving tabindex, automatic activation, Home/End. See
+ * `<rfg-page-tabs>` for the URL-backed half.
+ *
+ * @element rfg-tabs
+ * @slot - `<rfg-tab-panel>` children, each with a `label` attribute naming its tab.
+ */
 export class RfgTabs extends LitElement {
   static properties = {
+    /** The accessible name for the tablist. */
     label: { type: String },
+    /** @ignore */
     _selected: { state: true },
+    /** @ignore */
     _panels: { state: true },
   };
 

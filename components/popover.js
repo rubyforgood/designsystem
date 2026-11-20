@@ -17,10 +17,25 @@
 import { LitElement, html, css } from "lit";
 import { computePosition, offset, flip, shift } from "@floating-ui/dom";
 
+/**
+ * An anchored floating panel (account menu, filter) sharing one interaction contract —
+ * design.md's "Popovers" section: Escape closes and returns focus, outside click closes
+ * without moving focus, and it repositions to stay in the viewport (`@floating-ui/dom`).
+ * Unlike `<rfg-modal>`, this does **not** trap focus or make the rest of the page inert.
+ *
+ * @element rfg-popover
+ * @slot trigger - The element that opens the panel (typically a `<rfg-button>`).
+ * @slot - The panel content.
+ * @fires rfg-open - Dispatched when the panel opens.
+ * @fires rfg-close - Dispatched when the panel closes.
+ */
 export class RfgPopover extends LitElement {
   static properties = {
+    /** The accessible name for the panel. */
     label: { type: String },
+    /** Preferred placement relative to the trigger, e.g. `bottom-end`; flips/shifts automatically to stay in the viewport. */
     placement: { type: String },
+    /** @ignore */
     _open: { state: true },
   };
 

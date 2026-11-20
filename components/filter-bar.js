@@ -9,10 +9,22 @@
 import { LitElement, html, css } from "lit";
 import "./disclosure.js";
 
+/**
+ * Filters submit as a real GET request — design.md's "Filter bar" section. A bar whose
+ * controls fit on one line shows them; only a bar that doesn't fold composes
+ * `<rfg-disclosure>` for the folded case.
+ *
+ * @element rfg-filter-bar
+ * @slot fields - The filter controls, one wrapper element per field.
+ * @slot actions - Trailing actions (e.g. an export button).
+ */
 export class RfgFilterBar extends LitElement {
   static properties = {
+    /** The form's `action` attribute, for a real GET submission. */
     action: { type: String },
+    /** @ignore */
     _count: { state: true },
+    /** @ignore */
     _hasActions: { state: true },
   };
 

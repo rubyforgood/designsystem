@@ -3,6 +3,21 @@ import "./field.js";
 
 export default {
   title: "Components/Field",
+  component: "rfg-field",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Wraps a host-provided native control (an `<input>`, `<select>`, `<textarea>` — " +
+          "anything) with the label/required-marker/error conventions around it — design.md's " +
+          '"Forms: required fields and validation errors" section. The control gets an id ' +
+          "(generated if it doesn't have one) and `aria-required`/`aria-invalid`/" +
+          "`aria-describedby` proxied onto it. Renders into light DOM, not a shadow root: a " +
+          'shadow-rendered `<label for="...">` cannot label a light-DOM `<input id="...">`.',
+      },
+    },
+  },
   render: (args) => html`
     <rfg-field label=${args.label} ?required=${args.required} ?optional=${args.optional} error=${args.error || undefined}>
       <input type="text" />
@@ -10,9 +25,18 @@ export default {
   `,
   argTypes: {
     label: { control: "text" },
-    required: { control: "boolean" },
-    optional: { control: "boolean" },
-    error: { control: "text" },
+    required: {
+      control: "boolean",
+      description: "Adds the required marker and `aria-required` on the wrapped control.",
+    },
+    optional: {
+      control: "boolean",
+      description: "Marks the field optional instead — for forms where most fields are required and marking every one would be noise.",
+    },
+    error: {
+      control: "text",
+      description: "Validation error text, associated to the control via `aria-describedby` and `aria-invalid`.",
+    },
   },
   args: { label: "Source", required: false, optional: false, error: "" },
 };

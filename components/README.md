@@ -511,6 +511,39 @@ points `wcag-audit.js` and `keyboard-audit.js` (not `button-audit.js` — see
 *built* Storybook site in CI. The a11y addon catches a regression locally while you're building;
 the CI job is what actually gates a push.
 
+### Autodocs
+
+Every component gets a real "Docs" page — `@storybook/addon-docs`, `tags: ["autodocs"]` on each
+story file, and `npm run analyze` (`@custom-elements-manifest/analyzer`, see
+`custom-elements-manifest.config.mjs`) generating `custom-elements.json` from each component's own
+JSDoc, wired in via `setCustomElementsManifest()` in `.storybook/preview.js`. `npm run storybook`
+and `npm run build-storybook` both run `analyze` first; the manifest is gitignored and regenerated
+on every build, not hand-maintained.
+
+This exists because before it, exactly one of 24 story files (`button.stories.js`) cross-linked
+back to design.md at all — nothing enforced that a documented variant had a story, or that a
+component's Storybook entry said anything about *why* it's built the way it is. Every component's
+default export now also carries `parameters.docs.description.component` (one paragraph, sourced
+from that component's own header-comment description of what it implements in design.md) and a
+`component: "rfg-x"` field — the latter is what tells Storybook's web-components framework which
+tag to look up in the manifest; without it, `setCustomElementsManifest()` loads the data but
+nothing on the page ever reads it.
+
+Two things worth knowing if you're adding a component or touching this wiring:
+
+- **Internal reactive state leaks into the generated table twice.** A `{ state: true }` property
+  (Lit's `_foo` convention for state that isn't a public prop) shows up in *two* separate places
+  in the raw manifest — `declarations[].members` and `declarations[].attributes` — and an
+  `@ignore` JSDoc tag only suppresses the first when the property is declared as a plain
+  `static properties = { ... }` object entry (it does work on a constructor-assigned
+  `this._foo = ...` instance field). `custom-elements-manifest.config.mjs`'s
+  `strip-private-members` plugin strips both by name convention (`_`-prefixed) after analysis,
+  rather than relying on the tag — add a property that should stay internal, underscore it, done.
+- **The plain `static properties = {...}` object form is correctly understood by `--litelement`**,
+  including per-property JSDoc comments and `@slot`/`@fires`/`@csspart`/`@ignore` tags — this
+  isn't a TypeScript-decorators-only feature. Confirmed by generating a real manifest from
+  `button.js`/`field.js` (both use this form) before rolling JSDoc out to the rest.
+
 ## Building
 
 ```bash

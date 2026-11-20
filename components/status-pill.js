@@ -15,8 +15,17 @@ import { LitElement, html, css } from "lit";
 
 const TONES = new Set(["neutral", "info", "success", "warning", "danger", "brand"]);
 
+/**
+ * Communicates state, never an action — design.md's "Status pills" section. Never focusable,
+ * never looks pressable. Tones reuse the system's shared semantic vocabulary.
+ *
+ * @element rfg-status-pill
+ * @slot icon - Optional icon (rare — see design.md).
+ * @slot - The pill's label.
+ */
 export class RfgStatusPill extends LitElement {
   static properties = {
+    /** Reuses the system's shared semantic tone vocabulary rather than a pill-specific palette. */
     tone: { type: String, reflect: true },
   };
 

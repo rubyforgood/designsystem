@@ -3,11 +3,28 @@ import "./callout.js";
 
 export default {
   title: "Components/Callout",
+  component: "rfg-callout",
+  tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A notice about the page/record's *persistent* state (\"this is how things are here\") " +
+          "— design.md's \"Callouts\" section — distinct from `<rfg-flash-message>`'s one-time, " +
+          "per-event notice (\"that worked\"). No auto-dismiss, on purpose. Placement is " +
+          "deliberately not this element's job: no margin is set here, the host positions it.",
+      },
+    },
+  },
   render: (args) => html`
     <rfg-callout tone=${args.tone} heading=${args.heading || undefined}>${args.body}</rfg-callout>
   `,
   argTypes: {
-    tone: { control: "select", options: ["info", "success", "warning", "danger"] },
+    tone: {
+      control: "select",
+      options: ["info", "success", "warning", "danger"],
+      description: "Maps to the ARIA role: warning/danger interrupt (`role=\"alert\"`), info/success announce politely (`role=\"status\"`).",
+    },
     heading: { control: "text" },
     body: { control: "text" },
   },

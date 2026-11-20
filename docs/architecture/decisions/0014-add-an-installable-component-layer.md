@@ -264,3 +264,42 @@ Both were caught because the full suite was run as the actual acceptance gate, n
 was anticipated — worth recording as the reason "re-verify against a second real adopter's own
 test suite," not just this repo's own Storybook stories, is load-bearing for a component this
 central.
+
+**Update, closing the gap between design.md and Storybook itself.** After the Human Essentials
+dogfooding above, a review of how design.md's component guidance aligns with Storybook found that
+`button.stories.js` was the *only* one of 24 story files that cross-linked back to design.md at
+all — nothing enforced that a documented variant had a matching story, and 23 components' Docs
+experience said nothing about why they're built the way they are. The fix, piloted before rolling
+out, in two layers:
+
+- **`tags: ["autodocs"]` plus a `parameters.docs.description.component` string on every story
+  file** — one paragraph each, sourced from that component's own existing header-comment
+  description of the design.md section it implements (which, it turned out, every one of the 25
+  component files already carried, consistently, as its first comment block — this wasn't written
+  fresh, just surfaced into Storybook). Zero new dependencies; this alone gives every component a
+  real Docs page.
+- **`@custom-elements-manifest/analyzer` generating a manifest from JSDoc on each component class**,
+  for an auto-populated attributes/events/slots table on components that never had a hand-written
+  `argTypes` controls matrix (16 of 24). Piloted on `button.js`/`field.js` first rather than
+  assumed, because a web search surfaced a real, recent Storybook v10 regression
+  (storybookjs/storybook#33038) in exactly this wiring. The pilot found it needs more than
+  `setCustomElementsManifest()` alone in this version: `@storybook/addon-docs` has to be installed
+  and registered in `.storybook/main.js`'s `addons` (not just bundled in core, as it is for
+  React), and each story's default export needs a `component: "rfg-x"` field — the tag name
+  string Storybook's web-components framework uses to look the element up in the manifest; without
+  it the manifest loads but nothing on the page reads it. Confirmed via a Storybook-doesn't-error
+  check this repo's own history has twice flagged as insufficient on its own ("auditing the
+  audits," 2026-09-02): a Playwright pass that reads each Docs page's actual rendered text, not
+  just its console.
+- Also found in the pilot: a Lit `{ state: true }` property (the `_foo` convention for internal
+  state) leaks into the generated manifest in *two* places (`members` and a separate top-level
+  `attributes` array), and an `@ignore` JSDoc tag only suppresses the first when the property is a
+  plain `static properties = {...}` object entry — found because `_draft`/`_hasActions`/etc. still
+  showed up, undocumented, in the real rendered table after the tag was added. Fixed with a small
+  `custom-elements-manifest.config.mjs` plugin that strips both arrays by the existing `_`-prefix
+  convention after analysis, rather than depending on the tag.
+
+`npm run storybook`/`build-storybook` now run `npm run analyze` first; the manifest
+(`custom-elements.json`) is gitignored and regenerated on every build, the same way
+`storybook-static/` already is, not hand-maintained. See `components/README.md`'s "Autodocs"
+section for the how-to.
