@@ -303,3 +303,34 @@ out, in two layers:
 (`custom-elements.json`) is gitignored and regenerated on every build, the same way
 `storybook-static/` already is, not hand-maintained. See `components/README.md`'s "Autodocs"
 section for the how-to.
+
+**Update, generalizing the host→control attribute proxy for the mutating half of the button
+helper.** Phase 7 deferred `essentials_action_button` (the `button_to`/mutating half) because
+`<rfg-button>` only proxied one host attribute (`aria-label`) onto its internal control, and that
+half depends on several more: `data-confirm`, `data-disable-with`, `data-tooltip`. The question —
+whether `<rfg-button>` should learn what these mean (bake in confirm-dialog/disable-with behavior
+as first-class features) or stay a dumb pass-through — was decided in favor of staying dumb: the
+component forwards any `data-*`, `aria-*`, or `role` attribute it doesn't itself own (not one of
+`variant`/`size`/`href`/`disabled`/`reason`/`type`) onto the real control, without knowing or
+caring what any of them mean. rails-ujs and the host app's own confirm-dialog/tooltip controllers
+keep doing the actual work, exactly as they do for a plain `<button>` today; the component's only
+job is to stop being an attribute trap, the same structural problem light DOM already solved for
+tag-selector matching.
+
+**A real bug found by reproducing the actual mechanism, not assumed to work from the design
+alone.** The first version *copied* each attribute onto the control and left the original on the
+host. Reproducing Human Essentials' `confirm_dialog_controller.js` verbatim against a real
+`<rfg-button type="submit" data-confirm="...">` inside a real `<form>` — a document-capture
+listener matching `closest("[data-confirm]")`, `stopImmediatePropagation`, strip the attribute,
+`trigger.click()`, restore it — found that the *replay* click fails silently: the controller
+matches the control (the real click target) on the first click, strips its copy, and clicks it
+again — but the host's copy is still there, so `closest()` on the replayed click's bubble walks up
+and re-matches the host, intercepting its own replay a second time. The dialog closes; the form
+never submits. Fixed by moving the attribute instead of mirroring it (set on the control, remove
+from the host, in the same pass) — there is then only ever one copy, so a replay can't re-match a
+stale second one. Confirmed with the same reproduction, passing, before this was ever pointed at
+Human Essentials.
+
+The `MutationObserver` that already re-syncs content on external DOM mutation (the Turbo/jQuery
+fix from Phase 7) now also watches `attributes: true`, so an attribute a Stimulus controller sets
+on the host *after* first render still gets moved — not just the ones present at connect.

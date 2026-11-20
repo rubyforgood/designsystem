@@ -54,6 +54,20 @@ import { LitElement, html, css } from "lit";
 const VARIANTS = new Set(["primary", "secondary", "danger", "ghost"]);
 const SIZES = new Set(["sm", "md"]);
 
+// Attributes the component manages itself as reactive properties — never proxied, since the
+// host and the internal control would otherwise fight over them.
+const OWN_ATTRS = new Set(["variant", "size", "href", "disabled", "reason", "type"]);
+
+// A plain, generic pass-through: `data-*`, `aria-*` and `role`, whatever they are, forwarded
+// verbatim onto the real control. The component deliberately does not know what any of these
+// mean — e.g. it has no idea `data-confirm` triggers a confirm dialog, or that rails-ujs matches
+// `data-disable-with` via a CSS attribute selector. Baking in that knowledge would make this
+// component Rails-shaped; staying dumb keeps it useful to any consumer that needs an attribute to
+// reach the real, light-DOM control rather than stop at the custom element's own tag. See ADR 14.
+function isProxiedAttr(name) {
+  return !OWN_ATTRS.has(name) && (name === "role" || name.startsWith("aria-") || name.startsWith("data-"));
+}
+
 const STYLE_ID = "rfg-button-styles";
 
 const STYLES = css`
@@ -258,8 +272,23 @@ export class RfgButton extends LitElement {
     // rather than disconnecting and recreating it, is a real case this app hit. Re-deriving from
     // whatever the host's current direct children actually are, instead of trusting a stale
     // snapshot, is the same fix `<rfg-tabs>`/`<rfg-field>` already use for their own content.
-    this._observer = new MutationObserver(() => this._syncContent());
-    this._observer.observe(this, { childList: true });
+    //
+    // Also watches `attributes` — a Stimulus controller toggling `data-confirm` after first
+    // render is exactly the kind of external mutation that needs to reach the real control too
+    // (see `isProxiedAttr`/`updated()` below). `attributes: true` with no filter also fires for
+    // this component's own `reflect: true` properties (`variant`/`size`/`disabled`) when Lit
+    // writes them back as attributes; MutationObserver can't filter by pattern, only by exact
+    // name, and the host-supplied `data-*`/`aria-*` names aren't known in advance. The cost is
+    // one harmless extra no-op `requestUpdate()` on every such change — it converges immediately
+    // since nothing changes on the second pass — rather than a real bug.
+    this._observer = new MutationObserver((mutations) => {
+      if (mutations.some((m) => m.type === "childList")) {
+        this._syncContent();
+      } else {
+        this.requestUpdate();
+      }
+    });
+    this._observer.observe(this, { childList: true, attributes: true });
   }
 
   disconnectedCallback() {
@@ -285,8 +314,10 @@ export class RfgButton extends LitElement {
     }
   }
 
-  // Proxy `aria-label` from the host onto the internal control, since the host itself has no
-  // accessible-name-bearing role — the rendered <a>/<button> is what assistive tech sees. Also
+  // Proxies `data-*`/`aria-*`/`role` from the host onto the internal control (see
+  // `isProxiedAttr`) — the host itself has no accessible-name-bearing role, and a progressive-
+  // enhancement library (rails-ujs) or a delegated-listener controller (a confirm dialog, a
+  // tooltip) matches against a real element's own attributes, not a custom element's tag. Also
   // re-parents the captured original content into the freshly rendered control — a light-DOM
   // render doesn't move pre-existing children into place the way a shadow <slot> would.
   updated() {
@@ -299,11 +330,22 @@ export class RfgButton extends LitElement {
     if (iconMarker) placeInOrder(this._iconNodes, iconMarker);
     if (labelMarker) placeInOrder(this._labelNodes, labelMarker);
 
-    const hostLabel = this.getAttribute("aria-label");
-    if (hostLabel) {
-      control.setAttribute("aria-label", hostLabel);
-    } else {
-      control.removeAttribute("aria-label");
+    // Moved, not mirrored: an earlier "copy and leave both" version left a stale duplicate on
+    // the host, which broke exactly the thing this exists for. A delegated-listener controller
+    // (confirm_dialog_controller.js) matches via `closest("[data-confirm]")` from the real click
+    // target — the control, since that's the actual visible surface — strips the attribute,
+    // replays with `trigger.click()`, then restores it. With a copy left on the host, that
+    // replayed click still bubbles past a `data-confirm`-bearing ancestor, `closest()` matches
+    // the host instead, and the controller intercepts its own replay a second time — the dialog
+    // closes but the form silently never submits. Confirmed with a reproduction of that exact
+    // controller's intercept/replay sequence against a real `<rfg-button type="submit">` before
+    // this fix, and again after, passing. Moving instead of mirroring means there is never a
+    // second copy for a replay to re-match, on this or any later externally-triggered attribute
+    // (e.g. a Stimulus controller setting `data-confirm` on the host after first render).
+    for (const attr of [...this.attributes]) {
+      if (!isProxiedAttr(attr.name)) continue;
+      control.setAttribute(attr.name, attr.value);
+      this.removeAttribute(attr.name);
     }
 
     this._warnIfNoAccessibleName(control);
