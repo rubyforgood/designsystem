@@ -95,8 +95,10 @@ rule to extract beyond usage guidance). Each is verified in a real browser again
 accessibility rules its own `design.md` section documents, previewable via Storybook
 (`npm run storybook`) with an axe-core a11y gate on every story, and audited for real —
 `wcag-audit.js` and `keyboard-audit.js` run against the built Storybook site in CI (a third
-adapter, `bin/design/adapters/storybook/`, see `docs/portability/adapter-storybook.md`). See
-`components/README.md` and
+adapter, `bin/design/adapters/storybook/`, see `docs/portability/adapter-storybook.md`). The same
+build is also hosted — **<https://rubyforgood.github.io/designsystem/>** — redeployed by
+`.github/workflows/deploy-storybook.yml` on every push to `main`, so there's a live link to browse
+without cloning. See `components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
 This has not been published to the npm registry yet; install straight from GitHub in the meantime

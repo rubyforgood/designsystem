@@ -496,6 +496,10 @@ npm run storybook        # live dev server, http://localhost:6006
 npm run build-storybook  # static site, storybook-static/
 ```
 
+The same static build is hosted — **<https://rubyforgood.github.io/designsystem/>** — redeployed
+by `.github/workflows/deploy-storybook.yml` on every push to `main`, so there's a live link to
+browse without a local checkout.
+
 One story file per component (`components/<name>.stories.js`) covering every documented
 variant/state — this is the "preview before building, as a rendered page" step the
 `design-system-migration` skill already asks for, made durable instead of ad hoc. The
