@@ -233,3 +233,34 @@ stories (including every other component that composes `<rfg-button>` —
 `card`/`date-range-picker`/`empty-state`/`filter-bar`/`modal`/`popover`/`page-header`) still
 render with zero console errors, `wcag-audit.js` and `keyboard-audit.js` both still exit clean
 against the rebuilt Storybook site.
+
+**Update, two real defects found running Human Essentials' own system-spec suite against the
+migrated `essentials_link_button`** (not assumed from reading the diff — found by running the
+app's full `rspec`/`rspec-system` suite, the actual regression gate, not a sample of it):
+
+1. A real crash, `HierarchyRequestError: ... The new child element contains the parent`, thrown
+   from the re-parenting code above under a genuine interaction this app uses throughout its
+   filter bars: an AJAX response replacing an already-upgraded `<rfg-button>`'s content in place
+   (jQuery's `.replaceWith`/a Turbo frame update), rather than disconnecting and recreating the
+   element. The one-time capture in `connectedCallback` went stale the moment anything external
+   touched the host's children afterward. Fixed the same way `<rfg-tabs>`/`<rfg-field>` already
+   handle exactly this class of problem: a `MutationObserver` re-derives the captured content from
+   the host's *current* children on every `childList` change instead of trusting a snapshot, and
+   `placeInOrder` additionally drops any node that's disconnected or would itself contain the
+   marker (the specific condition that throws), recovering on the next sync rather than crashing
+   the render outright.
+2. A real, measured layout regression: the insertion-order marker elements (`<span
+   class="rfg-button-icon-position">`/`-label-position`) were never hidden after use, and the
+   existing `.icon-slot > * { width: 1em; height: 1em }` rule matched the leftover icon marker too
+   — an empty element forced to a full icon's box, silently doubling the icon-slot's width. Not
+   hypothetical: this grew every icon-bearing button by ~20px, which was enough to tip a 3-button
+   page header (`/partners`) onto a second line at Human Essentials' own 1200px system-spec
+   viewport, reproducing the exact "tab strip moves depending on header content" bug this app had
+   already fixed once (`tab_set_system_spec.rb`, cited in that file's own history). Fixed by
+   excluding the markers from that sizing rule and giving them `display: none` directly — they're
+   real DOM nodes used only as an insertion reference, never meant to be seen.
+
+Both were caught because the full suite was run as the actual acceptance gate, not because either
+was anticipated — worth recording as the reason "re-verify against a second real adopter's own
+test suite," not just this repo's own Storybook stories, is load-bearing for a component this
+central.

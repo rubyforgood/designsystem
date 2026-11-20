@@ -150,9 +150,20 @@ const STYLES = css`
     display: inline-flex;
   }
 
-  rfg-button .icon-slot > * {
+  rfg-button .icon-slot > *:not(.rfg-button-icon-position) {
     width: 1em;
     height: 1em;
+  }
+
+  /* These two exist only as insertion-order anchors for placeInOrder (below) — real DOM nodes
+     a moved child is positioned "before", never meant to be seen or take up space themselves.
+     Measured: left unhidden, this icon-slot one still matched the ":not()"-less version of the
+     rule above, forcing the (empty but real) marker to 1em square too and doubling the icon-slot's
+     width — a real, measured 20px-per-button growth, not a hypothetical one, found because it
+     tipped a 3-button page header onto a second line at this app's own 1200px test viewport. */
+  rfg-button .rfg-button-icon-position,
+  rfg-button .rfg-button-label-position {
+    display: none;
   }
 
   rfg-button .sr-only {
@@ -178,14 +189,20 @@ function ensureStylesInjected() {
 
 // Moves `nodes` to sit, in order, immediately before `marker` — a no-op when they're already
 // there, so this doesn't fight focus or re-trigger transitions on every unrelated re-render (the
-// same guard `<rfg-field>` uses for its single control node, generalized for a list).
+// same guard `<rfg-field>` uses for its single control node, generalized for a list). Also drops
+// any node that can no longer be placed at all (disconnected, or — found against a real Turbo
+// frame update — one that now contains `marker` itself, which throws HierarchyRequestError):
+// `_syncContent` re-derives `nodes` from the live tree on every mutation, but the two can still
+// observe the DOM in different states for one tick during an external rewrite, and a dropped
+// node is recovered on the very next sync rather than crashing the render entirely.
 function placeInOrder(nodes, marker) {
-  const alreadyPlaced = nodes.every((node, i) => {
-    const next = i === nodes.length - 1 ? marker : nodes[i + 1];
+  const placeable = nodes.filter((node) => node.isConnected && node !== marker && !node.contains(marker));
+  const alreadyPlaced = placeable.every((node, i) => {
+    const next = i === placeable.length - 1 ? marker : placeable[i + 1];
     return node.nextSibling === next;
   });
   if (alreadyPlaced) return;
-  nodes.forEach((node) => marker.before(node));
+  placeable.forEach((node) => marker.before(node));
 }
 
 export class RfgButton extends LitElement {
@@ -209,20 +226,35 @@ export class RfgButton extends LitElement {
     this.disabled = false;
     this.type = "button";
     this._warnedMissingName = false;
-    this._captured = false;
+    this._iconNodes = [];
+    this._labelNodes = [];
   }
 
   connectedCallback() {
     super.connectedCallback();
     ensureStylesInjected();
-    if (!this._captured) {
-      // Captured once, before any render has happened, so this never mistakes Lit's own
-      // rendered markup (the control, its icon-slot wrapper, the markers) for original content.
-      const original = [...this.childNodes];
-      this._iconNodes = original.filter((n) => n.nodeType === 1 && n.getAttribute("slot") === "icon");
-      this._labelNodes = original.filter((n) => !this._iconNodes.includes(n));
-      this._captured = true;
-    }
+    this._syncContent();
+    // Not a one-time capture: a host's own direct children can change after this element has
+    // already rendered once — a Turbo frame update replacing this element's content in place,
+    // rather than disconnecting and recreating it, is a real case this app hit. Re-deriving from
+    // whatever the host's current direct children actually are, instead of trusting a stale
+    // snapshot, is the same fix `<rfg-tabs>`/`<rfg-field>` already use for their own content.
+    this._observer = new MutationObserver(() => this._syncContent());
+    this._observer.observe(this, { childList: true });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._observer?.disconnect();
+  }
+
+  _syncContent() {
+    // :scope > * would also match the already-rendered .control, so it's excluded by identity,
+    // not by selector — the control is a real, specific element this component itself created.
+    const original = [...this.childNodes].filter((n) => n !== this._controlEl);
+    this._iconNodes = original.filter((n) => n.nodeType === 1 && n.getAttribute("slot") === "icon");
+    this._labelNodes = original.filter((n) => !this._iconNodes.includes(n));
+    this.requestUpdate();
   }
 
   willUpdate(changed) {
@@ -241,6 +273,7 @@ export class RfgButton extends LitElement {
   updated() {
     const control = this.querySelector(".control");
     if (!control) return;
+    this._controlEl = control;
 
     const iconMarker = control.querySelector(".rfg-button-icon-position");
     const labelMarker = control.querySelector(".rfg-button-label-position");
