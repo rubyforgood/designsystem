@@ -40,13 +40,13 @@ export default {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "danger", "ghost"],
+      options: ["primary", "secondary", "danger", "ghost", "ghost_danger"],
       description: "What the action means — not decided per-button. See design.md's Buttons table.",
     },
     size: {
       control: "select",
-      options: ["sm", "md"],
-      description: "What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions.",
+      options: ["sm", "md", "xs"],
+      description: "What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions, `xs` for a fixed-size icon-only control.",
     },
     disabled: {
       control: "boolean",
@@ -72,6 +72,22 @@ export const Primary = {};
 export const Secondary = { args: { variant: "secondary" } };
 export const Danger = { args: { variant: "danger" }, name: "Danger" };
 export const Ghost = { args: { variant: "ghost" } };
+export const GhostDanger = {
+  args: { variant: "ghost_danger", label: "Remove" },
+  name: "Ghost danger",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A destructive control that shouldn't shout at rest — design.md: \"a repeated " +
+          "destructive control shouldn't shout at rest... a destructive action with no fill is " +
+          "`ghost_danger`\", the same rest colour as plain `ghost`, rose on hover and focus only. " +
+          "Previously unexercised by any story — the component silently had no CSS for this " +
+          "variant at all until it was actually looked at.",
+      },
+    },
+  },
+};
 
 // --- Size axis — independent of variant ---
 
@@ -163,7 +179,17 @@ export const CompactIconOnly = {
 
 export const CompactIconOnlyDanger = {
   name: "xs, danger tone",
-  render: () => html`<rfg-button variant="danger" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
+  render: () => html`<rfg-button variant="ghost_danger" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`ghost_danger`, not filled `danger` — this is what Human Essentials' row-icon " +
+          "actions actually use for their destructive tone (`essentials_row_icon_action`/" +
+          "`essentials_row_icon_link` map `tone: :danger` to `variant: :ghost_danger`).",
+      },
+    },
+  },
 };
 
 export const CompactIconOnlyOverriddenToken = {

@@ -51,7 +51,7 @@
 // text instead.
 import { LitElement, html, css } from "lit";
 
-const VARIANTS = new Set(["primary", "secondary", "danger", "ghost"]);
+const VARIANTS = new Set(["primary", "secondary", "danger", "ghost", "ghost_danger"]);
 const SIZES = new Set(["sm", "md", "xs"]);
 
 // Attributes the component manages itself as reactive properties — never proxied, since the
@@ -164,6 +164,31 @@ const STYLES = css`
   }
   rfg-button[variant="ghost"] .control:hover {
     background: var(--color-neutral-100);
+  }
+
+  /* A destructive row/toolbar action: ghost's own rest treatment (no fill, same text colour),
+     tinted on hover rather than filled — found missing entirely, not assumed present: the
+     component only ever recognized four variants, so every "ghost_danger" button rendered fully
+     unstyled (transparent, inherited text colour) while silently logging the unrecognized-
+     variant warning below on every page load — a real, console-warning-only (not "error") bug
+     missed for two prior migration passes by only filtering for errors. The 15%-tint technique
+     matches rfg-icon-tile's own danger tone, since tokens/ exposes one value per semantic
+     tone, not a tint scale. */
+  rfg-button[variant="ghost_danger"] .control {
+    background: transparent;
+    color: var(--color-neutral-700);
+  }
+  rfg-button[variant="ghost_danger"] .control:hover {
+    background: color-mix(in oklch, var(--color-danger) 15%, white);
+    color: var(--color-danger);
+  }
+
+  /* Destructive variants get their own focus-ring colour — found missing, not assumed present,
+     the same way the ghost_danger variant itself was: every variant shared one brand-coloured
+     ring, so a focused destructive control's ring never matched its own danger colour. */
+  rfg-button[variant="danger"] .control:focus-visible,
+  rfg-button[variant="ghost_danger"] .control:focus-visible {
+    outline-color: var(--color-danger);
   }
 
   /* Native "disabled" (button mode only — anchors don't support this attribute). */
@@ -373,7 +398,12 @@ export class RfgButton extends LitElement {
   _warnIfNoAccessibleName(control) {
     if (this._warnedMissingName) return;
     const hasVisibleText = this.textContent.trim().length > 0;
-    const hasLabel = this.hasAttribute("aria-label") || this.hasAttribute("aria-labelledby");
+    // Checked on `control`, not `this` (the host): aria-label/aria-labelledby are *moved* onto
+    // the control by the time this runs (see updated(), above), not mirrored — the host no
+    // longer carries them at all. Checking the host here was a real bug, found by actually
+    // looking at console output on a real page rather than filtering for errors only: every
+    // icon-only button with a real aria-label logged this exact false-positive warning.
+    const hasLabel = control.hasAttribute("aria-label") || control.hasAttribute("aria-labelledby");
     if (!hasVisibleText && !hasLabel) {
       console.warn(
         "<rfg-button> has no visible text and no aria-label/aria-labelledby — an icon-only " +

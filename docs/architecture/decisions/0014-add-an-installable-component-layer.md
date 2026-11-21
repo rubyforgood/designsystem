@@ -365,3 +365,46 @@ shared-outline-color `ROW_ICON_CLASSES` rule) fixes a real, pre-existing bug as 
 shared rule hardcodes one `focus-visible` outline colour for every tone, so a focused *destructive*
 row-icon button currently shows a brand/indigo ring rather than rose, unlike every other
 destructive control in the app. The component's own `danger` variant already gets this right.
+
+**Correction, and two further bugs found by actually looking rather than trusting the above.**
+The sentence just above — "the component's own `danger` variant already gets this right" — was
+wrong, written before checking, not after: the component has only ever had one universal
+`focus-visible` rule (`outline: 2px solid var(--color-brand-600)`), no per-variant override at
+all, for *any* variant. A focused `danger`/`ghost_danger` control showed the same brand ring as
+everything else. Found by actually focusing a real `ghost_danger` button in a real browser and
+reading its computed `outline-color`, the same discipline this project has used throughout —
+caught here only because this phase, unusually, involved checking it directly rather than
+reasoning from the Ruby-side class strings. Fixed now: `danger`/`ghost_danger` get their own
+`outline-color: var(--color-danger)`, cascading over the shared rule via normal specificity.
+
+Two more, found the same way, in the same pass:
+
+- **`ghost_danger` was not a real variant at all.** `VARIANTS` only ever listed `primary`,
+  `secondary`, `danger`, `ghost` — never `ghost_danger`, even though design.md's own Buttons
+  section names it explicitly ("a destructive action with no fill is `ghost_danger`") and
+  Human Essentials' Ruby code has passed `variant: :ghost_danger` directly into `<rfg-button>`
+  since the *first* `essentials_action_button` migration. Every such button rendered fully
+  unstyled — transparent background, inherited text colour, no hover state — while silently
+  logging `<rfg-button> received unknown variant "ghost_danger"...` on every page load. Missed
+  for two migration passes because that line is a console *warning*, not an *error*, and every
+  verification pass in both phases filtered for `console.type() === "error"` only. No Storybook
+  story ever exercised this variant either, so the gap had no story, no audit, and no test to
+  catch it. Fixed: `ghost_danger` is now a real fifth variant — `--color-neutral-700` at rest
+  (matching plain `ghost`'s own rest colour, differing only on hover/focus), a 15%
+  `color-mix()` rose tint on hover (the same tinting technique `<rfg-icon-tile>`'s own danger
+  tone already uses, since `tokens/` exposes one value per semantic tone, not a tint scale) —
+  and a Storybook story now exercises it, so a regression here would show up in the next
+  full-sweep check.
+- **`_warnIfNoAccessibleName` had a false-positive bug of its own**, introduced by this same
+  phase's move-semantics fix (above): it checked `this.hasAttribute("aria-label")` — the host —
+  but `aria-label` is *moved* onto the control, not mirrored, so the host never carries it once
+  the proxy runs. Every icon-only button with a real, correct `aria-label` logged the
+  "no accessible name" warning anyway. Fixed to check `control`, the parameter the method
+  already receives.
+
+All three were found by an unusually thorough live-browser pass for this phase: screenshotting
+real rendered output at actual pixel dimensions, focusing real controls and reading computed
+`outline-color`, and — critically — reading *all* console output, not just `type: "error"`. The
+last habit is the one worth carrying forward: a `console.warn` is exactly as real a bug signal as
+a `console.error`, and this phase's own two new findings were both warnings that had been running
+silently for one to two prior "verified" migration passes.
