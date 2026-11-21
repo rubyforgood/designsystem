@@ -3033,6 +3033,35 @@ fifth tab of the catalogue and a sidebar entry. When it is, the page keeps its o
 than borrowing the strip's, because the sidebar has to be telling the truth about where it just
 sent you. Render the strip there anyway, so the tab is a way back as well as a way in.
 
+<a id="segmented-controls"></a>
+### Segmented controls
+
+```erb
+<%= render "shared/essentials/segmented_control", label: "Calendar range",
+      value: @range, segments: [["month", "Month"], ["week", "Week"]] %>
+```
+
+A connected row of buttons that switch between a few views of the **same** data, in place — not a
+tab (which navigates to a different screen) and not a radio group (which commits a choice for a
+form to read later). `/distributions/schedule` is the one place in the app that needs this today:
+a calendar range (Month/Week) and a calendar layout (Grid/List), each its own group.
+
+**Portable — `role="group"` with real, independently-focusable `aria-pressed` buttons, not
+`role="radiogroup"` with roving tabindex.** These toggle a state rather than submit a value, which
+is also why there's no arrow-key navigation between segments the way [Tabs](#tabs) has between
+tabs — there's nothing here modeled on the ARIA radio-group pattern to begin with. Two groups on
+one screen, not three buttons in one, because these answer two separate questions ("how much
+time" and "how it looks") — a single row where one label named a duration and its neighbour named
+a shape said nothing about how much time either one covered.
+
+**Portable — the chosen value lives in the URL, not client-side state.** The same argument
+[Tabs](#tabs) already settled for page tabs: a view becomes something you can link to, bookmark,
+and return to from the back button, and it's the only option that can answer "why does mine look
+different from yours" when two people compare screens. Changing a segment navigates (a real
+`?layout=grid`-style parameter), it doesn't just repaint client-side state — `format` is reserved
+by Rails routing for the response MIME type, so the parameter name here is something else
+(`layout`), not a name that happens to collide with it and raise a 406 before anything renders.
+
 ### Filter bar
 
 ```erb

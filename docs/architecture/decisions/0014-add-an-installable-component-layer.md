@@ -475,3 +475,48 @@ only by actually loading the built Storybook page and reading the console, not b
 naming again, since it has now recurred three times across this project: a stray backtick inside
 a tagged or plain template literal is invisible to a syntax-level read of the surrounding prose and
 only surfaces as a runtime error in the built output.
+
+**Update, `<rfg-segmented-control>` (twenty-nine total), and three candidates surveyed and
+rejected.** Before writing more components from the industry comparison alone, this pass instead
+went looking in Human Essentials itself for real evidence, the same discipline this ADR's very
+first components were built against. Four candidates (segmented control, toggle switch, progress
+bar, a grouped-accordion component) were checked against the actual running app, not assumed
+needed because Material/Carbon/Primer each have one:
+
+- **Toggle switch: no evidence, not built.** 14+ boolean settings across 10+ views all render
+  consistently through `simple_form`'s `:essentials_boolean` wrapper — a plain checkbox, with no
+  hand-styled toggle-switch look found anywhere in the app. The existing pattern isn't broken or
+  inconsistent; a toggle switch would be a purely aesthetic alternative to something that already
+  works, not a fix for a found defect.
+- **Progress bar: no evidence, not built.** CSV imports are synchronous controller actions with
+  no background job and nothing to track; every real background job in the app (email/
+  notification sends) is fire-and-forget with no user-facing progress UI at all. There is no
+  long-running, trackable operation in this app to build one against.
+- **A new grouped-accordion component: evidence exists, but argues against building one.** Two
+  real cases — a 13-section partner-profile form and a FAQ page — both just stack several
+  independent `<rfg-disclosure>` instances, which the existing component already fully handles.
+  The one group-level behavior found (`accordion_controller.js` disabling all triggers during a
+  surrounding form's submit, so a double-click can't reopen a section mid-save) is narrow and
+  specific enough to belong in design.md as a usage pattern, not a reason for a second component.
+- **Segmented control: real evidence, built.** `/distributions/schedule`'s calendar range
+  (Month/Week) and layout (Grid/List) switches — `role="group"` with `aria-pressed` buttons (not
+  radios, "these toggle a state rather than submit a value," the reference's own reasoning,
+  unchanged here), a dedicated helper (`essentials_view_toggle_classes`), and real design
+  reasoning already written into the view's own comment that this document had never captured at
+  all. Narrower evidence than `<rfg-combobox>`'s 14 views — one page, two button-groups — but the
+  portability case holds on its own terms: "switch between a few views, no navigation" is generic
+  enough that every one of the three industry systems compared ships one, so the one real local
+  instance is enough to build *from* even though most of the payoff is for a future adopter.
+
+**Found by actually clicking through the built story, not assumed working:** the self-triggered-
+resync guard this borrows from `<rfg-button>` checked whether *anything* was left among this
+element's direct children after a move, rather than whether any *button* specifically was —
+harmless for `<rfg-button>`, whose "everything not an icon is label content" bucket never leaves
+anything untracked, but a template literal's own whitespace between tags becomes real, un-moved
+text nodes here, which are never buttons and were never excluded by identity either. Every click
+after the first looked like "found nothing, but I already have buttons — this must be my own
+move, ignore it," silently wiping tracking and leaving every subsequent `aria-pressed` update a
+no-op. Caught only by actually clicking a segment in the built Storybook story and reading the
+resulting DOM state, not by code review — the bug was invisible in the source, since the guard's
+own stated reasoning ("self-triggered resync") was correct, just checking the wrong condition for
+it. Fixed by checking whether any button was found, not whether anything was found at all.

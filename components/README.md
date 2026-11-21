@@ -235,6 +235,47 @@ elements (which must stay in light DOM so their content can be arbitrary host ma
 boundary. Rendering the tabs themselves into light DOM puts both ends of every ID reference in one
 scope; styles are scoped by a `.rfg-tabs` wrapper class instead of `:host`.
 
+## `<rfg-segmented-control>`
+
+A connected row of real `<button>`s that switch between a few views **without navigating** —
+ported from a real, in-production Human Essentials pattern
+(`/distributions/schedule`'s calendar range/layout switches, `essentials_view_toggle_classes`),
+not designed from scratch.
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `label` | text | `"View options"` (the group's `aria-label`) |
+| `value` | any segment's own `value` | the first segment's, if unset |
+
+Slot: default (the segment buttons — real `<button type="button" value="...">` elements, any
+count).
+
+**`role="group"` with independently-focusable `aria-pressed` buttons, not `role="radiogroup"`.**
+The reference implementation's own reasoning, kept unchanged: this toggles a state, it doesn't
+submit a value — `<rfg-tabs>`'s roving-tabindex tablist above is the pattern for navigating
+between panels; this is a different interaction for a different reason, not an inconsistency
+between the two. No arrow-key navigation between segments for the same reason: there's nothing
+here modeled on the ARIA radio-group pattern to begin with.
+
+**The component dispatches `rfg-change`; it does not own what the choice means** —
+`<rfg-date-range-picker>`'s own precedent, a plain event the host turns into whatever it needs (a
+URL parameter, in the reference implementation's own case, so the view stays bookmarkable — the
+same argument design.md already settled for page tabs).
+
+**Renders into light DOM**, the same `<rfg-button>` fix, for the same reason: this owns the full
+connected-segments visual treatment (shared border, a divider between segments, only the outer
+corners rounded), which means moving real button children into one rendered container rather than
+leaving them to a shadow `<slot>`.
+
+**Found by actually clicking through the built story, not assumed working:** the self-triggered-
+resync guard this borrows from `<rfg-button>` checked whether anything at all was left among this
+element's direct children after a move — but a template literal's own whitespace between tags
+becomes real, un-moved, un-excluded text nodes once the buttons move into the group, so that check
+was never actually true once any real-world markup had whitespace in it. Every click after the
+first looked like "found zero buttons, but I already have some — ignore it," silently wiping
+tracking and leaving every subsequent `aria-pressed` update a no-op. Fixed by checking whether any
+*button* was found, not whether anything was found at all.
+
 ## `<rfg-modal>`
 
 Implements "Modals": wraps native `<dialog>` + `showModal()` rather than reimplementing focus

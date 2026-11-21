@@ -36,6 +36,7 @@ const ENTRY = {
   tooltip: "components/tooltip.js",
   menu: "components/menu.js",
   combobox: "components/combobox.js",
+  "segmented-control": "components/segmented-control.js",
 };
 
 export default defineConfig([
