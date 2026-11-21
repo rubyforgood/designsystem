@@ -4892,6 +4892,26 @@ results, which moving real focus away from the input would break. This is the WA
 pattern's own reason for the two patterns differing, not an inconsistency between this section and
 the row-actions one.
 
+**Update, 2026-11-21 — the "14 views" figure above was wrong, measured against the real app
+instead of recalled**: Human Essentials' own `docs/migration-map.md` puts the real, current count
+at **six selects across five views** (one of the original fourteen moved onto `<rfg-tag-input>`
+instead, named in `<rfg-tag-input>`'s own account above, and the figure was never updated after).
+Corrected by annotation, not a silent edit, per this project's own evidence-discipline rule.
+
+**A real defect found migrating the first of those five views, not assumed away:** this component
+only ever observed the wrapped `<select>` via a `MutationObserver` watching attribute mutations
+(`selected` written onto an `<option>`), which is not how a plain `select.value = …` assignment (or
+jQuery's `.val(x)`) changes a select at all — that's a property write with no attribute mutation to
+see. Reproduced directly against the Single Select story before trusting it: `select.value`
+updated correctly, `<rfg-combobox>`'s own visible textbox did not, silently showing the native
+implicit first option instead. Human Essentials' own barcode scanner does exactly this to the item
+picker it wraps (`$(select).val(itemId).trigger('change')`), so this would have been a real,
+silent regression on that view specifically, not a theoretical gap. Fixed by listening for the
+wrapped select's own native `change` event directly, in addition to the existing observer — the one
+signal every real cause (user interaction, jQuery's `.val().trigger('change')`, any other
+programmatic `.value =` followed by a dispatched `change`) already fires, rather than enumerating
+each cause's own DOM shape.
+
 <a id="callouts"></a>
 ### Callouts
 

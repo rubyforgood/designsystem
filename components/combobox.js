@@ -189,6 +189,7 @@ export class RfgCombobox extends RfgPopover {
     this._multiple = false;
     this._onInput = this._onInput.bind(this);
     this._onInputKeydown = this._onInputKeydown.bind(this);
+    this._onSelectChange = this._onSelectChange.bind(this);
   }
 
   connectedCallback() {
@@ -199,6 +200,7 @@ export class RfgCombobox extends RfgPopover {
   disconnectedCallback() {
     super.disconnectedCallback();
     this._selectObserver?.disconnect();
+    this._selectEl?.removeEventListener("change", this._onSelectChange);
   }
 
   // Overrides `RfgPopover`'s own version completely — see this file's header comment for why.
@@ -208,6 +210,7 @@ export class RfgCombobox extends RfgPopover {
     const select = this.querySelector("select");
     if (!select) return;
     if (select !== this._selectEl) {
+      this._selectEl?.removeEventListener("change", this._onSelectChange);
       this._selectEl = select;
       this._multiple = select.multiple;
       select.classList.add("rfg-combobox-select-hidden");
@@ -221,7 +224,25 @@ export class RfgCombobox extends RfgPopover {
         attributes: true,
         attributeFilter: ["selected", "value"],
       });
+      // The MutationObserver above only ever catches *attribute* mutations (a `selected`
+      // attribute written onto an `<option>`, say) — never a plain `select.value = …`/
+      // `.selectedIndex = …` assignment, which is a property write with no attribute mutation
+      // to observe at all. That's exactly how jQuery's own `.val(x)` sets a select, and exactly
+      // what Human Essentials' barcode scanner does to the item picker this wraps
+      // (`$(select).val(itemId).trigger('change')`) — found by reproducing that call directly
+      // against a real story, not assumed to work: the wrapped `<select>`'s own `.value` updated
+      // correctly, but this element's visible textbox kept showing the native implicit first
+      // option, silently stale. A real `change` event is the one signal every one of those paths
+      // already fires (natively, for user interaction; explicitly, for jQuery's own — `.trigger`
+      // dispatches a real DOM event, not a jQuery-only one), so listening for it directly, rather
+      // than trying to infer "the value changed" from DOM mutations, covers every real cause at
+      // once rather than enumerating them.
+      select.addEventListener("change", this._onSelectChange);
     }
+    this.requestUpdate();
+  }
+
+  _onSelectChange() {
     this.requestUpdate();
   }
 
