@@ -121,7 +121,19 @@ const STYLES = `
     display: none;
   }
 
-  rfg-combobox .rfg-popover-panel {
+  /* .rfg-popover-panel[role=listbox], not rfg-combobox .rfg-popover-panel -- found live
+     integrating this into a real app: RfgPopover.open() portals the panel straight to <body>
+     unconditionally the moment it's actually visible, which makes it a sibling of <body>'s
+     other children rather than a descendant of <rfg-combobox> at all from that point on. A
+     descendant-combinator selector matches the DOM tree as it currently stands, so this rule
+     silently stopped applying the instant any combobox opened -- confirmed by checking computed
+     styles on a real, open panel (max-height: none, overflow-y: visible, every option rendered
+     at once in an unbounded list) rather than assumed from the CSS alone. The panel's own role
+     attribute travels with it wherever it's portalled, so an attribute selector on the panel
+     itself is what actually matches reliably either way -- the same fix <rfg-menu>'s own
+     identical bug needed. No backtick anywhere in this comment, on purpose: this file has hit
+     the stray-backtick-inside-a-css-comment-truncates-the-template bug before. */
+  .rfg-popover-panel[role="listbox"] {
     min-width: 100%;
     max-height: 16rem;
     overflow-y: auto;

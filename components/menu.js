@@ -50,8 +50,22 @@ const STYLE_ID = "rfg-menu-styles";
 // default (a short single-word item, "Edit", looked cramped at `0.75rem`'s implied width with
 // nothing else constraining it) — a consuming app can still make an individual menu wider with its
 // own CSS; this is a floor, not a fixed size the way `<rfg-segmented-control>`'s token is.
+//
+// **`.rfg-popover-panel[role="menu"]`, not `rfg-menu .rfg-popover-panel`** — found live, not
+// assumed, integrating this into the same real app a second time: the panel only ever sits
+// inside `<rfg-menu>` *before* it opens. `RfgPopover.open()` portals it straight to `<body>`
+// unconditionally (the entire point of the portal — see popover.js's own header comment), which
+// makes it a sibling of `<body>`'s other children, not a descendant of `<rfg-menu>` at all, the
+// instant it's actually visible. A descendant-combinator selector matches the DOM tree as it
+// currently stands, so this rule silently stopped applying the moment any menu was opened,
+// invisibly falling back to `<rfg-popover>`'s own generic padding/no-min-width instead —
+// confirmed by checking computed styles on a real, open account menu, not by eyeballing a
+// screenshot (which looked close enough at a glance to not raise suspicion). The panel's own
+// `role` attribute is set unconditionally and travels with the element wherever it's portalled,
+// so an attribute selector on the panel itself is the one thing that still matches reliably
+// either way.
 const STYLES = css`
-  rfg-menu .rfg-popover-panel {
+  .rfg-popover-panel[role="menu"] {
     padding: 0.25rem 0;
     min-width: 12rem;
   }
