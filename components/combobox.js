@@ -358,6 +358,15 @@ export class RfgCombobox extends RfgPopover {
     this.dispatchEvent(new CustomEvent("rfg-change", { bubbles: true, composed: true }));
   }
 
+  // `?disabled=${this._selectEl?.disabled}` below is the one place this element reads the
+  // wrapped `<select>`'s `disabled` property at all — found needed integrating a real app's
+  // existing `f.input :item_id, disabled: requested.present? || …` field (an item pre-filled by
+  // a partner request, meant to stay locked): a native `disabled` attribute on the synthesized
+  // `<input>` is sufficient on its own, since a disabled input cannot receive focus at all (not
+  // via a real click, not via this element's own `.focus()` call), and `open()` is only ever
+  // reached through that same focus listener — so nothing else needed to change to make a
+  // disabled wrapped select behave like a disabled control rather than a fully interactive one
+  // that merely doesn't submit.
   render() {
     const options = this._options();
     const activeId = this._activeIndex >= 0 && this._activeIndex < options.length ? this._optionId(this._activeIndex) : undefined;
@@ -394,6 +403,7 @@ export class RfgCombobox extends RfgPopover {
           aria-activedescendant=${activeId ?? nothing}
           aria-label=${this.label ? nothing : this._selectAriaLabel()}
           autocomplete="off"
+          ?disabled=${this._selectEl?.disabled}
           .value=${textValue}
           @input=${this._onInput}
           @keydown=${this._onInputKeydown}
