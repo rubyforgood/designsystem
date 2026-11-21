@@ -4948,6 +4948,17 @@ the CSS text alone. `<rfg-menu>`'s own equivalent rule had the identical bug, fo
 time — see that section above. Both fixed by matching the panel's own `role` attribute instead,
 which travels with it wherever it's portalled.
 
+**A fourth, found immediately after fixing the third:** once the selector matched again, the
+panel opened at the full viewport's width rather than the trigger's — `min-width: 100%` can only
+ever mean "100% of this panel's own containing block," and once portalled to `<body>` with
+`position: fixed` and no explicit width, that containing block is the viewport, not the box this
+panel visually belongs to. `<rfg-combobox>` now overrides `_reposition()` to set a real pixel
+width directly (matching `@floating-ui/dom`'s own documented pattern for the same need), and the
+CSS `min-width: 100%` is gone — it would otherwise keep winning over the smaller JS-set width.
+`box-sizing: border-box` was added alongside it: without it the JS-set width covers only the
+panel's content box, with its own border and padding added on top, measured 8px wider than the
+trigger before this.
+
 <a id="callouts"></a>
 ### Callouts
 

@@ -132,9 +132,17 @@ const STYLES = `
      attribute travels with it wherever it's portalled, so an attribute selector on the panel
      itself is what actually matches reliably either way -- the same fix <rfg-menu>'s own
      identical bug needed. No backtick anywhere in this comment, on purpose: this file has hit
-     the stray-backtick-inside-a-css-comment-truncates-the-template bug before. */
+     the stray-backtick-inside-a-css-comment-truncates-the-template bug before.
+     No min-width here: _reposition() sets a real pixel width directly once portalled, where a
+     percentage has nothing meaningful left to resolve against -- a lingering min-width: 100%
+     would just re-break the same thing, since min-width wins over an explicit width that's
+     smaller than it. */
   .rfg-popover-panel[role="listbox"] {
-    min-width: 100%;
+    /* border-box, not the browser default content-box: _reposition() sets width to exactly
+       the trigger's own rendered width (border and padding included), and without this that
+       width would only cover this panel's content box, with its own border and padding then
+       added on top -- measured 8px wider than the trigger before this was added. */
+    box-sizing: border-box;
     max-height: 16rem;
     overflow-y: auto;
     padding: 0.25rem;
@@ -308,6 +316,24 @@ export class RfgCombobox extends RfgPopover {
   // asked for.
   _selectAriaLabel() {
     return this._selectEl?.getAttribute("aria-label") || "Options";
+  }
+
+  // Overrides RfgPopover's own version to also pin the panel's width to the trigger's -- the
+  // CSS `min-width: 100%` this panel's own stylesheet carries can only ever mean "100% of
+  // whatever the panel's actual containing block is," and that stops being this element's own
+  // box the moment the panel portals to `<body>` (a `position: fixed` element with no explicit
+  // width resolves a percentage against the viewport, not the box it visually belongs to) --
+  // found live, not assumed, after fixing the padding/max-height selector bug right next to this
+  // one: the panel still opened at full viewport width, left edge included, because nothing
+  // here had ever set a real pixel width to replace what the CSS could no longer express once
+  // portalled. Matches `@floating-ui/dom`'s own documented pattern for exactly this (a `size()`
+  // middleware doing the equivalent) rather than inventing a different mechanism, since this
+  // element already depends on that library for everything else about where the panel goes.
+  async _reposition() {
+    await super._reposition();
+    if (this._panelEl && this._trigger) {
+      this._panelEl.style.width = `${this._trigger.getBoundingClientRect().width}px`;
+    }
   }
 
   _onInput(e) {
