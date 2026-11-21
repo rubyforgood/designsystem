@@ -287,6 +287,17 @@ export class RfgCombobox extends RfgPopover {
     return selected ? selected.textContent : "";
   }
 
+  // Falls back to the wrapped `<select>`'s own `aria-label`, not straight to the generic
+  // "Options" — found wiring this into a real app's existing `f.input ..., label: false,
+  // input_html: {"aria-label": "Item"}` pattern (a visible label suppressed in favor of a
+  // specific accessible name, common wherever several of these repeat in one row): without this,
+  // every such consumer's real, specific name was silently discarded and replaced with the same
+  // generic "Options" on both the textbox and the panel, regardless of what the host actually
+  // asked for.
+  _selectAriaLabel() {
+    return this._selectEl?.getAttribute("aria-label") || "Options";
+  }
+
   _onInput(e) {
     this._query = e.target.value;
     this._activeIndex = this._options().length ? 0 : -1;
@@ -381,7 +392,7 @@ export class RfgCombobox extends RfgPopover {
           aria-expanded=${this._open}
           aria-controls=${this._panelId()}
           aria-activedescendant=${activeId ?? nothing}
-          aria-label=${this.label ? nothing : "Options"}
+          aria-label=${this.label ? nothing : this._selectAriaLabel()}
           autocomplete="off"
           .value=${textValue}
           @input=${this._onInput}
@@ -391,7 +402,7 @@ export class RfgCombobox extends RfgPopover {
       <div
         class="rfg-popover-panel"
         role="listbox"
-        aria-label=${this.label || "Options"}
+        aria-label=${this.label || this._selectAriaLabel()}
         aria-multiselectable=${this._multiple}
         id=${this._panelId()}
         ?hidden=${!this._open}
