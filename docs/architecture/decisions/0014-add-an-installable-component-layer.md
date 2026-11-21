@@ -408,3 +408,70 @@ real rendered output at actual pixel dimensions, focusing real controls and read
 last habit is the one worth carrying forward: a `console.warn` is exactly as real a bug signal as
 a `console.error`, and this phase's own two new findings were both warnings that had been running
 silently for one to two prior "verified" migration passes.
+
+**Update, three components sourced from an industry comparison rather than from `design.md`'s own
+existing catalog — `<rfg-tooltip>`, `<rfg-menu>`, `<rfg-combobox>` (twenty-eight total).** A
+Material/Carbon/Primer sweep, cross-referenced against this repo's actual component inventory,
+found two gaps triangulated by all three industry systems *and* by evidence already sitting in
+this repo: `design.md` fully specifies and audits a tooltip and a row-action kebab menu, but both
+had only ever existed as Human Essentials' own Rails/Stimulus code, never promoted into this
+layer. A third gap — a searchable combobox — had no prior spec at all, but Human Essentials' own
+`CLAUDE.md` already named a live dependency on select2 for exactly that need in 14 views.
+
+Building the portal fix `<rfg-menu>` needs surfaced a real, previously-latent bug in
+`<rfg-popover>` itself, found and corrected during this same pass, not assumed solved by the first
+attempt:
+
+- **A `<slot>` cannot be moved out of its own shadow host's subtree and keep projecting
+  content.** The first version of the portal fix moved `.rfg-popover-panel` (which still
+  contained an unnamed `<slot>`) to `<body>` while open. Confirmed broken empirically, not
+  assumed: `assignedElements({ flatten: true })` on that slot returned nothing the instant the
+  panel left its shadow root's own DOM subtree, even though the panel element itself still
+  opened, positioned, and painted correctly — and this broke `<rfg-popover>`'s own pre-existing,
+  non-chained `<rfg-date-range-picker>` consumer too, not only the new composition that first
+  surfaced it. Fixed by converting `<rfg-popover>` to light DOM (`createRenderRoot()` returns
+  `this`, the same fix `<rfg-button>`/`<rfg-tabs>` already needed for unrelated reasons) and
+  moving real captured children into marker positions instead of slotting them — real nodes
+  survive being relocated anywhere in the document; a `<slot>` does not.
+- **A nested forwarding `<slot>` (composing `<rfg-popover>` inside `<rfg-menu>`'s own shadow
+  root, re-exposing its slots through a second `<slot name="trigger" slot="trigger">`) hit the
+  identical failure one level removed**, even after the light-DOM fix above, because the
+  mechanism causing it is about physical DOM subtree membership, not shadow-root presence per
+  se. Fixed by having `<rfg-menu>` extend `RfgPopover` as a real JS subclass instead of composing
+  an instance of it — there is then only one shadow boundary (none) and one real set of tracked
+  content, so there is no forwarding chain left to break.
+- Once the panel was portalled correctly, two further bugs surfaced in `<rfg-menu>` specifically,
+  both the same shape: code that queried `this` (the host) or added a listener to `this` stopped
+  working the instant the real content it needed to find had moved to `<body>`, since it was no
+  longer a DOM descendant of `this` at all. `_items()` was fixed to query `this._panelEl`
+  directly; the keydown/click listeners for arrow-key navigation and close-on-select were moved
+  from `this` onto `this._panelEl`.
+- **`<rfg-button>` itself had a latent bug, found only because this was the first time anything
+  in this codebase called `.focus()` on one programmatically** (every prior consumer only ever
+  relied on natural Tab-order focus, which already worked fine via the real internal `.control`
+  button). The custom element host has no `tabindex` and was never itself the focusable thing;
+  calling `.focus()` on it was a silent no-op, so closing a menu via Enter on a real item left
+  focus on `document.body` instead of returning it to the trigger. Fixed with a `focus(options)`
+  override on `RfgButton` delegating to `this._controlEl` — a general correctness fix benefiting
+  any future caller that treats this element as focusable, not a popover-specific workaround.
+
+`<rfg-combobox>` wraps a host-provided `<select>`/`<select multiple>` rather than reimplementing
+one — the same "wrap, don't reimplement" choice `<rfg-field>` already makes for a native control,
+chosen over `<rfg-tag-input>`'s form-associated-custom-element approach because a `<select>`
+already *is* the native equivalent of what this needs, unlike free-form comma-separated text.
+Keyboard focus stays on its textbox throughout (`aria-activedescendant`, not real focus movement
+between options) — a deliberate difference from `<rfg-menu>`'s own arrow-key handling, since a
+combobox's whole point is typing *while* navigating results. One real WCAG violation was found and
+fixed by the same `wcag-audit.js` run that verifies every other component: the textbox had no
+accessible name at all (a visible `<label>` rendered above the box with no `for`/`id` association,
+and no `aria-label` fallback) — caught as a `CRITICAL label` finding across all four of this
+component's stories, not assumed clean because the markup looked reasonable.
+
+The same recurring, previously-fixed mistake — a bare backtick-wrapped code reference (`` `<rfg-
+button>` ``, inside a CSS comment) inside a `css`/plain-string template literal, silently
+truncating the whole template and producing a `ReferenceError: rfg is not defined` at runtime —
+recurred twice more during this batch, once in `popover.js` and once in `combobox.js`, each caught
+only by actually loading the built Storybook page and reading the console, not by review. Worth
+naming again, since it has now recurred three times across this project: a stray backtick inside
+a tagged or plain template literal is invisible to a syntax-level read of the surrounding prose and
+only surfaces as a runtime error in the built output.

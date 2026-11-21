@@ -85,13 +85,18 @@ documented, not-yet-attempted plans for the rest. `.github/workflows/checks.yml`
 checks, a doc-link audit, a regression check against the reference app, and (since the component
 layer) a components/Storybook build plus a real accessibility/keyboard audit run — all on every
 push. The
-component layer is newer still: twenty-five components built — `button`, `status-pill`,
+component layer is newer still: twenty-eight components built — `button`, `status-pill`,
 `icon-tile`, `avatar`, `card`, `flash-message`, `page-header`, `tabs`/`page-tabs`, `modal`,
-`popover`, `field`, `error-summary`, `table`, `date-range-picker`, `stats`, `numbered-step`,
-`callout`, `disclosure`, `empty-state`, `breadcrumbs`, `conditional-reveal`, `filter-bar`,
-`pagination`, `tag-input` — every genuinely portable component in `design.md`'s catalog except
-Charts (deliberately not ported; it defers entirely to Highcharts itself, so there's no generic
-rule to extract beyond usage guidance). Each is verified in a real browser against the
+`popover`, `menu`, `combobox`, `tooltip`, `field`, `error-summary`, `table`, `date-range-picker`,
+`stats`, `numbered-step`, `callout`, `disclosure`, `empty-state`, `breadcrumbs`,
+`conditional-reveal`, `filter-bar`, `pagination`, `tag-input` — every genuinely portable component
+in `design.md`'s catalog except Charts (deliberately not ported; it defers entirely to Highcharts
+itself, so there's no generic rule to extract beyond usage guidance). `menu` and `tooltip` are the
+newest kind of addition here: a Material/Carbon/Primer comparison sweep found design.md already
+specified both in full (the Row-actions kebab menu, the icon-only tooltip) and had audited them for
+years, but only ever against a Local, Rails-specific implementation — promoted to portable
+components here for the first time, not ported from a prior portable-but-unbuilt catalog entry the
+way the rest of this list was. Each is verified in a real browser against the
 accessibility rules its own `design.md` section documents, previewable via Storybook
 (`npm run storybook`) with an axe-core a11y gate on every story, and audited for real —
 `wcag-audit.js` and `keyboard-audit.js` run against the built Storybook site in CI (a third

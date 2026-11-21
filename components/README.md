@@ -84,6 +84,37 @@ from the host's light DOM into this element's shadow DOM the way `aria-label` (a
 can. Use `aria-label` with the label text directly until this is revisited with
 `ElementInternals`/`ariaLabelledByElements`, which doesn't have solid cross-browser support yet.
 
+## `<rfg-tooltip>`
+
+Implements design.md's tooltip rules (under "Row actions"): names and shows a bubble for an
+icon-only (or any) control on hover and focus — never `title`, which is browser chrome:
+unstyleable, silent on keyboard focus, gone on a timer, and neither hoverable nor dismissible
+(three failures of WCAG 1.4.13 at once).
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `text` | text | — (required; nothing shows without it) |
+
+Slot: default (the trigger element the tooltip is attached to).
+
+**The bubble's text comes from the trigger's own `aria-label`, not a second, separately-declared
+string** — if the slotted trigger has no accessible name of its own (no visible text, no existing
+`aria-label`/`aria-labelledby`), this writes `text` onto it as `aria-label` automatically, the same
+accessible-name check `<rfg-button>` already runs before it warns. design.md's own rule is that the
+bubble and the accessible name "carry the same string"; making that structural, rather than a
+convention to remember, closes off the two-copies-of-one-string mistake this codebase has hit
+before (see `<rfg-button>`'s attribute-proxy history).
+
+**The bubble is appended straight to `<body>`, never rendered through this element's own
+template.** A shadow-root-rendered bubble would face the same `position: fixed`-trapped-by-a-
+sticky-ancestor's-stacking-context problem `<rfg-popover>`'s panel needed a portal fix for (see
+below); managing the bubble as a plain, imperatively-created DOM node that's never nested inside
+this component's own tree sidesteps the problem by construction. Ported from Human Essentials' own
+`tooltip_controller.js` — the proven reference this is built from (640 icon-only controls across
+153 screens, 0 defects per its own audit), including the hoverable/dismissible interaction (Escape
+dismisses without moving the pointer; moving the pointer onto the bubble itself doesn't dismiss it)
+and the flip-left/flip-up positioning a frozen actions column makes routine.
+
 ## `<rfg-status-pill>`
 
 Implements the "Status pills" section: communicates state, never an action — never focusable,
@@ -231,17 +262,43 @@ Implements "Popovers": an anchored floating panel (the account menu, a filter) s
 interaction contract — Escape closes and returns focus to the trigger; an outside click closes
 *without* moving focus (the click already put focus wherever the user meant); expanded state is a
 real `aria-expanded` attribute; the panel is actually removed from the accessibility tree while
-closed (`hidden`, not just visually hidden); and it repositions (flips/shifts) to stay inside the
-viewport.
+closed (`hidden`, not just visually hidden); it repositions (flips/shifts) to stay inside the
+viewport; and it portals to `<body>` while open.
 
 | Attribute | Values | Default |
 | --- | --- | --- |
 | `label` | text | `"Popover"` (the panel's `aria-label`) |
 | `placement` | any Floating UI placement (`bottom-start`, `bottom-end`, …) | `bottom-start` |
+| `role` | `dialog` \| `menu` \| `listbox` | `dialog` |
 
-Slots: `trigger` (the host's own button — `aria-haspopup`/`aria-expanded`/`aria-controls` are
-proxied onto it, the same pattern `<rfg-button>` uses for `aria-label`) and default (the panel
-body).
+Slots: `trigger` (the host's own button, marked `slot="trigger"` — `aria-haspopup`/`aria-expanded`/
+`aria-controls` are proxied onto it, the same pattern `<rfg-button>` uses for `aria-label`) and
+default (the panel body).
+
+**Renders into light DOM, not a shadow root** — found necessary while building the portal fix
+below, not for any of the reasons `<rfg-button>`/`<rfg-field>`/`<rfg-tabs>` already needed it: a
+`<slot>` only projects its assigned content while it stays inside the physical DOM subtree of its
+own shadow host, so moving the panel to `<body>` while it still contained one silently broke
+projection entirely — real content (a date-range-picker's calendar inputs, a filter's checkboxes)
+rendered nothing once the panel moved, even though the panel `<div>` itself still opened,
+positioned, and painted. Follows `<rfg-button>`'s established fix for the same shape of problem:
+real children are captured once and moved (never mirrored, never slot-projected) into marker
+positions — a real node can be relocated anywhere in the document and keep working; a `<slot>`
+cannot.
+
+**Portals to `<body>` while open.** design.md's Row actions section names the exact failure this
+fixes, found against a real frozen table column: `position: fixed` escapes an ancestor's
+`overflow`, but not its *stacking context* — a `position: sticky` actions cell put this panel's
+`z-30` behind a sibling the sticky cell itself created, even though nothing about the panel's own
+markup changed. "The only reliable escape from an ancestor you do not control is not to be inside
+it." A comment node marks the panel's original position so it returns there on close;
+`disconnectedCallback` removes a still-portalled panel so a Turbo-equivalent render can't strand
+one on `<body>`.
+
+**`role`, generalizing what this panel (and what its trigger's `aria-haspopup`) actually is.**
+Defaults to `dialog`, this element's original and only shape — zero change for a direct consumer.
+`<rfg-menu>` sets it to `menu`; `<rfg-combobox>` sets it to `listbox`. `aria-haspopup`'s value is
+required to name the popup's own role, so the two can't be decided independently.
 
 **Not a modal**, and the distinction is functional, not visual: it must never trap focus or make
 the rest of the page inert, since a popover's point is usually to stay in context with what it's
@@ -252,6 +309,40 @@ design.md's own reasoning for `<dialog>` over a hand-rolled modal — prefer a c
 implementation over reimplementing a known-hard problem — applies just as directly to collision
 detection; Floating UI is the maintained successor to Popper and what Shoelace/Radix use for the
 same thing.
+
+## `<rfg-menu>`
+
+Implements design.md's Row actions section's kebab/overflow menu: a trigger that opens a list of
+real `role="menuitem"` controls, following the WAI-ARIA menu-button pattern.
+
+**Extends `RfgPopover` as a real JS subclass**, rather than composing an instance of it as a nested
+child — the first version tried composing, and a `<slot>` re-exposed through a second, nested
+`<slot>` (to forward `<rfg-popover>`'s own `trigger`/default slots out through this element's
+shadow root) stopped projecting the moment the panel portalled, for the identical reason
+`<rfg-popover>`'s own header comment above describes. Subclassing means there is only ever one
+shadow boundary (none, since `RfgPopover` already renders into light DOM) and one real set of
+tracked content nodes — no forwarding chain for the portal to break. Inherits every attribute and
+slot `<rfg-popover>` has (`label`, `placement`, `trigger`); `role` is forced to `menu` in the
+constructor rather than exposed as a settable property, since a menu that rendered as anything else
+wouldn't be this component any more.
+
+Adds, on top of the inherited popover behavior: arrow-key navigation between items (Up/Down/Home/
+End), ArrowDown/ArrowUp on the trigger opening straight to the first/last item (the WAI-ARIA APG
+menu-button pattern's own recommendation), and closing on selecting an item.
+
+**Items are plain light-DOM children, any real markup** — real `<a role="menuitem">`/
+`<button role="menuitem">`/a disabled `<span role="menuitem" aria-disabled="true">`, not a
+declarative `<rfg-menu-item>` sub-component. Same split already used for `<rfg-table>` ("Portable
+wrapper, Local markup"): design.md's row-actions case study has per-item logic this component has
+no business knowing — ghost vs. ghost_danger tone, a disabled *form* action rendered as a real
+disabled `<button>` vs. a disabled *link* rendered as a focusable `aria-disabled` `<span>` with
+visible reason text.
+
+**Keyboard focus lands on a disabled item, rather than skipping it** — a deliberate departure from
+the plain WAI-ARIA APG menu default. design.md's own "inert on arrival" rule, already applied
+elsewhere to a disabled link in `<rfg-button>`, is that a control which costs something to reason
+about stays reachable and explains itself rather than vanishing. Selecting a disabled item
+(Enter/Space/click) does nothing and does not close the menu.
 
 ## `<rfg-field>` and `<rfg-error-summary>`
 
@@ -488,6 +579,47 @@ form-participation API instead of a hidden input a host has to wire up.
 visually resembled select2 got clicked expecting a dropdown, and nothing opened. No chevron, no
 dropdown affordance anywhere in this element. Each chip's remove button is a real 24×24px target
 (WCAG 2.5.8), measured against the specific prior incident design.md records (9×21).
+
+## `<rfg-combobox>`
+
+A searchable, single- or multi-select dropdown, replacing the native `<select>`/`<select
+multiple>` it wraps — built to retire select2, still depended on for exactly this need in 14 Human
+Essentials views (design.md already names the friction: manual pixel-matching against
+`.select2-selection`, a stylesheet needing `!important` nothing else in the system does).
+
+| Attribute | Values | Default |
+| --- | --- | --- |
+| `label` | text | — (shown above the box; also the panel's `aria-label`) |
+
+Slot: default (the `<select>`/`<select multiple>` to wrap — `multiple` decides single- vs.
+multi-select mode, the same attribute that already means that natively).
+
+**Wraps a host-provided `<select>`, the same "wrap, don't reimplement" choice `<rfg-field>`
+already makes** — the real `<select>` stays in the DOM (hidden, not removed) as the actual
+form-submitting control, so `simple_form`'s `f.select`/`options_for_select` keeps working
+unchanged and the field still submits something if this component's JS never loads at all.
+Contrast with this element's own `<rfg-tag-input>` neighbour above: that control has no
+pre-existing native equivalent to lean on (free-form comma-separated text isn't a native input
+type) and became its own form-associated element; a `<select>` already *is* the native equivalent
+to this one's need, so wrapping is both less code and a real progressive-enhancement fallback.
+
+**Extends `RfgPopover` (`role="listbox"`), but overrides its content-handling completely** —
+unlike `<rfg-menu>`, which inherits `RfgPopover`'s move-real-content-into-markers mechanism
+unchanged, this component's panel rows are synthesized from the wrapped `<select>`'s current
+`<option>`s and regenerated on every render; there's no real host markup to preserve there the way
+there is for a menu's items, so Lit's own re-rendering is simpler and sufficient.
+
+**Keyboard focus stays on the textbox throughout** — `aria-activedescendant`, not real DOM focus
+moving between options the way `<rfg-menu>` does. A combobox's whole point is typing *while*
+navigating results, which moving real focus away from the input would break; this is the WAI-ARIA
+combobox pattern's own reason for using `aria-activedescendant` rather than the menu-button
+pattern's real-focus-movement, not an oversight carried over from building the menu first.
+
+**Chips (multi-select) reuse `<rfg-tag-input>`'s exact visual vocabulary** — same box/chip
+classes, same 24×24 remove-button target (WCAG 2.5.8) — rather than inventing a second multi-value
+look. Backspace on an empty query removes the last selected chip, the same rule `<rfg-tag-input>`
+already established for the same reason: a box full of chips with nothing typed reads as "edit the
+chips," not "edit the list."
 
 ## Preview
 

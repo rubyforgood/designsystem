@@ -1416,6 +1416,21 @@ recommended by the ARIA menu-button pattern anyway, and now the only reliable wa
 And a spec finds the trigger in the row but **the panel on the page**: `open_row_menu` does this
 for you.
 
+**Update, 2026-11-21 — this exact portal rule is now built into `<rfg-popover>` itself, and
+`<rfg-menu>` is a portable component built on top of it.** The same Material/Carbon/Primer sweep
+that promoted the tooltip above found this kebab menu already fully specified here too, with no
+portable implementation. Building it surfaced a real gap in `<rfg-popover>` the Rails
+`tooltip_controller.js`-style implementation never had to face: a `<slot>` only projects its
+assigned content while it stays inside the physical DOM subtree of its own shadow host, so a first
+attempt at the portal (moving the panel while it still contained one) silently broke real content
+rendering inside it — confirmed against `<rfg-popover>`'s own pre-existing
+`<rfg-date-range-picker>` consumer, not a new one. Fixed by rendering `<rfg-popover>` into light
+DOM instead (the same fix `<rfg-button>` already needed for unrelated reasons) and moving real
+captured children into marker positions rather than slotting them — see `components/README.md`.
+`<rfg-menu>` extends `RfgPopover` as a real subclass (`role="menu"`, arrow-key navigation, closes
+on selecting an item) rather than composing an instance of it, for the same reason: composing
+through a second, forwarded `<slot>` reintroduced the identical breakage one level removed.
+
 **The kebab trigger gets no tooltip.** It is a menu opener rather than an action, `aria-haspopup`
 already identifies it, and "More actions for <this row>" repeated down every row is noise — the menu
 it opens carries the labels.
@@ -1436,6 +1451,17 @@ room the row never had.
 `pw bin/design/tooltip-audit.js` checks all of it — named, tooltipped, no `title`, tooltip agrees
 with the name — and then, once in a real browser, that the bubble appears on keyboard focus, is
 `aria-hidden`, and goes on Escape. **640 icon-only controls across 153 screens, 0 defects.**
+
+**Update, 2026-11-21 — this is now `<rfg-tooltip>`, a portable component (see
+`components/README.md` and the installable-component-layer ADR), not only a Rails/Stimulus
+implementation.** A Material/Carbon/Primer comparison sweep found every rule above already
+documented and already audited, here, in full — but never promoted past the Local
+`tooltip_controller.js` this section was originally written from, despite auditing a pattern that
+every one of those systems ships as a first-class component. `<rfg-tooltip>` is built from that
+exact implementation (same hover/focus/Escape/hoverable behavior, same flip-left/flip-up
+positioning, same aria-hidden-bubble-plus-aria-label rule), not re-derived — the bubble is still
+appended straight to `<body>`, never through the component's own shadow root, for the identical
+reason the portalled-panel rule below exists.
 
 <a id="the-audit-scoped-itself-blind"></a>
 **It used to read `main .cell-actions` on 25 hardcoded pages, and reported 0 defects while there
@@ -4785,6 +4811,46 @@ JS error — while looking nothing like the rest of the app. What it actually ha
 **It did not get shorter, and that is worth recording** because the preview predicted it would:
 1,519px to **1,516px**. The eight bands cost ~368px, almost exactly what two columns save. The
 argument for the rebuild is consistency and the broken markup — not height.
+
+<a id="comboboxes"></a>
+### Comboboxes
+
+```erb
+<%= render "shared/essentials/combobox", label: "Storage location",
+      select: f.select(:storage_location_id, @storage_locations.map { |s| [s.name, s.id] }) %>
+```
+
+A searchable, single- or multi-select dropdown — for a long, closed list of options, picked by
+typing rather than scrolling a native `<select>`. **Local, named as such:** this app's own reason
+it needs one is select2, still depended on for exactly this in 14 views (storage locations, items,
+users on the admin forms and the line-item pickers) — a jQuery dependency from the AdminLTE era
+(ADR 0011) this app hasn't yet fully left behind, and the friction already named elsewhere in this
+document: `.select2-selection` needed its own hand-measured pixel values to line up with everything
+else, and its stylesheet is the one thing in this app's CSS that needs `!important` to win against
+it.
+
+**Portable — wrap the native `<select>`/`<select multiple>`, never reimplement one.** The same
+choice the required-field/validation-error wrapper above already makes for *any* native control: a
+real, host-provided `<select>` stays in the DOM, hidden rather than removed, as the actual
+form-submitting control. `simple_form`'s `f.select`/`options_for_select` output needs no change at
+all to be wrapped this way, and the field still submits something — degraded, but real — if the
+component's JS never loads. Contrast this with the tag input above: free-form comma-separated text
+has no native HTML equivalent to lean on, so that one became its own form-associated custom
+element instead; a `<select>` already *is* the native equivalent here, so wrapping is strictly less
+to build and a real progressive-enhancement fallback, not a nice-to-have.
+
+**Portable — `multiple` on the wrapped `<select>` decides single- vs. multi-select, not a second
+attribute this invents.** A multi-select renders its chosen options as dismissible chips, reusing
+the tag input's own chip/box visual vocabulary rather than a second multi-value look — same
+24×24px remove target (WCAG 2.5.8), same rule that Backspace on an empty, nothing-typed query
+removes the last chip rather than doing nothing.
+
+**Portable — keyboard focus never leaves the textbox.** `aria-activedescendant` points at whichever
+option is currently highlighted, rather than moving real DOM focus the way the row-action menu's
+arrow-key navigation does above — because a combobox's whole point is typing *while* navigating
+results, which moving real focus away from the input would break. This is the WAI-ARIA combobox
+pattern's own reason for the two patterns differing, not an inconsistency between this section and
+the row-actions one.
 
 <a id="callouts"></a>
 ### Callouts

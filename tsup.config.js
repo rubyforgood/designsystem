@@ -33,6 +33,9 @@ const ENTRY = {
   "filter-bar": "components/filter-bar.js",
   pagination: "components/pagination.js",
   "tag-input": "components/tag-input.js",
+  tooltip: "components/tooltip.js",
+  menu: "components/menu.js",
+  combobox: "components/combobox.js",
 };
 
 export default defineConfig([

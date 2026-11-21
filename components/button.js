@@ -344,6 +344,21 @@ export class RfgButton extends LitElement {
     // :scope > * would also match the already-rendered .control, so it's excluded by identity,
     // not by selector — the control is a real, specific element this component itself created.
     const original = [...this.childNodes].filter((n) => n !== this._controlEl);
+
+    // `placeInOrder` moving a node from being a direct child of the host into `.control` is
+    // *itself* a childList mutation on the host (a child was removed), which this own observer
+    // also watches — a self-triggered resync, not a genuine external change. Found live, not
+    // assumed: without this guard, that resync saw zero direct children, reset tracking to
+    // empty, and requested another update on every single render that has an icon or label —
+    // and once, on a real page, enough of that churn made Lit's own render bookkeeping desync
+    // and recreate `.control` entirely (the same class of risk already named for a raw
+    // `innerHTML=` wipe), silently orphaning the host's proxied `data-*`/`aria-*` attributes:
+    // they live on the disconnected original control, never re-set onto its replacement, because
+    // the host had already moved them away and had nothing left to move a second time. If
+    // nothing is left as a direct child but something is already tracked, that's this element's
+    // own placement, not an external one — leave the tracking and the DOM alone.
+    if (original.length === 0 && (this._iconNodes.length > 0 || this._labelNodes.length > 0)) return;
+
     this._iconNodes = original.filter((n) => n.nodeType === 1 && n.getAttribute("slot") === "icon");
     this._labelNodes = original.filter((n) => !this._iconNodes.includes(n));
     this.requestUpdate();
@@ -393,6 +408,17 @@ export class RfgButton extends LitElement {
     }
 
     this._warnIfNoAccessibleName(control);
+  }
+
+  // The host tag itself (`<rfg-button>`) has no `tabindex` and is never the thing that's actually
+  // interactive — `.control` is. Without this override, `.focus()` called on the host (anything
+  // that treats this component as its trigger and wants to return focus to it — `<rfg-popover>`
+  // closing is where this was found, a destructive row action's menu never returning focus after
+  // closing) is a silent no-op: a plain custom element isn't focusable by default, so the call
+  // does nothing and focus is left wherever it happened to be. Delegating here means any caller
+  // can treat this element as focusable the same way a real `<button>`/`<a>` already is.
+  focus(options) {
+    this._controlEl?.focus(options);
   }
 
   _warnIfNoAccessibleName(control) {
