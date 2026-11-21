@@ -52,7 +52,7 @@
 import { LitElement, html, css } from "lit";
 
 const VARIANTS = new Set(["primary", "secondary", "danger", "ghost"]);
-const SIZES = new Set(["sm", "md"]);
+const SIZES = new Set(["sm", "md", "xs"]);
 
 // Attributes the component manages itself as reactive properties — never proxied, since the
 // host and the internal control would otherwise fight over them.
@@ -110,6 +110,24 @@ const STYLES = css`
   rfg-button[size="sm"] .control {
     padding: 0.25rem 0.625rem;
     font-size: 0.8125rem;
+  }
+
+  /* A fixed, icon-only square — not a third point on the padding-based sm/md scale, which is
+     built for variable-width text+icon content and can't land on an exact box size. The box
+     dimension is a token, not a hardcoded number: what size an icon-only control "should" be is
+     app-specific (e.g. matched to a menu-trigger's own height elsewhere on the page), not a
+     portable design-system fact, so this stays a sensible default a consuming app can override,
+     the same way --radius-control etc. already are. No separate icon-size override needed: the
+     control's own font-size, not the box, drives the existing 1em icon-slot rule above.
+     See ADR 14. */
+  rfg-button[size="xs"] .control {
+    width: var(--rfg-button-xs-size, 1.75rem);
+    height: var(--rfg-button-xs-size, 1.75rem);
+    padding: 0;
+    /* ~4:7 of the box, same ratio as the 1.75rem default's 1rem icon — found by actually
+       overriding --rfg-button-xs-size and looking at the result, not assumed: a fixed font-size
+       here left the icon visibly stuck at its default size while the box grew around it. */
+    font-size: calc(var(--rfg-button-xs-size, 1.75rem) * 0.571);
   }
 
   /* Variant axis — what the action means. */
@@ -228,6 +246,7 @@ function placeInOrder(nodes, marker) {
  * @element rfg-button
  * @slot icon - Decorative icon content, marked with `slot="icon"`; sized and positioned ahead of the label.
  * @slot - The button's label (default slot).
+ * @cssprop [--rfg-button-xs-size=1.75rem] - The fixed width/height of `size="xs"`, a compact icon-only control. What this should be is app-specific (e.g. matched to a menu-trigger's own height elsewhere on the page) rather than a portable fact, so it's a token, not a hardcoded number.
  */
 export class RfgButton extends LitElement {
   createRenderRoot() {
@@ -237,7 +256,7 @@ export class RfgButton extends LitElement {
   static properties = {
     /** What the action means — not decided per-button. See design.md's Buttons table. */
     variant: { type: String, reflect: true },
-    /** What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions. */
+    /** What context the button appears in: `sm` inside a table row or dense toolbar, `md` for page/section actions, `xs` for a fixed-size icon-only control (see `--rfg-button-xs-size`). */
     size: { type: String, reflect: true },
     /** Switches the component to link mode: a real `<a>`, for navigation (a GET), never a state-changing action. */
     href: { type: String },

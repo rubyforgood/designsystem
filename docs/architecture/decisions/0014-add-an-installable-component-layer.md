@@ -334,3 +334,34 @@ Human Essentials.
 The `MutationObserver` that already re-syncs content on external DOM mutation (the Turbo/jQuery
 fix from Phase 7) now also watches `attributes: true`, so an attribute a Stimulus controller sets
 on the host *after* first render still gets moved — not just the ones present at connect.
+
+**Update, a token-based compact icon-only size (`size="xs"`).** Human Essentials' icon-only row
+actions (`essentials_row_icon_link`/`essentials_row_icon_action`) were excluded from both migration
+passes above as "a distinct 28px circular treatment, not `<rfg-button>`'s vocabulary." Re-examined
+before building this: the reasoning was overstated. The danger tone is colour-identical to the
+existing `ghost_danger` variant at rest and on hover (only the fixed size and, in the hand-built
+version, the focus-ring colour differ — see below); design.md itself never calls this a protected
+second vocabulary the way it explicitly does for `<rfg-icon-tile>`/`<rfg-avatar>`, framing the 28px
+figure purely as a layout decision (it matches a menu-trigger's own height elsewhere on the page).
+
+The real blocker was structural: `sm`/`md` are padding-based, sized for variable-width text+icon
+content, and the icon itself is fixed at `1em` (tied to the control's `font-size`) — neither
+produces a true, fixed, icon-only square. `<rfg-icon-tile>`'s own `sm` size (exactly `1.75rem`,
+fixed `width`/`height`) was the precedent for how to build one correctly, though that element
+itself is non-interactive and not reusable as-is.
+
+This repo's own portability audit (`docs/portability/design-md-tagging.md`) had already concluded
+the 28px figure itself is Local — derived from one specific app's own menu-trigger height, not a
+portable fact. So the new size's exact dimension is a CSS custom property
+(`--rfg-button-xs-size`, documented with `@cssprop`) with a sensible default (`1.75rem`), not a
+hardcoded number: any consuming app sets its own value rather than inheriting one app's layout
+constant. The icon's size is expressed as `calc(var(--rfg-button-xs-size, 1.75rem) * 0.571)` —
+found necessary by actually overriding the token and looking at the result: a fixed icon size left
+it visibly stuck at its default dimension while the box grew around it, which a fixed-ratio
+`calc()` off the same token fixes, keeping the icon proportioned at any override.
+
+Migrating onto the real `ghost`/`danger` variant CSS (rather than Human Essentials' own separate,
+shared-outline-color `ROW_ICON_CLASSES` rule) fixes a real, pre-existing bug as a side effect: that
+shared rule hardcodes one `focus-visible` outline colour for every tone, so a focused *destructive*
+row-icon button currently shows a brand/indigo ring rather than rose, unlike every other
+destructive control in the app. The component's own `danger` variant already gets this right.

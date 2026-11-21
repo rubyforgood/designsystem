@@ -136,3 +136,51 @@ export const IconOnlyWithLabel = {
       </rfg-button>
     `,
 };
+
+// --- xs: a fixed, icon-only square (size="xs") ---
+
+const TRASH_ICON = html`
+  <svg slot="icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M6 2a1 1 0 0 0-1 1v1H2.5a.5.5 0 0 0 0 1H3v8.5A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5V5h.5a.5.5 0 0 0 0-1H11V3a1 1 0 0 0-1-1H6Zm0 1h4v1H6V3Zm-1.5 2h7.5v8.5a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5V5Z" />
+  </svg>
+`;
+
+export const CompactIconOnly = {
+  name: "xs (fixed-size icon-only, default token value)",
+  render: () => html`<rfg-button variant="ghost" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A fixed 28px square (the `--rfg-button-xs-size` default) — not a third point on the " +
+          "padding-based sm/md scale, which can't land on an exact box size. The exact dimension " +
+          "is an app choice (e.g. matched to a menu-trigger's own height elsewhere on the page), " +
+          "so it's a token, not a hardcoded number — see the next story.",
+      },
+    },
+  },
+};
+
+export const CompactIconOnlyDanger = {
+  name: "xs, danger tone",
+  render: () => html`<rfg-button variant="danger" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
+};
+
+export const CompactIconOnlyOverriddenToken = {
+  name: "xs with --rfg-button-xs-size overridden to 2.5rem",
+  render: () => html`
+    <rfg-button
+      variant="ghost"
+      size="xs"
+      aria-label="Delete"
+      style="--rfg-button-xs-size: 2.5rem;"
+    >${TRASH_ICON}</rfg-button>
+  `,
+  parameters: {
+    docs: {
+      description: {
+        story: "Proves the override actually works, not just that it compiles — a consuming app sets its own value to match its own layout.",
+      },
+    },
+  },
+};
