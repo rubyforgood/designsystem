@@ -1438,9 +1438,20 @@ which breaks the edge-to-edge hover/click target this section's own markup alway
 the panel, each item's own padding running to the panel's full width). `<rfg-combobox>` had already
 solved the identical problem for its own option rows with its own scoped override; `<rfg-menu>`
 now does the same — its own small stylesheet, injected alongside `<rfg-popover>`'s, overriding
-`rfg-menu .rfg-popover-panel` to `0.25rem 0` padding and a `12rem` minimum width (a floor, not
+the panel to `0.25rem 0` padding and a `12rem` minimum width (a floor, not
 `<rfg-segmented-control>`'s kind of fixed token — a consuming app can still widen one with its own
 CSS).
+
+**Correction, same day — the rule above never actually applied.** It was written as `rfg-menu
+.rfg-popover-panel`, a descendant-combinator selector, and never verified against the one state
+that matters: once open, `<rfg-popover>`'s own `open()` portals the panel straight to `<body>`
+unconditionally, so it stops being a descendant of `<rfg-menu>` at all from that moment on —
+confirmed by checking computed styles on a real, open account menu (`padding: 12px`, `<rfg-popover>`'s
+own generic value, not the `4px` this section just described) rather than trusting the earlier
+screenshot, which looked close enough at a glance not to raise suspicion. Fixed by matching the
+panel's own `role="menu"` attribute instead, which travels with it wherever it's portalled. The
+identical bug, same root cause, was found in `<rfg-combobox>`'s own equivalent rule at the same
+time — see that section below.
 
 **The kebab trigger gets no tooltip.** It is a menu opener rather than an action, `aria-haspopup`
 already identifies it, and "More actions for <this row>" repeated down every row is noise — the menu
@@ -4925,6 +4936,17 @@ it just wouldn't submit, a real functional regression for a field specifically m
 changeable. A native `disabled` attribute on the synthesized input is sufficient on its own: a
 disabled input can't receive focus at all, and `open()` is only ever reached through that same
 focus listener.
+
+**A third gap, the most serious of the four, found opening the same view's combobox for the first
+time rather than just reading its markup.** The panel's own `max-height`/`overflow-y`/`min-width`
+rule was written as `rfg-combobox .rfg-popover-panel`, a descendant-combinator selector, and never
+actually applied once open: `<rfg-popover>`'s `open()` portals the panel straight to `<body>`
+unconditionally, so it stops being a descendant of `<rfg-combobox>` at all from that moment —
+confirmed by checking computed styles on a real, open panel (`max-height: none`, `overflow-y:
+visible`, every option rendered at once in a 1900px-tall unbounded list) rather than assumed from
+the CSS text alone. `<rfg-menu>`'s own equivalent rule had the identical bug, found at the same
+time — see that section above. Both fixed by matching the panel's own `role` attribute instead,
+which travels with it wherever it's portalled.
 
 <a id="callouts"></a>
 ### Callouts
