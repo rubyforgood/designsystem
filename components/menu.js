@@ -34,7 +34,36 @@
 // reachable and explains itself rather than vanishing — the same reasoning applies here. Selecting
 // a disabled item (Enter/Space/click) does nothing and does not close the menu; its own disabled-
 // ness already carries that.
+import { css } from "lit";
 import { RfgPopover } from "./popover.js";
+
+const STYLE_ID = "rfg-menu-styles";
+
+// Own small stylesheet, injected alongside `<rfg-popover>`'s — same pattern `<rfg-combobox>`
+// already uses for the same reason: this panel's content (menu items) needs edge-to-edge rows a
+// reader can click anywhere across, not `<rfg-popover>`'s generic 0.75rem inset built for
+// arbitrary dialog-shaped content. Found integrating this component into a real app for the first
+// time: Human Essentials' own hand-built kebab/account menus use `py-1` (a 4px vertical-only
+// inset) with items flush to the panel's left/right edges, and `<rfg-popover>`'s uniform padding
+// would have inset every item's hover background from the edge instead, a real visible regression
+// from what this component was supposed to replace. `min-width` is this component's own sensible
+// default (a short single-word item, "Edit", looked cramped at `0.75rem`'s implied width with
+// nothing else constraining it) — a consuming app can still make an individual menu wider with its
+// own CSS; this is a floor, not a fixed size the way `<rfg-segmented-control>`'s token is.
+const STYLES = css`
+  rfg-menu .rfg-popover-panel {
+    padding: 0.25rem 0;
+    min-width: 12rem;
+  }
+`;
+
+function ensureMenuStylesInjected() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = STYLES.cssText;
+  document.head.appendChild(style);
+}
 
 /**
  * A kebab/overflow menu: a trigger that opens a list of `role="menuitem"` controls — design.md's
@@ -54,6 +83,11 @@ export class RfgMenu extends RfgPopover {
     this._onKeydown = this._onKeydown.bind(this);
     this._onClick = this._onClick.bind(this);
     this._onTriggerKeydown = this._onTriggerKeydown.bind(this);
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    ensureMenuStylesInjected();
   }
 
   _wireTrigger() {

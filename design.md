@@ -1431,6 +1431,17 @@ captured children into marker positions rather than slotting them — see `compo
 on selecting an item) rather than composing an instance of it, for the same reason: composing
 through a second, forwarded `<slot>` reintroduced the identical breakage one level removed.
 
+**Update, 2026-11-21 — `<rfg-menu>` now carries its own panel padding, found migrating Human
+Essentials' real kebab/account menus onto it.** `<rfg-popover>`'s own panel padding (`0.75rem`,
+uniform, built for arbitrary dialog-shaped content) insets a menu's items from the panel edge,
+which breaks the edge-to-edge hover/click target this section's own markup always had (`py-1` on
+the panel, each item's own padding running to the panel's full width). `<rfg-combobox>` had already
+solved the identical problem for its own option rows with its own scoped override; `<rfg-menu>`
+now does the same — its own small stylesheet, injected alongside `<rfg-popover>`'s, overriding
+`rfg-menu .rfg-popover-panel` to `0.25rem 0` padding and a `12rem` minimum width (a floor, not
+`<rfg-segmented-control>`'s kind of fixed token — a consuming app can still widen one with its own
+CSS).
+
 **The kebab trigger gets no tooltip.** It is a menu opener rather than an action, `aria-haspopup`
 already identifies it, and "More actions for <this row>" repeated down every row is noise — the menu
 it opens carries the labels.
