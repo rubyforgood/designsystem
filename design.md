@@ -4912,6 +4912,20 @@ signal every real cause (user interaction, jQuery's `.val().trigger('change')`, 
 programmatic `.value =` followed by a dispatched `change`) already fires, rather than enumerating
 each cause's own DOM shape.
 
+**Two more real gaps, found integrating the same view and a second one right after.** The
+synthesized textbox's `aria-label` fell straight back to a generic `"Options"` whenever `label`
+went unset — true for both views here, which suppress a *visible* label in favor of one already
+carried by the field's own `aria-label` (`f.input ..., label: false, input_html: {"aria-label":
+"Item"}`, several of these repeating in one row) — discarding the specific name the host actually
+asked for. Now falls back to the wrapped `<select>`'s own `aria-label` before the generic string.
+Separately, nothing here read the wrapped select's `disabled` property at all: `line_items`'
+own item picker is conditionally `disabled` (an item pre-filled by a partner request, meant to
+stay locked), and without this the synthesized textbox stayed fully interactive regardless —
+it just wouldn't submit, a real functional regression for a field specifically meant not to be
+changeable. A native `disabled` attribute on the synthesized input is sufficient on its own: a
+disabled input can't receive focus at all, and `open()` is only ever reached through that same
+focus listener.
+
 <a id="callouts"></a>
 ### Callouts
 
