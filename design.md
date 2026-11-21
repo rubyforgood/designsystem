@@ -5057,6 +5057,17 @@ component keeps that arrangement and makes it the only one available.
 `heading: "h2"`, which is what makes eleven collapsed sections navigable by heading rather than
 by tabbing through eleven buttons. A one-off disclosure does not need one.
 
+**Usage pattern: disable every trigger in a set while its surrounding form submits.** When several
+disclosures sit inside one form (the partner-profile accordion, thirteen sections), a trigger stays
+a real, focusable button during submit — nothing here makes it inert on its own — so a second click
+mid-save can reopen a section while the request is in flight. The fix isn't a new component: find
+every trigger in the set (`querySelectorAll('[data-action*="disclosure#toggle"]')` here) and set
+`button.disabled = true` on each before the real submit, same as any other submit-time
+double-click guard. This was evaluated as a candidate for a dedicated grouped-accordion component
+and rejected — the behavior is this specific and this narrow, not a second disclosure component's
+worth of API surface; see [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md)'s
+own account of that evidence pass.
+
 Three copies of this markup existed before it, and they had drifted: only one wrapped its
 trigger in a heading, and only one put its actions outside the button.
 
