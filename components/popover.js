@@ -111,7 +111,16 @@ function placeInOrder(nodes, marker) {
  *
  * @element rfg-popover
  * @slot trigger - The element that opens the panel (typically a `<rfg-button>`), marked `slot="trigger"`.
- * @slot - The panel content.
+ * @slot - The panel content: anything with no `slot` attribute at all.
+ *
+ * Any OTHER explicitly slotted child -- any element carrying a `slot` attribute, whatever its
+ * value -- is treated as trigger-area content: placed beside `slot="trigger"`, in the author's
+ * own order, and never moved into the (collapsed) panel. This is for a `<label>` or a hint that
+ * has to stay visible whether or not the panel is open -- a filter picker's own label and "Up to
+ * 4, leave empty for everything"-style hint, say. Only the element actually marked `slot="trigger"`
+ * gets the click/aria wiring; the rest just rides along positionally. Found integrating into Human
+ * Essentials: a plain, unslotted `<label for="...">` sitting next to the trigger silently landed
+ * inside the panel instead, hidden with it until opened.
  * @fires rfg-open - Dispatched when the panel opens.
  * @fires rfg-close - Dispatched when the panel closes.
  */
@@ -208,7 +217,9 @@ export class RfgPopover extends LitElement {
     );
     if (original.length === 0 && (this._triggerNodes.length > 0 || this._contentNodes.length > 0)) return;
 
-    this._triggerNodes = original.filter((n) => n.nodeType === 1 && n.getAttribute("slot") === "trigger");
+    // Any explicitly slotted element -- any `slot` attribute, not only `slot="trigger"` -- stays
+    // in the trigger area rather than the panel. See the class's own @slot doc above.
+    this._triggerNodes = original.filter((n) => n.nodeType === 1 && n.hasAttribute("slot"));
     this._contentNodes = original.filter((n) => !this._triggerNodes.includes(n));
     this.requestUpdate();
   }
@@ -233,7 +244,10 @@ export class RfgPopover extends LitElement {
   }
 
   _wireTrigger() {
-    const trigger = this._triggerNodes[0];
+    // The one node that actually opens the panel, picked out of the whole trigger-area group by
+    // its specific slot name -- a label or hint riding alongside it must never receive the click
+    // listener or the aria-expanded/aria-controls wiring meant for the real control.
+    const trigger = this._triggerNodes.find((n) => n.getAttribute("slot") === "trigger");
     if (!trigger || trigger === this._trigger) return;
     this._trigger = trigger;
     trigger.setAttribute("aria-haspopup", this.role);

@@ -3952,6 +3952,27 @@ everything that's "in" the page** — the [two-step elevation scale](#spacing-ra
 established under Foundations, applied consistently here rather than accumulating a third,
 unshared step.
 
+**Portable — `noPortal` is a boolean property with an explicit `attribute: "no-portal"`, not Lit's
+default.** Lit's own default attribute-name conversion for a camelCase property just lowercases it
+(`noPortal` → `noportal`); it does not insert a hyphen. Declared without `attribute: "no-portal"`,
+the HTML every consumer actually writes (`no-portal="true"`, matching every other multi-word
+boolean attribute in this codebase and in HTML generally) silently never reached the property —
+found integrating into Human Essentials, where `no-portal="true"` was present in the rendered
+markup, the served JS had the `noPortal`-gated code, and the panel still portalled anyway.
+
+**Portable — anything with a `slot` attribute, not only `slot="trigger"`, stays out of the panel.**
+Any unslotted child is panel content; that was always the rule, and it is right for a menu or a
+combobox's own list of items. But a popover used as a *filter* commonly needs a `<label>` for the
+trigger, and sometimes a hint below it, that must stay visible and readable whether or not the
+panel is open — and the only two buckets the component recognized were "the one clickable trigger"
+and "the panel." An unslotted label landed in the second bucket by elimination, and sat hidden with
+the panel until it opened. The fix widens the trigger-area bucket to anything carrying *any* slot
+name, in the author's own order, while `_wireTrigger` still picks out the specific
+`slot="trigger"` element for the click/aria wiring — so a label or hint rides alongside the
+trigger without being mistaken for it. Found integrating into Human Essentials' date range, month
+range and compare pickers, each of which has a label (and two of which have a hint) beside the
+trigger.
+
 **Portable — a check for an interactive overlay's behavior has to actually open it, not just
 read its closed markup or scan the page as initially loaded.** A defect in open/interaction
 behavior is invisible to any audit that never triggers the interaction — this generalizes past
