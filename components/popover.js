@@ -138,7 +138,7 @@ export class RfgPopover extends LitElement {
      * `static targets` resolving inside the panel, silently lost every target the instant the
      * panel portalled out from under them.
      */
-    noPortal: { type: Boolean },
+    noPortal: { type: Boolean, attribute: "no-portal" },
     /** @ignore */
     _open: { state: true },
   };
