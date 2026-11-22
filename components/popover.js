@@ -235,6 +235,14 @@ export class RfgPopover extends LitElement {
     return `rfg-popover-${this._uid}`;
   }
 
+  // Public, read-only — a consumer wiring its own behavior to this element (a Stimulus controller
+  // on the same host, say) needs to ask "is this open right now" without reaching into `_open`,
+  // which is a Lit-internal convention (the leading underscore), not a contract. Named `isOpen`,
+  // not `open`, so it can't collide with the method above.
+  get isOpen() {
+    return this._open;
+  }
+
   async open() {
     if (this._open || !this._trigger) return;
     this._open = true;
@@ -243,6 +251,18 @@ export class RfgPopover extends LitElement {
     this._portal();
     await this._reposition();
     this._addDocListeners();
+    // Moves focus into the panel, same as the dialog pattern this panel shares the rest of its
+    // contract with (Escape, outside-click, portal) already asks for. `<rfg-menu>` overrides this
+    // method and focuses its own first item instead, afterward — this still runs first there, but
+    // harmlessly, since nothing inside a menu panel matches `[role="menuitem"]` *and* this
+    // selector at once by accident. `<rfg-combobox>` never reaches this at all with anything to
+    // focus: its own panel holds `role="option"` rows with no tabindex, and real focus never
+    // leaves its textbox in the first place (the WAI-ARIA combobox pattern's own reason), so the
+    // query below simply finds nothing there.
+    const first = this._panelEl?.querySelector(
+      "input:not([type=hidden]), select, textarea, button, [href], [tabindex]:not([tabindex='-1'])",
+    );
+    first?.focus();
     this.dispatchEvent(new CustomEvent("rfg-open", { bubbles: true, composed: true }));
   }
 

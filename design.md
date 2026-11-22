@@ -3919,6 +3919,18 @@ something a hand-rolled implementation tends to get wrong:
   navigation.
 - **Portable.** The panel repositions (flips, shifts) to stay within the viewport rather than
   extending past its edge, computed from the trigger's actual position at open time.
+- **Portable.** Opening moves focus into the panel, onto its first focusable control — the same
+  half of the dialog contract "Escape returns focus to the trigger" already names, completed. A
+  consumer that needs something more specific (a menu focusing its first item, a combobox whose
+  focus never leaves its own textbox in the first place) overrides this rather than fighting it;
+  the default exists for the common case, a dialog-shaped panel holding ordinary controls.
+
+**Local, but worth naming: a consumer wiring its own behavior to this element asks `isOpen`, not
+`_open`.** The leading underscore on the component's own internal state is a Lit convention, not a
+contract — a real, public, read-only accessor is the actual seam for "is this open right now,"
+needed the moment anything outside the component (a framework's own behavior layer attached to the
+same host element, say) has to react to that state without reaching into an implementation
+detail.
 
 **Portable — everything visually "above" the page shares one elevation treatment, distinct from
 everything that's "in" the page** — the [two-step elevation scale](#spacing-radius-elevation)
