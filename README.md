@@ -49,8 +49,9 @@ npm install github:rubyforgood/designsystem
 @import "@rubyforgood/design-system/tokens/theme.css";
 ```
 
-Once this is published to the registry, `npm install @rubyforgood/design-system` will work the
-same way and this page will be updated to lead with that instead.
+Once a first release is cut through `.github/workflows/release.yml` (see Status below),
+`npm install @rubyforgood/design-system` will work the same way and this page will be updated to
+lead with that instead.
 
 That gives you the shipped default palette (indigo, Figtree, a 4px scale). Retheme by overriding
 the same token names; see [`tokens/README.md`](tokens/README.md) for which parts are load-bearing
@@ -113,7 +114,10 @@ without cloning. See `components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
 This has not been published to the npm registry yet; install straight from GitHub in the meantime
-(see "Using the tokens" above).
+(see "Using the tokens" above). A release workflow exists now
+(`.github/workflows/release.yml`, [ADR 15](docs/architecture/decisions/0015-publish-to-npm-via-a-tag-triggered-release-workflow.md)) —
+pushing a `vX.Y.Z` tag builds and publishes — but nobody has cut a first release through it yet,
+and doing so needs an `NPM_TOKEN` repository secret that doesn't exist yet either.
 
 ## History
 

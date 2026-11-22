@@ -29,7 +29,8 @@
     "design.md",
     "LICENSE",
     "components/README.md",
-    "dist/"
+    "dist/",
+    "custom-elements.json"
   ],
   "exports": {
     "./components/button": {

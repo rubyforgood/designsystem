@@ -1,0 +1,80 @@
+name: release
+
+# Tag-triggered, not on every push to main (that's deploy-storybook's job) -- a release is a
+# deliberate act: bump "version" in package.json, commit, then
+#
+#   git tag vX.Y.Z && git push origin vX.Y.Z
+#
+# workflow_dispatch exists only to re-run a release that failed partway (npm publish is the one
+# step that can't simply be re-run blind -- see the version-match guard below -- so re-running
+# this workflow against the same already-pushed tag is the recovery path, not a second tag).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+# id-token: write is for npm's build provenance attestation (--provenance below), not for
+# authentication -- this package has never been published, and a brand-new package can't be
+# configured for npm's OIDC-based Trusted Publishing until after a first, token-authenticated
+# publish exists for its settings page to attach to. NPM_TOKEN (an npm "Automation" access token,
+# added as a repository secret) is what actually authenticates. contents: write is for the
+# GitHub release this workflow creates from the tag.
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Catches the one mistake this workflow can't recover from gracefully: a tag pushed before
+      # package.json's own "version" was bumped to match it. npm publish would otherwise either
+      # publish the wrong version number or (if that version was already published) fail with a
+      # registry error far less clear than this.
+      - name: Tag matches package.json version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "Tag $GITHUB_REF_NAME (version $tag) does not match package.json's version $pkg." >&2
+            echo "Bump package.json's version, commit it, then re-tag." >&2
+            exit 1
+          fi
+
+      # dist/ (tsup) and custom-elements.json (cem analyze) are both gitignored, build artifacts
+      # regenerated here same as checks.yml's components-build job already does -- never committed,
+      # so a release built from anything other than a fresh build would ship whatever the runner's
+      # previous job happened to leave behind.
+      - name: Build components
+        run: npm run build
+
+      - name: Generate the custom elements manifest
+        run: npm run analyze
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # --generate-notes asks GitHub to build the release body from merged PRs/commits since the
+      # previous tag -- this repo has no CHANGELOG.md of its own to pull from instead, and the
+      # evidence this project already keeps (docs/field-notes.md, docs/design-decisions.md-style
+      # trails in its origin app) is prose aimed at a contributor, not a changelog aimed at a
+      # consumer deciding whether to upgrade.
+      - name: Create the GitHub release
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 && exit 0
+          gh release create "$GITHUB_REF_NAME" --generate-notes --title "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
