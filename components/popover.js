@@ -127,6 +127,18 @@ export class RfgPopover extends LitElement {
     placement: { type: String },
     /** The panel's ARIA role, and what `aria-haspopup` on the trigger names — `dialog` (default), `menu`, or `listbox`. */
     role: { type: String },
+    /**
+     * Skips portalling the panel to `<body>` while open. Set this when nothing in the ancestor
+     * chain creates a stacking context the panel would otherwise need to escape (no
+     * `position: sticky`/`fixed` ancestor) — portalling has a real cost this element cannot see
+     * from inside itself: anything watching the panel's *own* subtree for changes (a framework's
+     * own behavior layer attached to this element, tracking its descendants) stops seeing it the
+     * moment it becomes a `<body>` child instead, since that is a different subtree entirely.
+     * Found integrating this into a real app: Stimulus controllers attached to this element, with
+     * `static targets` resolving inside the panel, silently lost every target the instant the
+     * panel portalled out from under them.
+     */
+    noPortal: { type: Boolean },
     /** @ignore */
     _open: { state: true },
   };
@@ -283,7 +295,7 @@ export class RfgPopover extends LitElement {
   // of DOM nesting, so moving the element changes nothing about the positioning math below —
   // only the ancestor chain stacking contexts resolve against, which is the entire point.
   _portal() {
-    if (!this._panelEl || this._placeholder) return;
+    if (!this._panelEl || this._placeholder || this.noPortal) return;
     this._placeholder = document.createComment("rfg-popover-panel");
     this._panelEl.before(this._placeholder);
     document.body.appendChild(this._panelEl);

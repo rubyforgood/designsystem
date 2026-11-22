@@ -3932,6 +3932,21 @@ needed the moment anything outside the component (a framework's own behavior lay
 same host element, say) has to react to that state without reaching into an implementation
 detail.
 
+**Portable — the portal-to-`<body>` fix is opt-out (`noPortal`), not unconditional, because it has
+a real cost the component cannot see from inside itself.** The fix exists to escape an ancestor's
+stacking context (a `position: sticky`/`fixed` cell trapping the panel underneath something else) —
+but nothing here needs escaping when no such ancestor exists, and portalling the panel in that case
+only moves its content out of any *other* subtree-scoped observer watching it, for nothing in
+return. Found live, not assumed, integrating this element with Stimulus controllers for the first
+time: a controller attached to this same host element, with `static targets` resolving inside the
+panel, silently lost every target the instant the panel portalled out from under it — Stimulus's
+own target tracking is scoped to the controller's host subtree, and a `<body>`-child panel is a
+different subtree entirely. The same reasoning that argues for portalling by default (most
+consumers *do* sit inside a trapping ancestor, and the failure mode without it — a menu or dropdown
+rendering underneath something else — is worse and less obvious than opting out when it turns out
+unnecessary) argues for keeping the *default* unconditional; `noPortal` is the escape hatch for the
+real, found exception, not a reason to flip the default.
+
 **Portable — everything visually "above" the page shares one elevation treatment, distinct from
 everything that's "in" the page** — the [two-step elevation scale](#spacing-radius-elevation)
 established under Foundations, applied consistently here rather than accumulating a third,
