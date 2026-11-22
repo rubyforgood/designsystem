@@ -1,5 +1,8 @@
 # Ruby For Good Design System
 
+**Storybook: <https://rubyforgood.github.io/designsystem/>** — every component, previewable, no
+clone required. Redeployed on every push to `main` by `.github/workflows/deploy-storybook.yml`.
+
 Ruby For Good's global design system. Any application in the Ruby For Good ecosystem (or outside
 it) can migrate its UI onto this system using [`design.md`](design.md), the [design
 tokens](tokens/), an installable [component layer](components/) built as Web Components, the
@@ -21,6 +24,7 @@ portable beyond the app it was first found on, including where it turned out *no
 | [`design.md`](design.md) | The spec. Every rule is tagged **Portable** (holds on any app) or **Local** (this project's own answer: the practice of deciding may transfer, the specific value doesn't). See [`docs/portability/design-md-tagging.md`](docs/portability/design-md-tagging.md) for the full breakdown. |
 | [`tokens/`](tokens/) | Design tokens as a Tailwind v4 `@theme` block: colour, type, spacing, radius, elevation, with the Portable rule and the Local default value stated separately for each. |
 | [`components/`](components/README.md) | An installable Web Components layer (Lit) implementing `design.md`'s Components section in code — `npm install`-able or copy a single standalone file. Early: only `<rfg-button>` exists so far. See [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md). |
+| [Storybook](https://rubyforgood.github.io/designsystem/) | Every component, live and previewable in a browser — no clone required. Redeployed on every push to `main`. |
 | [`bin/design/`](bin/design/README.md) | ~40 executable audits (WCAG conformance, copy quality, dead code, and more) built on an adapter seam: point one small file (`targets.js`) at your app and most of the suite runs unmodified. |
 | [`examples/reference-app/`](examples/reference-app/) | A second, deliberately non-Rails adapter target: proof (and, honestly, some disproof) that the adapter claim holds. See [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md). |
 | [`docs/field-notes.md`](docs/field-notes.md) | The evidence index: what's measured, what's historical, and the rule for not citing another app's own numbers as claims about your app. |
