@@ -42,11 +42,22 @@ portable beyond the app it was first found on, including where it turned out *no
 | [`examples/reference-app/`](examples/reference-app/) | A second, deliberately non-Rails adapter target: proof (and, honestly, some disproof) that the adapter claim holds. See [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md). |
 | [`docs/field-notes.md`](docs/field-notes.md) | The evidence index: what's measured, what's historical, and the rule for not citing another app's own numbers as claims about your app. |
 | [`docs/portability/`](docs/portability/) | The genericization work itself: what's proven portable, what's still Local, what's an honest known gap. |
-| [`.claude/skills/`](.claude/skills/) | The methodology as Claude Code skills: `design-system-migration`, `audit-suite`, `wcag-conformance`, `evidence-discipline`, `session-durability`. Not published to npm; available in this repository. |
+| [`plugin/`](plugin/) | The methodology as a Claude Code plugin with five skills: `design-system-migration`, `audit-suite`, `wcag-conformance`, `evidence-discipline`, `session-durability`. Install it without cloning this repo (see below). Inside this repo, `.claude/skills/` links to the same files. |
 
 ## Migrating an app onto this system
 
-Load the `design-system-migration` skill in Claude Code and point it at the app you're migrating.
+First install the skills into Claude Code, from inside any project:
+
+```
+/plugin marketplace add rubyforgood/designsystem
+/plugin install design-system@rubyforgood
+```
+
+This downloads only the `plugin/` folder (about 150 KB), not the whole repository. The skills
+appear as `design-system:design-system-migration`, `design-system:audit-suite` and so on. To get
+updates later, run `/plugin marketplace update rubyforgood`.
+
+Then load the `design-system-migration` skill in Claude Code and point it at the app you're migrating.
 It works from `design.md` as the normative spec, researches how the app's current UI compares,
 previews changes before building them, applies fixes app-wide rather than screen-by-screen, and
 wires up an executable audit so a fixed defect can't silently come back. `audit-suite` and

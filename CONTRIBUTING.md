@@ -25,11 +25,14 @@ else's app. These rules keep that safe. Read [README.md](README.md) first for wh
 4. **Back up a claim with a measurement.** If a doc says something passes, or gives a number,
    it should be something you ran, with the date. If an audit passes, check that it would also
    fail on a broken page. The `audit-suite` and `evidence-discipline` skills in
-   [`.claude/skills/`](.claude/skills/) explain how.
-5. **CI must pass** (`.github/workflows/checks.yml`): syntax checks, the seam check, the doc-link
+   [`plugin/skills/`](plugin/skills/) explain how.
+5. **Changing a skill?** Edit it in `plugin/skills/` (`.claude/skills` is a link to that folder)
+   and bump `version` in `plugin/.claude-plugin/plugin.json`. Installed copies only update when
+   that version changes.
+6. **CI must pass** (`.github/workflows/checks.yml`): syntax checks, the seam check, the doc-link
    and citation audits, the components and Storybook builds, the accessibility and keyboard audits
    against the stories, and the reference-app known-outcomes harness.
-6. **Say whether it's a breaking change** in the pull request description (see below).
+7. **Say whether it's a breaking change** in the pull request description (see below).
 
 ## Versioning while we're on 0.x
 

@@ -81,7 +81,12 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   them, not because this repo's own direction depends on them), and the mockup set under
   `mockups/`.
 - `videos/` — before/after reference material (e.g. a pre-migration recording of a sibling app).
-- `.claude/skills/` —
+- `plugin/` — the Claude Code plugin adopters install (`/plugin marketplace add
+  rubyforgood/designsystem`, then `/plugin install design-system@rubyforgood`; the marketplace
+  manifest is `.claude-plugin/marketplace.json`). Its skills live in `plugin/skills/`, and
+  `.claude/skills` is a symlink to that folder so they also load when working in this repo. Edit
+  them in `plugin/skills/`, and bump `version` in `plugin/.claude-plugin/plugin.json` when you
+  change them, or installed copies won't update.
   - `design-system-migration` — the overall way of working: spec first, research industry
     precedent, preview before building, apply fixes broadly, enforce with executable audits.
   - `audit-suite` — writing checks you can actually trust (provenance, positive/negative controls,

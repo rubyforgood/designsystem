@@ -1,0 +1,18 @@
+{
+  "name": "design-system",
+  "version": "0.1.0",
+  "description": "Ruby For Good's design system skills: migrate an app's UI onto a normative spec, write audits you can trust, audit WCAG 2.2 A/AA, keep documented claims true, and keep long sessions from losing work.",
+  "author": {
+    "name": "Ruby For Good"
+  },
+  "homepage": "https://github.com/rubyforgood/designsystem",
+  "repository": "https://github.com/rubyforgood/designsystem",
+  "license": "MIT",
+  "keywords": [
+    "design-system",
+    "accessibility",
+    "wcag",
+    "audits",
+    "migration"
+  ]
+}

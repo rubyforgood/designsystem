@@ -1,0 +1,16 @@
+{
+  "name": "rubyforgood",
+  "owner": {
+    "name": "Ruby For Good"
+  },
+  "metadata": {
+    "description": "Ruby For Good's design system plugins for Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "design-system",
+      "source": "./plugin",
+      "description": "Skills for migrating an app onto Ruby For Good's design system and keeping it there."
+    }
+  ]
+}
