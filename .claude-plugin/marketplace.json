@@ -9,7 +9,11 @@
   "plugins": [
     {
       "name": "design-system",
-      "source": "./plugin",
+      "source": {
+        "source": "git-subdir",
+        "url": "rubyforgood/designsystem",
+        "path": "plugin"
+      },
       "description": "Skills for migrating an app onto Ruby For Good's design system and keeping it there."
     }
   ]
