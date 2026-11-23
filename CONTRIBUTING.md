@@ -47,6 +47,14 @@ The package follows [semantic versioning](https://semver.org) and is still pre-1
 - **Every breaking change is listed** in that version's release notes, with what to change in the
   app. The [GitHub releases](https://github.com/rubyforgood/designsystem/releases) are the
   changelog. `docs/changelog.md` is Human Essentials' own history, not this package's.
+- **Deprecate before removing, when it's cheap to.** If a renamed attribute, slot or token can
+  keep working, leave the old name working for one more minor release and log a console warning
+  naming its replacement. Remove it in the release after that. Apps then upgrade first and fix
+  the warnings in their own time, rather than having both land on the same day. Where keeping the
+  old behaviour would be costly or confusing, skip this and say so in the release notes.
+- **Tell adopting apps before a breaking release ships**, not only in its release notes. Open an
+  issue on each adopting app's repo, or post in its channel, saying what will change and in which
+  version.
 - **Apps pin an exact version**, as the README's Rails steps do, so nobody gets a breaking
   change without choosing to upgrade.
 
