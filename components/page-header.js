@@ -72,14 +72,12 @@ export class RfgPageHeader extends LitElement {
       outline-offset: 2px;
     }
 
+    /* The 8px gap to a preceding back link comes from .titles' \`gap\` alone. Fixed in v0.1.3:
+       this also had \`margin-top: 0.5rem\`, which added to the gap and made it 16px. */
     .heading-block {
       display: flex;
       flex-direction: column;
       gap: 0.125rem;
-      margin-top: 0.5rem; /* the 8px gap to a preceding back link */
-    }
-    .heading-block:first-child {
-      margin-top: 0;
     }
 
     h1 {

@@ -25,7 +25,7 @@ export default {
           "- Follows the WAI-ARIA menu button pattern. The trigger gets `aria-haspopup=\"menu\"` and `aria-expanded`.",
           "- Down Arrow or Up Arrow on the trigger opens the menu on the first or last item. Inside the menu, Up Arrow, Down Arrow, Home and End move between items. Escape closes it and returns focus to the trigger. Choosing an item closes the menu.",
           "- Disabled items stay reachable by keyboard so people can read why they're unavailable. Choosing one does nothing.",
-          "- You provide the items as real `<a role=\"menuitem\">` or `<button role=\"menuitem\">` elements. For a disabled link, use `<span role=\"menuitem\" aria-disabled=\"true\" tabindex=\"0\">`.",
+          "- You provide the items as real `<a role=\"menuitem\">` or `<button role=\"menuitem\">` elements. For a disabled item, use `aria-disabled=\"true\"`, never the `disabled` attribute: a natively disabled button can't take focus, so the menu skips it and nobody can read why it's unavailable. For a disabled link, use `<span role=\"menuitem\" aria-disabled=\"true\" tabindex=\"0\">`.",
           "- Give the menu a `label` and an icon-only trigger an `aria-label`, such as \"Actions for Website redesign\".",
           "",
           "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#row-actions)",
@@ -69,7 +69,7 @@ export const WithADisabledItem = {
     <rfg-menu label="Actions for Annual report">
       <rfg-button slot="trigger" variant="ghost" size="xs" aria-label="Actions for Annual report">⋮</rfg-button>
       <a role="menuitem" href="#edit" style=${ITEM_STYLE}>Edit</a>
-      <button role="menuitem" type="button" disabled style=${ITEM_STYLE + "opacity: 0.6; cursor: not-allowed;"}>
+      <button role="menuitem" type="button" aria-disabled="true" style=${ITEM_STYLE + "opacity: 0.6; cursor: not-allowed;"}>
         Archive
         <span style="display: block; font-size: 0.75rem; font-weight: 400;">
           Can't archive a project with open tasks

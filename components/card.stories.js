@@ -14,7 +14,7 @@ export default {
           "",
           "**When to use**",
           "- To group a self-contained block of content, such as a table, a form section or a summary.",
-          "- Set `padded` to false when the body, such as a table, should run to the card's edges.",
+          "- Set `padded=\"false\"` when the body, such as a table, should run to the card's edges.",
           "- Leave out the heading, subtitle and actions when you only need the surface. No header is drawn.",
           "",
           "**When not to use**",
@@ -32,7 +32,7 @@ export default {
   },
   render: (args) =>
     html`
-      <rfg-card heading=${args.heading || undefined} subtitle=${args.subtitle || undefined} ?padded=${args.padded}>
+      <rfg-card heading=${args.heading || undefined} subtitle=${args.subtitle || undefined} padded=${args.padded ? "true" : "false"}>
         Card body content goes here.
       </rfg-card>
     `,
@@ -72,7 +72,7 @@ export const Unpadded = {
   },
   render: () =>
     html`
-      <rfg-card heading="Projects" ?padded=${false}>
+      <rfg-card heading="Projects" padded="false">
         <div style="padding: 0.5rem 1.25rem; font-family: var(--font-sans); font-size: 0.875rem;">
           A table-shaped body that should reach the card's edges.
         </div>

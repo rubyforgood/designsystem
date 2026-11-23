@@ -12,7 +12,8 @@
 
 ROOT = File.expand_path("../..", __dir__)
 
-SKIP = %r{\A(videos/|package-lock\.json|custom-elements\.json|storybook-static/|dist/)}
+# This file is skipped too: its patterns and comments name the British spellings it looks for.
+SKIP = %r{\A(videos/|package-lock\.json|custom-elements\.json|storybook-static/|dist/|bin/design/spelling-audit\.rb\z)}
 BINARY = /\.(mp4|png|jpe?g|gif|ico|woff2?|pdf|tgz)\z/
 
 # Word-level patterns. Each is matched case-insensitively against whole words (hyphenated

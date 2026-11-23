@@ -16,14 +16,97 @@
 // blocking with an error.
 //
 // design.md's documented fix for the From/To fields' `change` bubbling into a wrapping filter
-// form's own submit doesn't apply here the way it did originally: these inputs render inside this
-// element's own shadow DOM (not slotted from light DOM), and a native `change` event's `composed`
-// flag is `false` by default — it already can't cross the shadow boundary to reach a host page's
-// form listener. Same shadow-DOM-makes-a-documented-gotcha-moot shape as modal.js's `margin: auto`
-// note.
+// form's own submit doesn't apply here: while the panel is open, `<rfg-popover>` has moved it to
+// <body>, outside any form that wraps this element, so the inputs' `change` events can't reach
+// that form's listeners. (An earlier version of this comment credited the shadow boundary; that
+// stopped being the reason once the panel moved to <body>.)
 import { LitElement, html, css } from "lit";
 import "./popover.js";
 import "./button.js";
+
+// The panel's styles live in a light-DOM stylesheet, injected once per document, not in
+// `static styles`. `<rfg-popover>` moves its panel content to <body> while open (so a sticky or
+// overflow-hidden ancestor can't clip it), which takes it out of this element's shadow root and
+// out of reach of its styles. Fixed in v0.1.3: v0.1.0–0.1.2 kept these rules in `static styles`,
+// so the open panel had none of them (measured: `.panel` was `display: block`, the presets had no
+// divider, and the current preset showed the browser's default button gray, not --color-brand-50).
+// The same pattern as <rfg-menu>'s panel styles; class names are prefixed `rfg-drp-` so they can't
+// collide with the host app's.
+const STYLE_ID = "rfg-date-range-picker-styles";
+const PANEL_STYLES = css`
+  .rfg-drp-panel {
+    display: flex;
+    gap: 1rem;
+    font-family: var(--font-sans);
+  }
+
+  .rfg-drp-presets {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 9rem;
+    border-right: 1px solid var(--color-neutral-200);
+    padding-right: 1rem;
+  }
+
+  .rfg-drp-preset {
+    appearance: none;
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-control);
+    font-size: 0.8125rem;
+    color: var(--color-neutral-700);
+    cursor: pointer;
+  }
+  .rfg-drp-preset:hover {
+    background: var(--color-neutral-100);
+  }
+  .rfg-drp-preset[aria-current="true"] {
+    background: var(--color-brand-50);
+    color: var(--color-brand-700);
+    font-weight: 500;
+  }
+  .rfg-drp-preset:focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: -2px;
+  }
+
+  .rfg-drp-custom {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .rfg-drp-custom label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-neutral-500);
+  }
+
+  .rfg-drp-custom input {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid var(--color-neutral-200);
+    border-radius: var(--radius-control);
+  }
+  .rfg-drp-custom input:focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+`;
+
+function ensurePanelStylesInjected() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = PANEL_STYLES.cssText;
+  document.head.appendChild(style);
+}
 
 /**
  * One trigger showing the current range, a popover of presets and two native date inputs —
@@ -50,71 +133,6 @@ export class RfgDateRangePicker extends LitElement {
     :host {
       display: inline-block;
     }
-
-    .panel {
-      display: flex;
-      gap: 1rem;
-      font-family: var(--font-sans);
-    }
-
-    .presets {
-      display: flex;
-      flex-direction: column;
-      gap: 0.125rem;
-      min-width: 9rem;
-      border-right: 1px solid var(--color-neutral-200);
-      padding-right: 1rem;
-    }
-
-    .preset {
-      appearance: none;
-      background: none;
-      border: none;
-      text-align: left;
-      padding: 0.375rem 0.5rem;
-      border-radius: var(--radius-control);
-      font-size: 0.8125rem;
-      color: var(--color-neutral-700);
-      cursor: pointer;
-    }
-    .preset:hover {
-      background: var(--color-neutral-100);
-    }
-    .preset[aria-current="true"] {
-      background: var(--color-brand-50);
-      color: var(--color-brand-700);
-      font-weight: 500;
-    }
-    .preset:focus-visible {
-      outline: 2px solid var(--color-brand-600);
-      outline-offset: -2px;
-    }
-
-    .custom {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .custom label {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      font-size: 0.75rem;
-      color: var(--color-neutral-500);
-    }
-
-    .custom input {
-      font-family: var(--font-sans);
-      font-size: 0.875rem;
-      padding: 0.375rem 0.5rem;
-      border: 1px solid var(--color-neutral-200);
-      border-radius: var(--radius-control);
-    }
-    .custom input:focus-visible {
-      outline: 2px solid var(--color-brand-600);
-      outline-offset: 2px;
-    }
   `;
 
   constructor() {
@@ -123,6 +141,11 @@ export class RfgDateRangePicker extends LitElement {
     this.start = "";
     this.end = "";
     this._debounceHandle = null;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    ensurePanelStylesInjected();
   }
 
   willUpdate(changed) {
@@ -187,12 +210,12 @@ export class RfgDateRangePicker extends LitElement {
     return html`
       <rfg-popover label="Date range">
         <rfg-button slot="trigger" variant="secondary" size="sm">${this._triggerLabel()}</rfg-button>
-        <div class="panel">
-          <div class="presets">
+        <div class="rfg-drp-panel">
+          <div class="rfg-drp-presets">
             ${this.presets.map(
               (p) => html`
                 <button
-                  class="preset"
+                  class="rfg-drp-preset"
                   type="button"
                   aria-current=${p === matching}
                   @click=${() => this._selectPreset(p)}
@@ -202,7 +225,7 @@ export class RfgDateRangePicker extends LitElement {
               `,
             )}
           </div>
-          <div class="custom">
+          <div class="rfg-drp-custom">
             <label>
               From
               <input type="date" .value=${this._draftStart || ""} @input=${(e) => { this._draftStart = e.target.value; this._onCustomInput(); }} />

@@ -58,6 +58,16 @@ Neither was caught before because axe and the keyboard audit don't check either 
 story-level check (computed `text-align` on a `numeric` cell; `control.form` non-null) would catch
 both again.
 
+## Behavior checks for every component: done, and they found five more bugs
+
+*About this repo, not Human Essentials.* Added and closed 2026-11-23.
+
+`bin/design/adapters/storybook/behavior-checks/` now has a file for each of the 29 components (436
+checks, in CI). Writing them found bugs in the tooltip, date range picker, card, page header and
+the menu story, all fixed in v0.1.3. See
+[`adapter-storybook.md`](portability/adapter-storybook.md). Not covered yet: a flash message
+pausing its timer on focus (only hover is checked), and tab panels' own `tabindex`.
+
 ## Test suite
 
 **Three flakes fixed on 2026-09-04, and eight consecutive clean runs since.** Before them, 15

@@ -133,6 +133,15 @@ this component's own tree sidesteps the problem by construction. Ported from Hum
 dismisses without moving the pointer; moving the pointer onto the bubble itself doesn't dismiss it)
 and the flip-left/flip-up positioning a frozen actions column makes routine.
 
+**Fixed in v0.1.3: hoverable and dismissible for a real pointer.** v0.1.0–0.1.2 hid the bubble the
+moment the pointer left the trigger. A test that jumped the pointer straight onto the bubble passed,
+but a real pointer crosses the 8px gap between them and lost the bubble on the way (WCAG 1.4.13
+"hoverable"). Also, only the trigger listened for the pointer leaving, so once the pointer was on
+the bubble, moving off it never hid it. Now leaving the trigger or the bubble starts a 150ms hide,
+entering the bubble cancels it, and the bubble hides when the pointer leaves it. Found by
+`component-behavior-audit.js` moving the pointer in 20 steps rather than jumping; that check fails
+against v0.1.2.
+
 ## `<rfg-status-pill>`
 
 Implements the "Status pills" section: communicates state, never an action — never focusable,
@@ -182,7 +191,7 @@ when there's something in it, via `slotchange`, not assumed from attributes alon
 | Attribute | Values | Default | Notes |
 | --- | --- | --- | --- |
 | `heading` / `subtitle` | text | — | Header renders only if either is set or `actions` has content. |
-| `padded` | boolean | `true` | `false` when the body (e.g. a table) should meet the card edges. |
+| `padded` | `"false"` to turn off | on | `padded="false"` when the body (e.g. a table) should meet the card edges. (Fixed in v0.1.3: before, `padded="false"` left padding on; only setting the `.padded` property worked.) |
 
 Slots: default (body), `actions` (header, right-aligned), `footer`.
 
@@ -225,7 +234,7 @@ Implements "Page header". Owns the page's only `<h1>` — a host shouldn't rende
 | `subtitle` | text | — |
 | `back-href` / `back-label` | a URL / text | — |
 
-The back link and title sit as one block with an 8px gap.
+The back link and title sit as one block with an 8px gap. (Fixed in v0.1.3: it measured 16px, because a flex gap and a margin both added 8px.)
 
 Slot: `actions` (right-aligned). Alignment is derived from whether `subtitle` is set, not a
 separate attribute to keep in sync by hand: no subtitle aligns the row to `flex-end` (a 40px
@@ -407,6 +416,12 @@ elsewhere to a disabled link in `<rfg-button>`, is that a control which costs so
 about stays reachable and explains itself rather than vanishing. Selecting a disabled item
 (Enter/Space/click) does nothing and does not close the menu.
 
+
+**Use `aria-disabled="true"` for a disabled item, never the `disabled` attribute.** A natively
+disabled button can't take focus, so the arrow keys skip it and nobody using a keyboard or screen
+reader can find out why it's unavailable. `aria-disabled` keeps it reachable, and the menu ignores
+clicks on it. Corrected 2026-11-23: the "Disabled items with a reason" story used `disabled` on its
+button while its description said both items stayed reachable.
 ## `<rfg-field>` and `<rfg-error-summary>`
 
 Implements "Forms: required fields and validation errors" — one of design.md's densest,
@@ -500,11 +515,19 @@ setting From then To costs one commit, not two) and leaves the popover open; an 
 range (End before Start) is silently swapped rather than blocked with an error — checked across
 two separate inversions in the same session, not just one.
 
+**The panel's styles are a light-DOM stylesheet, injected once per document**
+(`#rfg-date-range-picker-styles`, classes prefixed `rfg-drp-`). Fixed in v0.1.3: `<rfg-popover>`
+moves the panel to `<body>` while it's open, out of this element's shadow root, so styles in
+`static styles` never reached it. In v0.1.0–0.1.2 the open panel was unstyled: measured as
+`display: block` instead of presets beside the dates, no divider, and the current preset in the
+browser's default button gray instead of `--color-brand-50`. Same class of bug as `<rfg-table>` in
+v0.1.0.
+
 design.md's documented fix for the From/To fields' `change` event bubbling into a wrapping filter
-form's own submit doesn't apply here: these inputs render inside this element's own shadow DOM
-(not slotted from light DOM), and a native `change` event's `composed` flag is `false` by
-default — it already can't cross the shadow boundary to reach a host page's form listener. Same
-shadow-DOM-makes-a-documented-gotcha-moot shape as `<rfg-modal>`'s `margin: auto` note.
+form's own submit doesn't apply here: while the panel is open it lives in `<body>`, outside any
+form that wraps this element, so the inputs' `change` events can't reach that form's listeners.
+(Corrected 2026-11-23: this used to credit the shadow boundary, which stopped being true once the
+panel moved to `<body>`.)
 
 ## `<rfg-stats>`
 

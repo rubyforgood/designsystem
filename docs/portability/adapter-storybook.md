@@ -37,29 +37,42 @@ Storybook server, and report what actually happened.
 `component-behavior-audit.js` lives in this adapter directory, not in `bin/design/`, because it
 checks specific component stories rather than running against any app's targets. It covers what
 axe and the keyboard audit can't see: whether a component *works*, not only whether it's
-accessible. Two real v0.1.0 defects got past both audits:
+accessible. Two real v0.1.0 defects got past both audits and prompted it:
 
 - **`<rfg-table>`**: no cell style applied at all (`::slotted(table) td` matches nothing).
 - **`<rfg-filter-bar>`**: no control belonged to its form, so it submitted nothing.
 
-It runs 20 checks across 4 stories (two of each component): computed alignment, digits, padding,
-borders, `white-space` and `text-overflow` for the table; for the filter bar, that every control
-belongs to `bar.form`, that submitting includes every named control, and that the method is GET.
-It exits 1 on any failure, and also when a story is missing or has nothing to check, so renaming a
-story or emptying an example can't make it pass vacuously. It's wired into CI after the keyboard
-audit.
+**How it's organized.** One file per component in `behavior-checks/`, each exporting story entries
+with either a `check` (run inside the page) or a `run(page)` (driven from Node with Playwright, for
+real key presses, clicks and pointer movement). `ONLY=<component>` runs one file. It exits 1 on any
+failure, and also when a story is missing or a check returns nothing, so renaming a story or
+emptying an example can't make it pass vacuously. It's in CI after the keyboard audit.
 
-**Controls, measured 2026-11-23:**
-- **Positive:** against the current Storybook, 20 checks, 0 failed.
-- **Negative:** Storybook rebuilt with `table.js` and `filter-bar.js` from the `v0.1.0` tag. The
-  first version of the check failed 18 of 20. The two that passed were both "cells have padding"
-  with a threshold of `> 0`: browsers give a table cell 1px of padding by default, so that check
-  passed while every component style was missing. The threshold is now `>= 8px` (the component
-  sets 10px), and with that change all 20 checks fail against v0.1.0.
+**Coverage, measured 2026-11-23:** 29 files, one per component, 436 checks, 0 failed, in about 50
+seconds (the flash-message auto-dismiss checks wait in real time).
 
-Adding a check for another component: give its story the state the check needs (the filter bar
-stories' controls gained `name` attributes for this), add a check function, and repeat the
-negative control against a build that has the defect.
+**Every check has a negative control.** Each was shown to report a failure when its behavior was
+broken in the page (a method replaced with a no-op, an attribute stripped, a stylesheet removed),
+without editing source. The table and filter bar checks were also run against Storybook rebuilt
+from the v0.1.0 code: the first version failed 18 of 20, and the two that passed were a padding
+check satisfied by the browser's default 1px, so its threshold is now `>= 8px` and all 20 fail.
+
+**Bugs it found** (writing the checks for all 29 components), all fixed in v0.1.3:
+
+- **`<rfg-tooltip>`**: not hoverable by a real pointer (the bubble vanished crossing the 8px gap to
+  it), and once on the bubble, leaving it never hid it. WCAG 1.4.13.
+- **`<rfg-date-range-picker>`**: the open panel was unstyled, because `<rfg-popover>` moves it to
+  `<body>`, out of reach of the picker's shadow styles.
+- **`<rfg-card>`**: `padded="false"` couldn't turn padding off.
+- **`<rfg-page-header>`**: the gap between the back link and the title was 16px, not 8px.
+- **`<rfg-menu>`** (story and docs): the disabled-items story used `disabled` on a button, which
+  can't take focus, while its description said every item stayed reachable.
+
+The five re-enabled checks were run against Storybook rebuilt from the v0.1.2 code, in a separate
+worktree. Each one fails there and passes on v0.1.3.
+
+Adding a check for a new component: give its story the state the check needs, add a file to
+`behavior-checks/`, and show that each check fails when the behavior is broken.
 
 ## What this means for the plan
 

@@ -52,6 +52,11 @@ const STYLES = `
   }
 `;
 
+// How long the bubble stays after the pointer leaves the trigger or the bubble. Long enough for a
+// real pointer to cross the 8px gap between them (WCAG 1.4.13 "hoverable"), short enough that
+// moving away still reads as dismissing it.
+const HIDE_DELAY_MS = 150;
+
 function ensureStylesInjected() {
   if (document.getElementById(STYLE_ID)) return;
   const style = document.createElement("style");
@@ -87,6 +92,9 @@ export class RfgTooltip extends LitElement {
     this._onBlur = this._onBlur.bind(this);
     this._onKeydown = this._onKeydown.bind(this);
     this._onScroll = this._onScroll.bind(this);
+    this._onBubbleEnter = this._onBubbleEnter.bind(this);
+    this._onBubbleLeave = this._onBubbleLeave.bind(this);
+    this._hideTimer = null;
   }
 
   connectedCallback() {
@@ -156,6 +164,7 @@ export class RfgTooltip extends LitElement {
     // whose mouse happens to already rest on a control they Tab to would press Escape, dismiss the
     // bubble, and immediately get it back — exactly what WCAG 1.4.13 "dismissible" promises can't
     // happen. Cleared on the next genuine leave, so a real subsequent hover still works normally.
+    this._cancelHide();
     if (this._escapeDismissed) {
       this._escapeDismissed = false;
       return;
@@ -163,11 +172,36 @@ export class RfgTooltip extends LitElement {
     this._show();
   }
 
+  // WCAG 1.4.13 "hoverable": the pointer must be able to move from the trigger onto the bubble.
+  // There's an 8px gap between them, so leaving the trigger only schedules the hide, and entering
+  // the bubble cancels it. Fixed in v0.1.3: v0.1.0–0.1.2 hid immediately, so a real pointer
+  // crossing the gap lost the bubble before reaching it.
   _onOut(e) {
-    // WCAG 1.4.13 "hoverable": moving the pointer onto the bubble itself must not dismiss it.
     if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".rfg-tooltip-bubble")) return;
+    if (this._trigger && e.relatedTarget && this._trigger.contains(e.relatedTarget)) return;
     this._escapeDismissed = false;
-    this._hide();
+    this._scheduleHide();
+  }
+
+  _onBubbleEnter() {
+    this._cancelHide();
+  }
+
+  // Leaving the bubble hides it too, unless the pointer went back to the trigger. Fixed in v0.1.3:
+  // before, only the trigger listened, so a bubble the pointer had moved onto never went away.
+  _onBubbleLeave(e) {
+    if (this._trigger && e.relatedTarget && this._trigger.contains(e.relatedTarget)) return;
+    this._scheduleHide();
+  }
+
+  _scheduleHide() {
+    this._cancelHide();
+    this._hideTimer = setTimeout(() => this._hide(), HIDE_DELAY_MS);
+  }
+
+  _cancelHide() {
+    clearTimeout(this._hideTimer);
+    this._hideTimer = null;
   }
 
   _onFocus() {
@@ -198,6 +232,8 @@ export class RfgTooltip extends LitElement {
     this._bubble.className = "rfg-tooltip-bubble";
     this._bubble.setAttribute("aria-hidden", "true");
     this._bubble.textContent = this.text;
+    this._bubble.addEventListener("mouseenter", this._onBubbleEnter);
+    this._bubble.addEventListener("mouseleave", this._onBubbleLeave);
     document.body.appendChild(this._bubble);
     this._place();
     document.addEventListener("keydown", this._onKeydown);
@@ -230,6 +266,7 @@ export class RfgTooltip extends LitElement {
   }
 
   _hide() {
+    this._cancelHide();
     if (!this._bubble) return;
     this._bubble.remove();
     this._bubble = null;

@@ -58,10 +58,11 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   running it there is a vacuous pass by construction, not a check — see
   `docs/portability/adapter-storybook.md` for the measured outcomes, including a real
   `keyboard-audit.js` bug this adapter found and fixed. It also holds
-  `component-behavior-audit.js`, a Storybook-only check (also in CI) that `<rfg-table>`'s cell
-  styles apply and `<rfg-filter-bar>`'s controls submit, which axe and the keyboard audit can't
-  see. Both shipped broken in v0.1.0, and the check fails all 20 of its assertions against that
-  code.
+  `component-behavior-audit.js`, a Storybook-only check (also in CI) of what axe and the keyboard
+  audit can't see: whether each component actually works. One file per component in
+  `behavior-checks/`, 436 checks across all 29, each with a negative control. Writing them found
+  seven real bugs (table and filter bar in v0.1.0; tooltip, date range picker, card, page header,
+  and the menu story in v0.1.2), all fixed. A new component gets a file there too.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target
   (`bin/design/adapters/reference-app/targets.js`), built specifically to test whether the adapter
   seam's portability claim actually holds, not just to have a demo app.

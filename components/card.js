@@ -33,7 +33,16 @@ export class RfgCard extends LitElement {
     /** Shown below the heading. */
     subtitle: { type: String },
     /** When false, the body meets the card edges (e.g. a table) instead of relying on whitespace alone. */
-    padded: { type: Boolean },
+    // Defaults to true, so a plain Boolean attribute could never turn it off: an absent attribute
+    // keeps the default, and `padded="false"` is "present", so true. Fixed in v0.1.3 with a
+    // converter that reads the attribute's value: `padded="false"` turns padding off, and any
+    // other value (or `padded` alone) leaves it on. Setting the property still works as before.
+    padded: {
+      converter: {
+        fromAttribute: (value) => value !== "false",
+        toAttribute: (value) => (value ? "" : "false"),
+      },
+    },
     /** @ignore */
     _hasActions: { state: true },
     /** @ignore */
