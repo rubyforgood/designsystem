@@ -103,6 +103,11 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
 
 ## Working here
 
+- **US English spelling only, never British**: color, behavior, organize, gray, center,
+  labeled. This covers docs, code, comments, file names, commits and anything a subagent writes
+  (say so in every subagent brief). The only exceptions are `aria-labelledby` (the real attribute
+  name) and external URLs. `bin/design/spelling-audit.rb` fails CI on a British spelling.
+
 - This has real git history now, pushed to `https://github.com/rubyforgood/designsystem`. Don't
   treat it as a fresh scaffold — check `git log` and the docs above before assuming something is
   unstarted.

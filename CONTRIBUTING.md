@@ -14,6 +14,10 @@ else's app. These rules keep that safe. Read [README.md](README.md) first for wh
 
 ## Rules for a pull request
 
+Write in **US English spelling** (color, behavior, organize). CI's spelling audit
+(`bin/design/spelling-audit.rb`) fails on British spellings.
+
+
 1. **Change `design.md` in the same pull request** as any change to the UI it describes. The
    spec comes first: a component that does something `design.md` doesn't describe is a gap in the
    spec, so write the rule down too.
