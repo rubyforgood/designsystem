@@ -5,18 +5,18 @@
 Written after a real error: design.md justified the selection bar covering the filter row with
 "three of the four keep it in the toolbar", citing Carbon, Material, GitHub and Gmail -- when only
 Carbon takes the filters away. The other three were counted as agreeing by describing them all as
-"keeping it in the toolbar", which is true of the *category* and false of the specific behaviour.
+"keeping it in the toolbar", which is true of the *category* and false of the specific behavior.
 
 This cannot check whether a claim is true; nothing here can browse. What it can do is find the
 claims whose *form* outruns the checking behind them, so they can be softened or evidenced:
 
-  names an artefact   cites a component, class or documented page -- `OverflowMenu`, `slds-truncate`,
+  names an artifact   cites a component, class or documented page -- `OverflowMenu`, `slds-truncate`,
                       `<Table sticky />`, "Conditionally revealing a question". Strongest: a reader
                       can look it up and disagree.
   attributes numbers  gives a system a measurement. Checkable in principle, recalled in practice.
   asserts unanimity   "all", "none", "nobody", "not one", "identically". The riskiest form, because
                       one counter-example falsifies it and the more systems named the likelier that is.
-  observational       "X, Y and Z do this", no artefact and no absolute. Honest about being a
+  observational       "X, Y and Z do this", no artifact and no absolute. Honest about being a
                       description.
 
 Run: python3 bin/design/citation-audit.py            the summary and the risky claims
@@ -36,7 +36,7 @@ SYSTEMS = ["Carbon", "Material", "GitHub", "GitLab", "Gmail", "Linear", "Notion"
            "Handsontable", "Excel", "Google Sheets", "Confluence", "Bootstrap", "Fluent",
            "Metabase", "Slack", "Vercel", "Xero", "QuickBooks", "Mailchimp", "Apple"]
 
-ARTEFACT = re.compile(r"`[A-Z][A-Za-z]+`|`slds-[\w-]+`|`govuk-[\w-]+`|`<[A-Z][^>]*/>`|"
+ARTIFACT = re.compile(r"`[A-Z][A-Za-z]+`|`slds-[\w-]+`|`govuk-[\w-]+`|`<[A-Z][^>]*/>`|"
                       r"`[a-z]+Field`|`\.form-check`|`ellipsis`|\"[A-Z][^\"]{6,60}\"")
 ABSOLUTE_WORD = r"(?:all|none|nobody|not one|every|identically|alike|universal|unanimous|never)"
 NUMERIC = re.compile(r"\b\d+\s*(px|dp|rem|%)\b")
@@ -99,7 +99,7 @@ def overreaches(blk, named):
     return False
 
 
-def normalise(found):
+def normalize(found):
     out = set()
     for f in found:
         out.add("Drive" if "Drive" in f else "Polaris" if "Polaris" in f
@@ -116,16 +116,16 @@ for doc in DOCS:
         # corrected by *annotation* rather than by rewriting it -- rewriting would make the record
         # claim better reasoning than actually happened, which is the same fault one level up.
         annotated = i + 1 < len(parts) and parts[i + 1].lstrip().startswith("> *Corrected")
-        named = normalise({s for s in SYSTEMS if re.search(r"\b" + re.escape(s) + r"\b", blk)})
+        named = normalize({s for s in SYSTEMS if re.search(r"\b" + re.escape(s) + r"\b", blk)})
         if len(named) < 2:
             continue
         # The decision-log entry that *records* this mistake quotes the bad claim deliberately.
-        if "I generalised from Carbon" in blk:
+        if "I generalized from Carbon" in blk:
             continue
         rows.append({
             "where": f"{doc}:{text[:text.index(blk)].count(chr(10)) + 1}",
             "n": len(named),
-            "artefact": bool(ARTEFACT.search(blk)),
+            "artifact": bool(ARTIFACT.search(blk)),
             "absolute": overreaches(blk, named),
             "numeric": attributes_number(blk, named),
             "first": blk.strip().split("\n")[0][:76],
@@ -133,7 +133,7 @@ for doc in DOCS:
         })
 
 def kind(r):
-    if r["artefact"]: return "names an artefact"
+    if r["artifact"]: return "names an artifact"
     if r["numeric"]: return "attributes numbers"
     if r["absolute"]: return "asserts unanimity"
     return "observational"
@@ -142,7 +142,7 @@ print(f"{len(rows)} claims cite two or more systems\n")
 for k, v in Counter(kind(r) for r in rows).most_common():
     print(f"  {v:3d}  {k}")
 
-risky = sorted((r for r in rows if not r["artefact"] and r["absolute"] and r["n"] >= 4),
+risky = sorted((r for r in rows if not r["artifact"] and r["absolute"] and r["n"] >= 4),
                key=lambda r: -r["n"])
 annotated = [r for r in risky if r["annotated"]]
 outstanding = [r for r in risky if not r["annotated"]]
@@ -183,7 +183,7 @@ if "--bless" in sys.argv:
     import json
     with open(BASELINE, "w") as f:
         json.dump({"outstanding": len(outstanding),
-                   "note": "Claims asserting agreement across 4+ systems with no artefact named. "
+                   "note": "Claims asserting agreement across 4+ systems with no artifact named. "
                            "The two that remain are the proximity test's known limit -- absolutes "
                            "about this app sitting next to a system's name. See design.md, "
                            "\"Citing another system\"."}, f, indent=2)

@@ -37,7 +37,7 @@ survive the next row: on `/partners`, "Review profile" is bordered and "Request 
 is not, yet each is the primary thing to do for its row. The emphasis tracks the action's name
 rather than its importance, which is worse than no emphasis.
 
-**Badge the exception, not the norm.** A column where every row is badged spends colour on
+**Badge the exception, not the norm.** A column where every row is badged spends color on
 information the reader already has. Where 90% of rows say the same thing, the badge is noise
 and the eye learns to skip the column — taking the exceptions with it.
 
@@ -137,7 +137,7 @@ precisely the wrong conclusion.
 The "Send reminders?" column pills both states: `Yes` in success tone with a bell,
 `No` in neutral tone with a struck-through bell. So every row carries a badge, which is what the
 rule is against — but the rule exists to stop a badge shouting on a row that is not exceptional,
-and a neutral grey pill is not shouting.
+and a neutral gray pill is not shouting.
 
 Three ways to read it, and it is a design call rather than a defect:
 
@@ -190,14 +190,14 @@ The 2026-08-18 finding, for the record:
 > 6 rows, 6 row badges, plus a 7-badge filter strip = 13 badges on one screen. **The filter strip
 > and the status column share a visual language.** The strip built its chips from
 > `EssentialsUiHelper::PILL_TONES` — literally the status palette — so a control that filters the
-> list and a badge that reports a row's state were the same shape, size and colour. design.md says
+> list and a badge that reports a row's state were the same shape, size and color. design.md says
 > a pill is a state and "does not look pressable"; half of them were links.
 
 ## Two further inconsistencies found while auditing
 
 - **The same concept is rendered two ways.** Still true on 2026-09-04. Invitation status is plain
   text in `users/_organization_user.html.erb:6` (`<td><%= user.invitation_status %></td>`) and
-  three coloured pills in `partner_users/_users.html.erb`.
+  three colored pills in `partner_users/_users.html.erb`.
 - **~~A partner in `recertification_required` has no row action.~~ No longer true.** The `case` in
   `_partner_row.html.erb` still falls through for that status, but the partial now ends with
   `row_items += [{label: "View partner", ...}] if row_items.empty?`, so the row gets one action

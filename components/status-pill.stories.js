@@ -21,7 +21,7 @@ export default {
           "",
           "**Accessibility**",
           "- Pills are never focusable and never look pressable.",
-          "- The word carries the meaning, so the status doesn't rely on colour alone. Always write a clear label.",
+          "- The word carries the meaning, so the status doesn't rely on color alone. Always write a clear label.",
           "- An icon in the `icon` slot is decorative and hidden from assistive tech.",
           "",
           "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#status-pills)",
@@ -34,7 +34,7 @@ export default {
     tone: {
       control: "select",
       options: ["neutral", "info", "success", "warning", "danger", "brand"],
-      description: "The colour tone. Uses the same tone names as the rest of the system.",
+      description: "The color tone. Uses the same tone names as the rest of the system.",
     },
     label: { control: "text" },
   },

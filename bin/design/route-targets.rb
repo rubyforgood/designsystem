@@ -47,7 +47,7 @@ IDS = {
 # **Matched on the action name alone, so it has to be a name no screen anywhere uses.** `inventory`
 # was on this list to skip `storage_locations#inventory`, which is a partial -- and it took
 # `items#inventory` with it, which is a full screen with an `<h1>`, a shell, and a place in the item
-# catalogue's tab strip. Every audit built on this file was therefore blind to it, which is the same
+# catalog's tab strip. Every audit built on this file was therefore blind to it, which is the same
 # fault as a hardcoded page list wearing a different hat. Anything controller-specific goes in
 # SKIP_PAIR below.
 SKIP_ACTION = /\A(destroy|deactivate|reactivate|restore|print|print_picklist|print_unfulfilled|

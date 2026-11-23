@@ -100,7 +100,7 @@ actual 900px pan, which the audit reported immediately and correctly.
 
 The general form: `guard + condition = safe`. Removing the guard tests nothing unless the condition
 is present. It applies to a validation with no invalid record to reject, a rate limiter with no
-traffic, a sanitiser with nothing dangerous in the input, an `overflow` rule with nothing
+traffic, a sanitizer with nothing dangerous in the input, an `overflow` rule with nothing
 overflowing.
 
 ## In CI

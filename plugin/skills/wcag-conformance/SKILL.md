@@ -57,7 +57,7 @@ Note it is *entirely* hidden that fails at AA. Partial obscuring is 2.4.12, whic
 ### 3.3.8 in practice
 
 The one that bites real applications is a **password field that blocks paste**, which breaks every
-password manager and forces the user to transcribe. Check for cancelled paste events, not just the
+password manager and forces the user to transcribe. Check for canceled paste events, not just the
 absence of an `onpaste` attribute — and check the field carries an `autocomplete` token a manager
 can fill from.
 

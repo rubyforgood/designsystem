@@ -7,12 +7,12 @@ likely to have been copied. Every rule here came from a defect found in a real a
 ## Ask what the user should do next, and send them there
 
 Re-rendering the form is right when the user can change something and try again. It is wrong when
-the failure is a **state** — the record is already gone, already cancelled, already claimed by
+the failure is a **state** — the record is already gone, already canceled, already claimed by
 somebody else. Returning them to the form then puts them in front of a control that can never
 succeed, and discards whatever they had typed into it.
 
-A cancellation screen failed only on "we could not find it" and "it has already been cancelled",
-and redirected back to its own form with a flash. Someone whose colleague cancelled the record first
+A cancellation screen failed only on "we could not find it" and "it has already been canceled",
+and redirected back to its own form with a flash. Someone whose colleague canceled the record first
 would write their reason again and get the same error, forever. The fix was the destination, not the
 message: the record's own page, which shows the state that actually applies.
 
@@ -80,7 +80,7 @@ and the server agree. Both are defensible; the mismatch is not.
 When the same state appears on two screens, two views drift — and they drift in meaning, not just in
 styling.
 
-An invitation status was plain lowercase text in one table and coloured pills in another. They did
+An invitation status was plain lowercase text in one table and colored pills in another. They did
 not merely look different: the model distinguished *accepted* (took the invitation) from *joined*
 (has signed in since), and the second screen recomputed the state from one timestamp and collapsed
 both. The same user read "joined" on one screen and "Accepted" on the other.

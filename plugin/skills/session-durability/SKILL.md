@@ -91,7 +91,7 @@ Two separate things go wrong, and both were measured rather than reasoned about:
 The predicate that holds: the file on disk is **byte-for-byte a version git once held at that
 path**. It is exact; it separates a reverted file from a runtime artifact that happens to occupy a
 deleted path (`spec/example_failures.txt` has history *and* a deleting commit, and rspec rewrites it
-every run); and matching bytes is also the licence to delete, because git can give the file back.
+every run); and matching bytes is also the license to delete, because git can give the file back.
 
 Make it cheap with one filter before any per-path work: a single
 `git log --full-history --name-only --format=` lists every path git ever touched, which cut 212

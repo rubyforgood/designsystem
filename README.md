@@ -9,7 +9,7 @@ Adopting it gets an app:
 
 - **A written spec** ([`design.md`](design.md)) for components, layout, copy and accessibility.
   Each rule says whether it holds on any app or is just this system's default choice.
-- **Design tokens** for colour, type, spacing and so on, as plain CSS variables or a Tailwind v4
+- **Design tokens** for color, type, spacing and so on, as plain CSS variables or a Tailwind v4
   theme.
 - **Twenty-nine ready-made components** as Web Components. They work in Rails views, plain HTML,
   React or Vue, with or without a JavaScript build step. You can
@@ -35,7 +35,7 @@ portable beyond the app it was first found on, including where it turned out *no
 | | |
 | --- | --- |
 | [`design.md`](design.md) | The spec. Every rule is tagged **Portable** (holds on any app) or **Local** (this project's own answer: the practice of deciding may transfer, the specific value doesn't). See [`docs/portability/design-md-tagging.md`](docs/portability/design-md-tagging.md) for the full breakdown. |
-| [`tokens/`](tokens/) | Design tokens as a Tailwind v4 `@theme` block: colour, type, spacing, radius, elevation, with the Portable rule and the Local default value stated separately for each. |
+| [`tokens/`](tokens/) | Design tokens as a Tailwind v4 `@theme` block: color, type, spacing, radius, elevation, with the Portable rule and the Local default value stated separately for each. |
 | [`components/`](components/README.md) | An installable Web Components layer (Lit) implementing `design.md`'s Components section in code — `npm install`-able or copy a single standalone file. Twenty-nine components, every portable one in `design.md`'s catalog except Charts. See [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md). |
 | [Storybook](https://rubyforgood.github.io/designsystem/) | Every component, live and previewable in a browser — no clone required. Redeployed on every push to `main`. |
 | [`bin/design/`](bin/design/README.md) | ~40 executable audits (WCAG conformance, copy quality, dead code, and more) built on an adapter seam: point one small file (`targets.js`) at your app and most of the suite runs unmodified. |

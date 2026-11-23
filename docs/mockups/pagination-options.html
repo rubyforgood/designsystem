@@ -46,12 +46,12 @@ is which page-size rule you want.</p>
   them, at 121px a row: a <strong>6,442px page</strong> with no pagination control. Dead code
   hiding a missing feature.</p>
   <p style="margin-top:8px"><code>/admin/base_items</code> is the same shape without the dead
-  code: 47 rows, 2,867px, unpaginated, and global to every organisation.</p>
+  code: 47 rows, 2,867px, unpaginated, and global to every organization.</p>
 </div>
 
 <h2><span class="n">2</span>Which tables should paginate at all</h2>
 <p class="note">Not a row count. The question is whether a collection is <strong>bounded by the
-size of the organisation</strong> or <strong>grows with its activity</strong>. A list of three
+size of the organization</strong> or <strong>grows with its activity</strong>. A list of three
 storage locations does not want a pager; a list of donations does, from the first day, because the
 page that is fine at 20 rows is unusable at 2,000 and nobody notices the day it crosses over.</p>
 <table class="diag">
@@ -63,7 +63,7 @@ page that is fine at 20 rows is unusable at 2,000 and nobody notices the day it 
             <code>events</code> <code>product_drives</code> <code>purchases</code>
             <code>requests</code> <code>transfers</code></td>
         <td class="ok">Always paginate</td></tr>
-    <tr><td><strong>The organisation</strong></td>
+    <tr><td><strong>The organization</strong></td>
         <td><code>donation_sites</code> <code>items</code> <code>kits</code>
             <code>manufacturers</code> <code>partner_groups</code> <code>partners</code>
             <code>product_drive_participants</code> <code>storage_locations</code>

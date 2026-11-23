@@ -18,7 +18,7 @@ export default {
           "A dialog that sits on top of the page and holds the person's attention until they finish or dismiss it. Built on the browser's native `<dialog>` element.",
           "",
           "**When to use**",
-          "- A short, focused task that has to be finished or cancelled before going back to the page, such as importing a file or confirming a destructive action.",
+          "- A short, focused task that has to be finished or canceled before going back to the page, such as importing a file or confirming a destructive action.",
           "",
           "**When not to use**",
           "- For a menu or filter panel that should stay in context with the page. Use Popover instead.",

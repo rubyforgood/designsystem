@@ -12,7 +12,7 @@ distinct portal audience." This document now uses the generic contract names
 of vocabulary leak a portable contract shouldn't have. What each predicate *checks* below is still
 the source project's own domain — that part doesn't generalize and isn't meant to.
 
-**What this is not.** It is not evidence that the *interface* generalises. It is a sample of one
+**What this is not.** It is not evidence that the *interface* generalizes. It is a sample of one
 stack, and `adapter.md` above describes the shape it fits; whether that shape survives contact with
 Django or Next.js is unknown until somebody tries. Read this as "here is how one team did it",
 not as a specification.

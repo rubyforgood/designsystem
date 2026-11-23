@@ -47,7 +47,7 @@ def legacy_table(src)
 end
 
 # Preflight sets `border-color: currentColor`, so an `<hr>` with no border class draws in the
-# *text* colour -- near-black, against the slate-200 hairline every other divider uses.
+# *text* color -- near-black, against the slate-200 hairline every other divider uses.
 def bare_hr(src)
   src.scan(/<hr\b[^>]*>/).reject { |t| t =~ /class="[^"]*\bborder-/ }
 end
@@ -72,7 +72,7 @@ end
 #
 # `font-medium` is required as well, and it is the whole discriminator. It is what `essentials_detail`
 # puts on a `<dt>`, so it marks a *label above a value*. Without it the check also matched a stat
-# card's caption *below* a number -- small, grey, four of them in a row on the partner dashboard,
+# card's caption *below* a number -- small, gray, four of them in a row on the partner dashboard,
 # and correct.
 DETAIL_PAIR = /<p[^>]*class="[^"]*text-(?:xs|sm)[^"]*font-medium[^"]*text-slate-(?:500|600)[^"]*"[^>]*>/
 

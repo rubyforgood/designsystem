@@ -29,7 +29,7 @@
     background: var(--color-slate-50);
   }
 
-  /* The stacked form. `td` becomes a labelled field; `tr` becomes the card. */
+  /* The stacked form. `td` becomes a labeled field; `tr` becomes the card. */
   @container (width < 44rem) {
     .stackable { display: block; }
     .stackable caption { display: block; text-align: left; }
@@ -201,9 +201,9 @@
   corner</strong> to take it below 44rem, then below 26rem.</p>
 
   <section class="space-y-3">
-    <h3 class="text-lg font-semibold">A &mdash; Every field, labelled</h3>
+    <h3 class="text-lg font-semibold">A &mdash; Every field, labeled</h3>
     <p class="max-w-3xl text-slate-600">
-      All nine columns become labelled fields: one column of them when the space is very narrow, two
+      All nine columns become labeled fields: one column of them when the space is very narrow, two
       when there is room. Nothing is hidden and nothing is decided for the reader.
     </p>
     <div class="demo-wrap" style="width: 100%">
@@ -243,9 +243,9 @@
       </table>
     </div>
     <ul class="max-w-3xl list-disc pl-5 text-sm text-slate-600 space-y-1">
-      <li><strong>For:</strong> no editorial judgement, no hidden data, and it is the literal reading of the pattern the system already uses for line item rows.</li>
+      <li><strong>For:</strong> no editorial judgment, no hidden data, and it is the literal reading of the pattern the system already uses for line item rows.</li>
       <li><strong>For:</strong> one rule set for all fifteen tables. Nothing to decide per table.</li>
-      <li><strong>Against:</strong> tall. Nine fields &times; fourteen rows is 126 labelled values on one page.</li>
+      <li><strong>Against:</strong> tall. Nine fields &times; fourteen rows is 126 labeled values on one page.</li>
       <li><strong>Against:</strong> a label for every value repeats the heading fourteen times, which is exactly what a table exists to avoid.</li>
     </ul>
   </section>
@@ -301,7 +301,7 @@
     <ul class="max-w-3xl list-disc pl-5 text-sm text-slate-600 space-y-1">
       <li><strong>For:</strong> a scannable list. Four fields per record instead of nine, so the page is roughly half as tall and you can still compare records by eye.</li>
       <li><strong>For:</strong> nothing is lost &mdash; the fold is a disclosure, not a cut.</li>
-      <li><strong>Against:</strong> it needs a judgement per table about which fields lead. Fifteen decisions, and they will be argued about.</li>
+      <li><strong>Against:</strong> it needs a judgment per table about which fields lead. Fifteen decisions, and they will be argued about.</li>
       <li><strong>Against:</strong> the column order in the table and the field order in the card stop matching, unless the table is reordered to agree.</li>
       <li><strong>Against:</strong> a disclosure per row is a lot of controls on a page &mdash; fourteen more buttons on <code class="rounded bg-slate-200 px-1 text-xs">/purchases</code>.</li>
     </ul>
@@ -346,7 +346,7 @@
     </div>
     <ul class="max-w-3xl list-disc pl-5 text-sm text-slate-600 space-y-1">
       <li><strong>For:</strong> the shape people expect from a list of records on a narrow screen.</li>
-      <li><strong>For:</strong> no per-table judgement, like A.</li>
+      <li><strong>For:</strong> no per-table judgment, like A.</li>
       <li><strong>Against:</strong> as tall as A.</li>
       <li><strong>Against:</strong> the actions cell has to be found by class rather than position, so every table needs a marker on that cell. 34 of the 299 headings are already the <code class="rounded bg-slate-200 px-1 text-xs">sr-only</code> actions kind, so they are findable &mdash; but it is a change to every table.</li>
     </ul>
@@ -412,10 +412,10 @@
     <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-slate-700 space-y-2">
       <p><strong>B, with the container query and the controller-supplied labels and roles.</strong></p>
       <p>A and C are honest and simple, and they produce a very long page: nine fields on fourteen
-      records is 126 labelled values, and a label repeated fourteen times is the thing a table exists
+      records is 126 labeled values, and a label repeated fourteen times is the thing a table exists
       to avoid. B keeps the list scannable, which is the point of an index page &mdash; you are there
       to find one record, not to read them all.</p>
-      <p><strong>The cost of B is fifteen judgements</strong> about which fields lead, and I would
+      <p><strong>The cost of B is fifteen judgments</strong> about which fields lead, and I would
       rather make those explicitly than pretend all nine matter equally at 320px. For
       <code class="rounded bg-slate-200 px-1 text-xs">/purchases</code>: who it was from, what it
       cost, when, and where it went.</p>

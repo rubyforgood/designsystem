@@ -1,4 +1,4 @@
-// Behaviour checks that axe-core and keyboard-audit.js can't see, run against specific stories in
+// Behavior checks that axe-core and keyboard-audit.js can't see, run against specific stories in
 // the built Storybook. Each check exists because a real defect shipped without it:
 //
 //   - <rfg-table> (v0.1.0): every cell rule was written as `::slotted(table) td`, which matches
@@ -15,7 +15,7 @@
 // Negative control: run against a Storybook built from the v0.1.0 versions of table.js and
 // filter-bar.js, this fails every check (see docs/portability/adapter-storybook.md).
 //
-// Usage: BASE_URL=http://127.0.0.1:4300 node component-behaviour-audit.js
+// Usage: BASE_URL=http://127.0.0.1:4300 node component-behavior-audit.js
 const { chromium } = require("playwright");
 
 const BASE = process.env.BASE_URL || "http://127.0.0.1:4300";

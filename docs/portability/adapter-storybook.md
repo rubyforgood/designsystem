@@ -32,9 +32,9 @@ Storybook server, and report what actually happened.
 | `keyboard-audit.js` | **Found and fixed a real bug, then clean.** First run: "0 screens checked" — not because there was nothing to check, but because the audit compares `new URL(page.url()).pathname` against the adapter's `t.path`, and Storybook addresses a story by query string (`/iframe.html?id=...`), which `.pathname` strips. The comparison could never succeed, so every target was silently skipped rather than erroring. | **Adapter-contract gap, not Storybook-specific**: nothing in `adapter.md`'s contract says a target's `path` can't contain a query string — it happened to be true for the Rails and reference-app adapters, and the audit quietly assumed it as if it were a rule. Fixed in `bin/design/keyboard-audit.js` by comparing `pathname + search` instead of `pathname` alone (see the code comment there). Verified non-regression with the reference-app adapter's own `known-outcomes.js` (22/22 still match, including `keyboard-audit.js`'s own documented "3 screens, no findings") before trusting the fix. Re-run after the fix: 10 screens checked, no findings. |
 | `button-audit.js` | **Vacuous pass — not meaningful at this level, and said so rather than hidden.** "0 page headers checked", "10 headers carrying no action", "0 findings". | This audit checks **page-header button-group composition** — at most three actions, exactly one primary, primary last — which is a property of a *page layout*, not of one component. A bare component story has no `[data-page-header="actions"]` container at all, so the audit finds nothing to count on every single story. The 0 findings is not evidence `<rfg-button>` is correct; it's evidence this particular audit has nothing to check in isolation. It belongs in the suite that eventually audits a *page built from* these components, not in the gate for the component library itself. |
 
-## A third, Storybook-only check: component behaviour (added 2026-11-23)
+## A third, Storybook-only check: component behavior (added 2026-11-23)
 
-`component-behaviour-audit.js` lives in this adapter directory, not in `bin/design/`, because it
+`component-behavior-audit.js` lives in this adapter directory, not in `bin/design/`, because it
 checks specific component stories rather than running against any app's targets. It covers what
 axe and the keyboard audit can't see: whether a component *works*, not only whether it's
 accessible. Two real v0.1.0 defects got past both audits:
@@ -80,5 +80,5 @@ cp bin/design/wcag-audit.js bin/design/keyboard-audit.js bin/design/adapters/sto
 cd bin/design/adapters/storybook
 BASE_URL=http://127.0.0.1:4300 node wcag-audit.js
 BASE_URL=http://127.0.0.1:4300 node keyboard-audit.js
-BASE_URL=http://127.0.0.1:4300 node component-behaviour-audit.js
+BASE_URL=http://127.0.0.1:4300 node component-behavior-audit.js
 ```

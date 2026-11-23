@@ -18,7 +18,7 @@ time and local to this repository: the migration was half-finished, the benefit 
 ergonomics, and the cost was rewriting 400 views with volunteer labour. Nothing about that
 trade-off was wrong.
 
-What has changed is that the decision is no longer local. Ruby for Good is standardising its
+What has changed is that the decision is no longer local. Ruby for Good is standardizing its
 applications on a single shared design system, so that contributors moving between RFG projects
 meet the same components, tokens and conventions, and so that accessibility and design work done
 once benefits every app. Under that constraint, "Bootstrap because it is what we already have"

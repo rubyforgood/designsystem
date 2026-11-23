@@ -11,7 +11,7 @@
 //   1. THE STRIP DOES NOT MOVE. Every tab in a set puts its tab strip at the same height.
 //      Measured before the fix: /partners at y=228 and /partner_groups at y=174, because the
 //      filter bar sat above the card holding the strip -- a 54px jump on every switch. Same on
-//      the item catalogue, where /item_categories is the one tab with no filters.
+//      the item catalog, where /item_categories is the one tab with no filters.
 //
 //   2. THE RAIL STILL SAYS WHERE YOU ARE. A tab that lives under a sidebar entry keeps that entry
 //      marked and its group open. `active_on` listed only the first tab's controller, so landing

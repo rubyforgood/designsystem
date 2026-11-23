@@ -23,7 +23,7 @@ system" methodology — none of which mention Human Essentials at all.
 | What this app is / Status | 8 | ~0% Portable | Entirely HE domain description — organizations, partners, event sourcing |
 | Foundations: Typography | 10 | ~20% Portable | Semantic rules (heading = structure not size) portable; exact classes/px Local |
 | Foundations: Sentence case | 8 | ~60% Portable | The *rule* (sentence case, no shouting) is portable; HE's exact class/CSS enforcement is Local |
-| Foundations: Colour | 10 | ~50% Portable | "Never colour alone" (WCAG 1.4.1) portable; indigo/slate palette, exact hex/oklch Local |
+| Foundations: Color | 10 | ~50% Portable | "Never color alone" (WCAG 1.4.1) portable; indigo/slate palette, exact hex/oklch Local |
 | Foundations: Spacing/radius/elevation | 6 | ~0% Portable | Pure Tailwind scale values, this app's picks |
 | Foundations: A value is not a style | 4 | ~75% Portable | "No inline style except CSS custom properties" is a portable principle |
 | Foundations: Address fields | 9 | ~55% Portable | WCAG 1.3.5 + autocomplete token rules portable; HE's specific fields (ZIP, `third_party:`) Local |
@@ -51,7 +51,7 @@ system" methodology — none of which mention Human Essentials at all.
 | App shell (sidebar, bank/partner/auth shells) | 20 | ~5% Portable | Entirely HE's information architecture and nav labels |
 | Key patterns (Turbo, Stimulus, multi-tenancy, print) | 8 | ~10% Portable | "Show the tenant everywhere" principle portable; Turbo/Stimulus specifics Local |
 | Build | 10 | 0% Portable | Rails/Tailwind/Propshaft toolchain, entirely this app's stack |
-| Citing another system | 4 | 100% Portable | Pure methodology — cite artefacts not categories, provenance on every figure. Zero HE content |
+| Citing another system | 4 | 100% Portable | Pure methodology — cite artifacts not categories, provenance on every figure. Zero HE content |
 | Building or changing a page (checklist) | 10 | ~60% Portable | The checklist steps are mostly portable; the audit script names are Local |
 | Backlog | — | N/A | Not rules — a punch list, doesn't tag |
 
@@ -88,9 +88,9 @@ migration status, not carry these facts forward. Nothing here generalizes as a r
 - Column heading exact classes (`text-xs font-semibold text-slate-500`, no uppercase/tracking) —
   **Local**.
 
-### Foundations — Colour
+### Foundations — Color
 
-- **Never colour alone** — **Portable**. Direct restatement of WCAG 1.4.1.
+- **Never color alone** — **Portable**. Direct restatement of WCAG 1.4.1.
 - Indigo brand scale, slate neutrals, exact token table — **Local**.
 - Semantic tone mapping (success=emerald, warning=amber, danger=rose, info=sky) — **Local**
   pattern, but the *concept* of "one meaning per tone, consistently applied" is **Portable**.
@@ -141,7 +141,7 @@ consistently — but the specific values don't transfer.
 Nearly everything here is **Portable** — it's WCAG 2.2 AA restated for a general audience, even
 though every example is drawn from HE:
 
-- One `<main>` landmark, labelled nav, no duplicate landmarks — **Portable**.
+- One `<main>` landmark, labeled nav, no duplicate landmarks — **Portable**.
 - Skip link, visible on focus, not `.sr-only-focusable` (because that shifts layout) — **Portable**.
 - One `h1`, no skipped heading levels — **Portable**.
 - Every control named (label/aria-label/aria-labelledby) — **Portable**.
@@ -214,13 +214,13 @@ HE's numbers:
 - **A chart's series count is a constant the design picks, never a number the data supplies** —
   **Portable**, a genuinely reusable data-viz principle (also central to this session's own
   `dataviz` skill).
-- **Colour alone cannot distinguish more than ~3 series and clear a 3:1 contrast floor** —
+- **Color alone cannot distinguish more than ~3 series and clear a 3:1 contrast floor** —
   **Portable**, this is closer to a measured fact about human color perception than an HE opinion.
 - **Every chart has a table of the same figures beside it** (accessibility: charts aren't
   screen-reader-readable) — **Portable**.
 - **A period chart takes a period range matching its granularity** — **Portable** shape; HE's
   specific month-range picker implementation — **Local**.
-- Specific palette (`CHART_BAND_COLOURS`), HE's trend-chart history, comparison-window math — all
+- Specific palette (`CHART_BAND_COLORS`), HE's trend-chart history, comparison-window math — all
   **Local**.
 
 ### Components — Filters
@@ -271,7 +271,7 @@ HE's numbers:
 
 ### Components — Forms
 
-- **A field takes the width of its grid column; narrow it only when it has neighbours to align
+- **A field takes the width of its grid column; narrow it only when it has neighbors to align
   against** — **Portable** layout principle, one of the more nuanced and reusable ideas here.
 - **Required is stated two ways** (visual marker + `aria-required`) — **Portable**, WCAG-grounded.
 - simple_form wrapper names, `essentials_form_for` — **Local**.
@@ -394,8 +394,8 @@ toolchain," which isn't really a design-system rule at all.
 
 **100% Portable**, and arguably the second most valuable section after the audit-discipline one:
 
-- **Name the artefact, or say "observed"** — don't claim a system's rule if it never published one.
-- **Check each cited system against the specific behaviour, not the category it belongs to.**
+- **Name the artifact, or say "observed"** — don't claim a system's rule if it never published one.
+- **Check each cited system against the specific behavior, not the category it belongs to.**
 - **A number belongs to whoever measured it** — mark recalled/attributed figures as such.
 - **Avoid absolutes ("all", "none") unless every case was actually checked.**
 
@@ -404,7 +404,7 @@ design document and reads as already-portable.
 
 ### Building or changing a page (the closing checklist)
 
-Mostly **Portable** as a checklist shape (one h1, name every control, colour is never the only
+Mostly **Portable** as a checklist shape (one h1, name every control, color is never the only
 signal, run an audit before shipping) — though several steps name HE's specific scripts
 (`bin/design/audit.js`) which are **Local**. Good candidate for direct adaptation: keep the
 checklist shape, swap in whatever this project's own audit tooling ends up being.
@@ -439,9 +439,9 @@ share).
   Local/Portable boundary already, and is the clearest example in the whole file of the pattern
   `writing-rules.md` asks for. Not ambiguous, but worth citing as the model example when writing
   the *next* version of this spec.
-- **Chart series-count and colour-distinguishability rules.** These read as closer to Portable than
-  typical Local component rules because they're grounded in measured facts about human colour
-  perception and a documented, unsolvable-by-choice constraint (at most 3 mutually-3:1 colours on
+- **Chart series-count and color-distinguishability rules.** These read as closer to Portable than
+  typical Local component rules because they're grounded in measured facts about human color
+  perception and a documented, unsolvable-by-choice constraint (at most 3 mutually-3:1 colors on
   white) rather than in HE's taste. Tagged Portable above; flagging here because it's a judgment
   call whether "grounded in a hard constraint" is enough to promote something out of Local when it
   still lives inside a very HE-specific chart component.

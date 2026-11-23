@@ -33,8 +33,8 @@
 <body class="text-slate-900"><div class="wrap">
 
 <h1>The summary band</h1>
-<p class="lede">Nothing here is built. <strong>Resize this window</strong> to see the wide behaviour;
-the boxed panels are real iframes at 430px, so they show the narrow behaviour at the same time.</p>
+<p class="lede">Nothing here is built. <strong>Resize this window</strong> to see the wide behavior;
+the boxed panels are real iframes at 430px, so they show the narrow behavior at the same time.</p>
 
 <h2><span class="n">1</span>What is wrong</h2>
 <p class="note">The band is <code>grid gap-4 sm:grid-cols-2 lg:grid-cols-3</code> &mdash; a fixed
@@ -101,12 +101,12 @@ is no orphan to design around.</p>
   <div class="body" style="border-top:1px solid #e2e8f0">
     <p class="note" style="margin:0">Same card, but the separators are a <code>gap-px</code> grid
     over a <code>slate-200</code> backdrop with white cells. That draws a hairline between
-    <em>every</em> pair of neighbours automatically &mdash; rows as well as columns &mdash; so the
+    <em>every</em> pair of neighbors automatically &mdash; rows as well as columns &mdash; so the
     layout is free to be 2&times;2 at tablet without the divider maths falling apart. This is the
     Tailwind UI pattern for exactly this component.</p>
     <p class="note" style="margin:8px 0 0">Column counts chosen so the grid is always <em>full</em>:
     4 figures go 1 &rarr; 2&times;2 &rarr; 4; 3 figures go 1 &rarr; 3; 2 figures go 1 &rarr; 2.
-    An empty grid cell would show the backdrop as a grey block, which is the one way this pattern
+    An empty grid cell would show the backdrop as a gray block, which is the one way this pattern
     can look wrong, and matching the count to the columns is what prevents it.</p>
   </div>
 </figure>
@@ -122,7 +122,7 @@ is no orphan to design around.</p>
   <div class="body" style="border-top:1px solid #e2e8f0">
     <p class="note" style="margin:0">The minimal change: one line in the helper, orphan gone,
     everything else as it is. It does not answer the other half of what you asked &mdash; these are
-    still four grey boxes rather than one card &mdash; but it is worth seeing what the smallest fix
+    still four gray boxes rather than one card &mdash; but it is worth seeing what the smallest fix
     buys, because it is nearly all of the layout complaint.</p>
   </div>
 </figure>

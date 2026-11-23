@@ -14,7 +14,7 @@ export default {
           "",
           "**When to use**",
           "- Once per page, at the top.",
-          "- Add a back link when the page sits under a parent page, labelled `Back to <noun>`.",
+          "- Add a back link when the page sits under a parent page, labeled `Back to <noun>`.",
           "",
           "**When not to use**",
           "- For a heading inside a page section, use a Card heading or a plain heading instead.",

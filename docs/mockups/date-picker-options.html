@@ -42,9 +42,9 @@ fine — it uses the app's filter classes. The popup is the problem.</p>
     <tr><td>Typeface</td><td><code>-apple-system</code></td><td><strong>Figtree</strong></td></tr>
     <tr><td>Font size</td><td>12.8px</td><td>12px or 14px — 12.8 is off the scale entirely</td></tr>
     <tr><td>Corner radius</td><td>5px panel, 3px day cells</td><td>8px (<code>rounded-lg</code>), 16px (<code>rounded-2xl</code>)</td></tr>
-    <tr><td>Elevation</td><td><code>0 0 5px #ddd</code> — a grey glow on all four sides</td><td>directional <code>shadow-sm</code> / <code>shadow-xl</code></td></tr>
+    <tr><td>Elevation</td><td><code>0 0 5px #ddd</code> — a gray glow on all four sides</td><td>directional <code>shadow-sm</code> / <code>shadow-xl</code></td></tr>
     <tr><td>Border</td><td>none</td><td><code>1px solid slate-200</code></td></tr>
-    <tr><td>Text colour</td><td><code>#333</code>, <code>#ddd</code> hardcoded</td><td>slate scale</td></tr>
+    <tr><td>Text color</td><td><code>#333</code>, <code>#ddd</code> hardcoded</td><td>slate scale</td></tr>
     <tr><td>Day cells</td><td><code>cursor: default</code> — they do not look clickable</td><td>pointer</td></tr>
   </tbody>
 </table>
@@ -52,7 +52,7 @@ fine — it uses the app's filter classes. The popup is the problem.</p>
 <div class="warn">
   <p><strong>Three more things worth knowing.</strong></p>
   <p style="margin-top:6px">It is pinned to <code>https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js</code>
-  — <strong>unversioned</strong>. That is an external runtime dependency whose behaviour can change
+  — <strong>unversioned</strong>. That is an external runtime dependency whose behavior can change
   under the app without a deploy. The migration removed the Font Awesome CDNs deliberately; this one
   survived.</p>
   <p style="margin-top:6px">The preset labels are Title Case — "All Time", "Last 7 Days", "This
@@ -154,7 +154,7 @@ fine — it uses the app's filter classes. The popup is the problem.</p>
   working, and the change is contained to one partial plus a Stimulus controller. <em>What I would
   do first.</em></p>
   <p style="margin-top:6px"><strong>Or change the parsing</strong> to accept two ISO dates. Cleaner
-  — <code>strptime</code> with a localised month name is fragile, and its rescue silently resets to
+  — <code>strptime</code> with a localized month name is fragile, and its rescue silently resets to
   the default range with a flash. But it touches the helper, ten call sites and their specs.</p>
 </div>
 <p class="note"><strong>So: A, B or C — and keep the wire format or change it?</strong> I would take

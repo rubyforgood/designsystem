@@ -20,7 +20,7 @@ else's app. These rules keep that safe. Read [README.md](README.md) first for wh
 2. **Tag every new rule** in `design.md` as **Portable** (holds on any app) or **Local** (this
    system's default answer). See
    [`docs/portability/design-md-tagging.md`](docs/portability/design-md-tagging.md).
-3. **Components use tokens only**, never a hard-coded colour, size or font. Each component needs a
+3. **Components use tokens only**, never a hard-coded color, size or font. Each component needs a
    Storybook story, and the story must pass the accessibility check (`npm run storybook`).
 4. **Back up a claim with a measurement.** If a doc says something passes, or gives a number,
    it should be something you ran, with the date. If an audit passes, check that it would also
@@ -49,7 +49,7 @@ The package follows [semantic versioning](https://semver.org) and is still pre-1
   keep working, leave the old name working for one more minor release and log a console warning
   naming its replacement. Remove it in the release after that. Apps then upgrade first and fix
   the warnings in their own time, rather than having both land on the same day. Where keeping the
-  old behaviour would be costly or confusing, skip this and say so in the release notes.
+  old behavior would be costly or confusing, skip this and say so in the release notes.
 - **Tell adopting apps before a breaking release ships**, not only in its release notes. Open an
   issue on each adopting app's repo, or post in its channel, saying what will change and in which
   version.

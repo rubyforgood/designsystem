@@ -47,7 +47,7 @@ function Table({ head, children }) {
   );
 }
 
-/** Colour swatches for every token starting with `prefix`, e.g. "--color-brand-". */
+/** Color swatches for every token starting with `prefix`, e.g. "--color-brand-". */
 export function ColorScale({ prefix }) {
   const tokens = useTokens(prefix);
   return (

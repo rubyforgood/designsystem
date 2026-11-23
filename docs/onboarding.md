@@ -73,7 +73,7 @@ runs through `authorize_user` in `ApplicationController`.
 ## The domain model
 
 A tour of the parts you meet first. [domain-model.md](domain-model.md) is the full reference —
-polymorphic joins, the event catalogue, the partner state machine — for when you need it.
+polymorphic joins, the event catalog, the partner state machine — for when you need it.
 
 ### Organization is the tenant boundary
 
@@ -140,7 +140,7 @@ The central workflow, and the one worth tracing end to end on your first day:
 `recertification_required`, `deactivated`) that gates most of this, and a `Partners::Profile`
 holding the agency detail the bank collects.
 
-## How the code is organised
+## How the code is organized
 
 | Where | What | Count |
 | --- | --- | --- |
@@ -266,7 +266,7 @@ table you are working on looks suspiciously short or long, check the band before
 [design.md](../design.md) is normative. In short: Tailwind v4, Figtree, indigo on slate,
 sentence case, components as partials in `app/views/shared/essentials/` and helpers in
 `EssentialsUiHelper`. Build a page from the partials rather than from utility strings, give the
-page exactly one `<h1>`, name every control, and never let colour be the only signal.
+page exactly one `<h1>`, name every control, and never let color be the only signal.
 
 ```bash
 ruby bin/design/which-audits.rb       # FIRST: which of the 30 does my change affect?
@@ -325,7 +325,7 @@ which stacks two paddings and puts 48 or 72px under the heading where the design
 occurrences of `px-4 py-6 sm:px-6 lg:px-8` and missed 17 of the 31, because they open the header
 wrapper with `pt-6`. The stable part is `px-4 sm:px-6 lg:px-8`.
 
-**A field rendered inside `f.input ... do` has none of the design system's behaviour.** The block
+**A field rendered inside `f.input ... do` has none of the design system's behavior.** The block
 *replaces* the wrapper's input, so it skips the whole `:essentials` pipeline: no classes, no width,
 no `aria-required`, no `aria-invalid`, no inline error. That is how a 44px number field ended up
 with a 92px placeholder cut off mid-word, and how three partner profile fields lost their error
@@ -382,7 +382,7 @@ exits non-zero when anything is dead.
 
 This branch has been diverged from `main` for weeks and has rewritten most of the views, so a merge
 is not a routine one. **The rule that makes the conflicts tractable: design owns the markup, main
-owns the behaviour.** For each conflicted view, take this branch's file, then find what `main`
+owns the behavior.** For each conflicted view, take this branch's file, then find what `main`
 actually changed against the merge base and re-apply *that* in design-system terms:
 
 ```bash
@@ -434,7 +434,7 @@ untracked debris in `public/` (step 7) — the second cost an hour on a CSV expo
 code path was byte-identical to before the merge.
 
 **On `main`'s specs.** They assert `main`'s markup and copy: Font Awesome names, Bootstrap
-attributes, Title Case labels. Update the assertion to what ships here and keep the behaviour it
+attributes, Title Case labels. Update the assertion to what ships here and keep the behavior it
 pins — and port their regression tests rather than dropping them, because the bug is usually still
 real even when the markup moved. Delete one only when it duplicates a spec here with the older
 expectations, and say so where it was.
@@ -444,7 +444,7 @@ expectations, and say so where it was.
 | Document | What it is |
 | --- | --- |
 | `docs/architecture/decisions/` | ADRs. Why a structural decision was made, at the time. Not edited afterwards. |
-| `docs/design-decisions.md` | Running log of UI judgement calls, with the reasoning. |
+| `docs/design-decisions.md` | Running log of UI judgment calls, with the reasoning. |
 | `design.md` | The design system as it stands now. |
 | `docs/migration-map.md` | What replaced what, and how to verify. |
 
@@ -615,7 +615,7 @@ There is deliberately no Day view: across a year, a day held **1.9 distributions
 just one on 13 days out of 22.
 
 **If you found the Week button did nothing, that was a real bug and it is fixed.** In a window
-narrower than about 992 pixels — a laptop at 150% scaling, or any window that is not maximised — the
+narrower than about 992 pixels — a laptop at 150% scaling, or any window that is not maximized — the
 page already opened in what it called "Week", so pressing Week changed nothing. Duration and layout
 are separate controls now, and each one does exactly what it says.
 
@@ -625,7 +625,7 @@ Today button doing nothing while you are looking at today is harmless: it is the
 moved away.
 
 **The three "Reset search" buttons in the partner portal** — on children, families and family
-requests — are greyed out until you have actually searched for something. Those are greyed rather
+requests — are grayed out until you have actually searched for something. Those are grayed rather
 than left live because pressing one with nothing to reset reloads the whole page for no change,
 which the Today button does not.
 
@@ -638,7 +638,7 @@ the calendar, so they always say what is on screen.
 the real one that seemed to appear and vanish as you scrolled — that was a custom scrollbar and the
 browser's own, both switched on. The custom one does the work and the browser's is hidden.
 
-**It is also quieter and easier to see.** The grey strip and its border are gone; what is left is a
+**It is also quieter and easier to see.** The gray strip and its border are gone; what is left is a
 thin track and a rounded handle. The handle is darker than the original one on purpose — that one
 did not have enough contrast against its track to meet the accessibility standard for a control —
 but it is lighter than the version that shipped briefly on 28 August, which overshot the standard
@@ -661,7 +661,7 @@ to you it is worth saying: it is measured from the bar to the buttons, not from 
 the edges of.
 
 **Save and Cancel now sit below the card, not inside it.** On New item, New kit, New vendor and the
-rest, the buttons used to sit inside the white card under a short grey line. The line is gone and
+rest, the buttons used to sit inside the white card under a short gray line. The line is gone and
 the buttons have moved just below the card. Nothing about saving has changed — the buttons do the
 same thing in the same order, `Save` then `Cancel`.
 
@@ -793,7 +793,7 @@ git config core.hooksPath .githooks
 `bin/workspace-restore` takes is of the disk *after* the rollback, so it holds the damage, not what
 was lost — verified the hard way while building it, on three uncommitted files.
 
-Two symptoms worth recognising:
+Two symptoms worth recognizing:
 
 - **A file a commit deleted is back on disk.** `git checkout .` will not remove it, so the app goes
   on rendering it. `bin/workspace-check` lists these separately, and tells them apart from your own
@@ -849,9 +849,9 @@ match. Tick nothing and you get everything.
 **The control shows how many you have chosen; the names appear as chips on the line below it**,
 after the word *Comparing:*. Remove one with the × beside it, or use **Clear comparison** to remove
 them all — neither needs the control opened. Each chip shows its line's dash pattern, so you can
-read the chart without matching colours.
+read the chart without matching colors.
 
-**Up to four at a time.** Beyond four the lines stop being tellable apart, so the rest are greyed out
+**Up to four at a time.** Beyond four the lines stop being tellable apart, so the rest are grayed out
 and the panel says *"4 of 4 chosen. Clear one to add another."*
 
 **Your choices apply when you close the control**, so picking four things is one page load rather
@@ -864,11 +864,11 @@ recomputed every few minutes now, so what you recorded this morning is there.
 
 **The chart now shows your item categories as stacked bands** rather than one anonymous total, so
 you can see what is driving a month. There is a **Category** filter beside the months to narrow to
-one — including **Uncategorised**, for items you have not filed anywhere. If your bank does not use
+one — including **Uncategorized**, for items you have not filed anywhere. If your bank does not use
 categories, the chart looks exactly as it did.
 
 **"Compare with the previous period"** sits on the chart itself. It draws the window before this one
-as a dashed grey line behind your figures, adds a row of those figures to the table, and says the
+as a dashed gray line behind your figures, adds a row of those figures to the table, and says the
 change in words — *"Total 167,278, up 241% on the previous period."*
 
 The previous period is **your window shifted back by its own length**: ask for six months and it
@@ -884,7 +884,7 @@ month boxes for anything else. The window is in the address bar, so you can book
 August* would give you two stub columns at the ends that look like a fall but are just a part-month.
 You can only pick whole months, so that cannot happen.
 
-**The current month is included, and labelled.** It says *"so far"* on the column and on the table
+**The current month is included, and labeled.** It says *"so far"* on the column and on the table
 heading, and the card says *"…is still running"* — so you can see how the month is going without
 mistaking a part-month for a bad one.
 
@@ -894,10 +894,10 @@ happened, not what is booked.
 
 ### The monthly trend reports draw something now
 
-**Monthly Distributions, Donations and Purchases used to open with an empty chart.** A tall grey box,
+**Monthly Distributions, Donations and Purchases used to open with an empty chart.** A tall gray box,
 a list of 47 item names down the side, and no bars — you had to press **Select all** before anything
 appeared, and what appeared then was 47 items crammed into each month at about two pixels each, in
-ten colours shared between them.
+ten colors shared between them.
 
 **The chart now shows one column per month: the total, with the figure printed on it.** It is
 shorter, so the table of figures is visible without scrolling.
@@ -926,7 +926,7 @@ table.
 
 ### Delete asks in the app's own words again, not the browser's
 
-**If Delete — on a product drive, a vendor, an item, anywhere — put up a grey browser box with your
+**If Delete — on a product drive, a vendor, an item, anywhere — put up a gray browser box with your
 server's hostname above the message, reload.** The app has its own confirmation dialog: it names the
 action on the button (*Delete*, not *OK*) and reddens it when the action destroys something. A
 working-tree rollback had removed the whole mechanism, so every confirmation in the app fell through
@@ -973,7 +973,7 @@ Some smaller things went with it:
 - **The partner group form's button says "Save"**, like every other form in the app. It said *Add
   partner group* and *Update partner group*.
 - **On Requests, the row action called "Cancel" now says "Cancel request".** *Cancel* is the word
-  this app uses on every form to mean "abandon what I was doing"; here it cancelled the request,
+  this app uses on every form to mean "abandon what I was doing"; here it canceled the request,
   which is not the same thing at all.
 - **"Invite user" wore three different icons on three pages.** It is one now.
 
@@ -1041,7 +1041,7 @@ python3 bin/design/citation-audit.py --check
 ```
 
 It fails when the number of claims asserting agreement across four or more systems, with no
-component named, goes up. Name the artefact where one is published, say **observed** where it is
+component named, goes up. Name the artifact where one is published, say **observed** where it is
 not, and keep numbers attributed to whoever measured them.
 
 ### Six tables now reach the edge of their card
@@ -1060,7 +1060,7 @@ screens, which is where a page's main action goes everywhere else.
 **Switching between Partners and Groups used to shift the whole card up or down by about 50px**,
 because the filter row sat above it and Groups has no filters. The filters now sit *inside* the card,
 just under the tabs, so **the tabs are in the same place on every tab** and only the table below them
-changes. The same was true across the item catalogue, where Item categories is the one tab without
+changes. The same was true across the item catalog, where Item categories is the one tab without
 filters.
 
 Groups and Item categories still have no filter row, deliberately — they are short lists, and a
@@ -1109,7 +1109,7 @@ On a table that already fits, nothing has changed at all.
 
 To make room for a column that is always on screen, **the buttons in it are now icons**. Hover one --
 or reach it with the Tab key -- and it tells you what it is. It says the same word it always did; a
-labelled pair took 168-273px and the icons take 94px.
+labeled pair took 168-273px and the icons take 94px.
 
 If you are on a phone or a narrow window, the table becomes a list of cards as before, and there
 **the actions get their words back**, because a tooltip is no use without a mouse.
@@ -1117,13 +1117,13 @@ If you are on a phone or a narrow window, the table becomes a list of cards as b
 One more change on **Kits**: its two buttons are now behind the same ⋮ menu the other tables use,
 because which ones you get depends on whether the kit is active. And if a kit cannot be deactivated
 because a storage location still holds it, the action is still offered -- clicking it now tells you
-why and what to do about it, instead of being greyed out with no explanation.
+why and what to do about it, instead of being grayed out with no explanation.
 
 ### Fields that only apply to one answer now sit under that answer
 
 **On New distribution, Shipping cost used to sit off to the right of the delivery method options**,
 in a box half again as wide as every other field on the card, and *above* the *Shipped* option that
-brings it up. It now appears directly underneath *Shipped*, indented, with a short grey rule down
+brings it up. It now appears directly underneath *Shipped*, indented, with a short gray rule down
 its left side — the rule is there to say the field belongs to that one option and not to the other
 two.
 
@@ -1204,11 +1204,11 @@ last sign-in, status and the actions you can take.
 
 ### Confirmations look like the app now
 
-**"Are you sure?" is the app's own dialog**, not the grey browser box that used to say
+**"Are you sure?" is the app's own dialog**, not the gray browser box that used to say
 *localhost:3000 says* above the question. The button says what it will do — *Delete*, *Deactivate* —
 and turns red when the action destroys something.
 
-**An action that cannot be done is no longer greyed out.** *Deactivate* on Items, on Storage
+**An action that cannot be done is no longer grayed out.** *Deactivate* on Items, on Storage
 locations, and *Delete* on a partner group are all clickable, and if the action cannot be completed
 the app says why and what to do about it:
 
@@ -1219,7 +1219,7 @@ the app says why and what to do about it:
 deactivated takes you straight to the explanation — it does not ask "are you sure?" about something
 that was never going to happen. Where the action *can* be done, the confirmation still appears.
 
-The one exception is your own row on the organization's Users table, which stays greyed out — there
+The one exception is your own row on the organization's Users table, which stays grayed out — there
 is nothing to attempt there, so there is nothing to explain afterwards.
 
 ### "Re-send invite" is "Re-send invitation" everywhere
@@ -1286,12 +1286,12 @@ the arrows. What the arrow does has not changed.
 *Edit* beside it ran the full width. A layout bug, not a choice, and it affected every row menu.
 
 **Tables have a visible "Actions" heading** over the last column. It used to be there only for
-screen readers, which was fine when the column held buttons labelled *Edit* and *Delete* — now that
+screen readers, which was fine when the column held buttons labeled *Edit* and *Delete* — now that
 most of them hold a single "..." it is worth naming.
 
 **An action you cannot use tells you why, on screen.** Under *Deactivate* on Items you will now read
 "Still in inventory or used by a kit". That sentence existed before but only screen readers got it;
-everyone else saw a greyed-out word with no explanation.
+everyone else saw a grayed-out word with no explanation.
 
 **Where a row had three or more things you could do, they moved into the "..." menu** at the end of
 the row — barcode items, donation sites and storage locations. Nothing was removed; the actions are
@@ -1302,7 +1302,7 @@ agencies the buttons used to change label, change width, and sometimes disappear
 because which action applies depends on the partner's status. Same on the Users table on your
 organization page, where it depends on the person's role. Both now show one "..." on every row.
 
-**An action you cannot use is now listed and greyed out with the reason**, instead of simply not
+**An action you cannot use is now listed and grayed out with the reason**, instead of simply not
 being there. So "why can I not delete this group?" has an answer on screen.
 
 **Where a table has one or two actions that are always available, they stay as buttons** — nothing
@@ -1337,7 +1337,7 @@ which the screen never said.
 
 **Now: type a unit and press Enter.** Comma and Tab still work if that is your habit. Each unit is a
 chip with its own remove button, backspace on an empty box removes the last one, and typing a unit
-that is already there — in any capitalisation — is refused rather than silently added twice. The
+that is already there — in any capitalization — is refused rather than silently added twice. The
 line under the label says all of this.
 
 This field only appears when the **packs** feature flag is on.
@@ -1347,8 +1347,8 @@ This field only appears when the **packs** feature flag is on.
 **The text editor's buttons had no icons at all** for a few hours between two commits -- fourteen
 empty squares above each email box. Fixed; they are the same icons as the rest of the app.
 
-**The address is labelled again.** Street, City, State and Zip each have a visible label, like every
-other address in the app. They used to show their name only as grey text inside the box, which
+**The address is labeled again.** Street, City, State and Zip each have a visible label, like every
+other address in the app. They used to show their name only as gray text inside the box, which
 vanished as soon as you typed. State and Zip now share a line instead of each running the full width
 of the card.
 
@@ -1356,15 +1356,15 @@ of the card.
 together to too far apart in one step; they are now 8px apart, which is what Carbon, Ant Design,
 Atlassian and Bootstrap all use for the same control.
 
-**`%{partner_name}` and the other placeholders in the email hints are now grey chips**, so they read
+**`%{partner_name}` and the other placeholders in the email hints are now gray chips**, so they read
 as something you can type rather than as a bug.
 
-**There is more room at the foot of every page**, between the last thing on it and the grey footer
+**There is more room at the foot of every page**, between the last thing on it and the gray footer
 bar.
 
 **The sections are banded now.** Each heading -- *Basic information*, *Storage*, *Emails* and the
 rest -- sits on a pale strip running the full width of the card, the same way the sections on your
-organization page do. Before, each one had a grey line that started halfway across, level with the
+organization page do. Before, each one had a gray line that started halfway across, level with the
 end of the heading text. That was a browser quirk rather than a design, and it is gone.
 
 **Yes/No options have room to breathe.** They were stacked flush against each other, 24px each with
@@ -1373,7 +1373,7 @@ to hit correctly on a phone.
 
 **"Deadline day" is readable again.** The box under *Deadline day in reminder email* was too narrow
 for its own placeholder, so the words were cut off mid-way. Same for the reminder day box. Both are
-wide enough now. The reminder options above them were also rebuilt: they are a proper labelled group
+wide enough now. The reminder options above them were also rebuilt: they are a proper labeled group
 instead of a stack of loose labels and line breaks.
 
 **The buttons above the email text boxes match the rest of the app.** The bold, italic, link, list
@@ -1479,7 +1479,7 @@ as text now, and any ZIP that had already lost its leading zero has had it put b
 
 **One spelling.** "Zip code", "Zipcode" and "Zip Code" all appeared on different screens; it is
 **ZIP code** everywhere. On the partner profile view, the two program address lines were both
-labelled "Program Address" &mdash; they now say which line is which.
+labeled "Program Address" &mdash; they now say which line is which.
 
 ### Keyboard users: nothing hides under the scroll bar any more
 
@@ -1544,7 +1544,7 @@ forms are wider and shorter, and no box is stretched to a width its contents nev
 nothing worth pairing — new kit has three fields — are unchanged.
 
 **Forms stay left-aligned**, lined up with the page title, because that is where every other page in
-the app puts its heading. Centring them would slide the title sideways as you moved between a list
+the app puts its heading. Centering them would slide the title sideways as you moved between a list
 and its form.
 
 **Zipcodes are shown as five digits, in boxes, lowest to highest.** They used to be a run of numbers
@@ -1609,13 +1609,13 @@ product drive, inventory audit — the line still explains it, and then says wha
 
 **Getting requests out of the app is one button now.** The requests page used to carry four buttons
 across the top; the CSV export and the unfulfilled picklists PDF are both behind a single **Export**
-menu, and the totals summary moved down onto the table it summarises, where it is called **Show
+menu, and the totals summary moved down onto the table it summarizes, where it is called **Show
 product totals**. That panel now ends with a **Total** row — it used to list every item's quantity
 and never add them up.
 
 **On a narrow screen a table becomes a list of cards.** Below about 640px of card width — a phone,
 a split window, a browser zoomed a long way in — the columns are dropped and each row becomes a card
-with every value labelled: one column of them on a phone, two when there is a little more room. The
+with every value labeled: one column of them on a phone, two when there is a little more room. The
 name that identifies the row is the card's heading and its action sits beside it. Nothing is hidden,
 and the page gets much longer: it is a swap of scrolling down for scrolling sideways, because before
 this you could see about a fifth of a table on a phone. Widen the window past that and the table
@@ -1626,7 +1626,7 @@ Every table with anything in it carries a line along the bottom of its card sayi
 altogether. That total is the answer to "did that filter do anything?", so it is worth a glance
 after you change one. A table with nothing in it says so in the middle of the card instead.
 
-Beside that line are the page controls. **Prev** and **Next** are always there, greyed out when
+Beside that line are the page controls. **Prev** and **Next** are always there, grayed out when
 there is nowhere to go, so they stay in the same place instead of appearing and disappearing
 under your cursor. **`« First`** and **`Last »`** show up once there is more than one page — on
 the audit and event lists the oldest record is often the one you want, and `Last »` is the way
@@ -1671,7 +1671,7 @@ status changes to *recertification required* until you do.
 - **Deactivating is not deleting.** Deactivated partners, items and storage locations keep their
   history, which is why last year's totals do not change when you tidy up this year's list.
 - **Items belong to your bank.** Your "Size 1 Nappies" is yours to name and manage; it is mapped
-  behind the scenes to a shared catalogue entry so that reporting across banks still works.
+  behind the scenes to a shared catalog entry so that reporting across banks still works.
 - **Your bank's name is on every page.** People work with more than one bank, and a screen that
   does not say which one you are in is a screen you can act on by mistake.
 

@@ -2,7 +2,7 @@
 // form, `role="alert"`, naming every failing field in one place. Deliberately **not** GOV.UK's
 // linked-error-summary pattern (each message a link to its field) — design.md borrows the
 // pattern's reasoning, not its implementation, because this system's own established rule (no
-// underline on block-level links) would turn the links into an unrelated third accent colour.
+// underline on block-level links) would turn the links into an unrelated third accent color.
 // The functional benefit (getting to the field) is preserved another way instead: every message
 // is also duplicated at its own field via `<rfg-field>`'s `aria-describedby`, so nothing is lost
 // by not linking.

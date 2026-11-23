@@ -51,7 +51,7 @@ const inspect = (LEGACY) => {
     main: all("main").length,
     skips,
     legacy: LEGACY.filter((c) => all("." + CSS.escape(c)).length),
-    unlabelled: shown("input:not([type=hidden]):not([type=submit]):not([type=button]), select, textarea")
+    unlabeled: shown("input:not([type=hidden]):not([type=submit]):not([type=button]), select, textarea")
       .filter((e) => !(e.labels && e.labels.length) && !e.getAttribute("aria-label") && !e.getAttribute("aria-labelledby")).length,
     nameless: shown("button, [role=button]")
       .filter((e) => !e.textContent.trim() && !e.getAttribute("aria-label") && !e.querySelector("img[alt]:not([alt=''])")).length,
@@ -108,7 +108,7 @@ const roleFor = (controller) =>
       if (a.main !== 1) problems.push(`main=${a.main}`);
       if (a.skips.length) problems.push("heading skip " + a.skips.join(","));
       if (a.legacy.length) problems.push("legacy " + a.legacy.join(","));
-      if (a.unlabelled) problems.push(`unlabelled inputs=${a.unlabelled}`);
+      if (a.unlabeled) problems.push(`unlabeled inputs=${a.unlabeled}`);
       if (a.nameless) problems.push(`buttons with no name=${a.nameless}`);
       if (a.font !== "Figtree") problems.push("font " + a.font);
       if (errors.length) problems.push("js error: " + errors[0]);

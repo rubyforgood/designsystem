@@ -63,7 +63,7 @@ const STYLES = css`
     color: var(--color-neutral-900);
   }
 
-  /* z-index so a focus ring on a middle segment isn't clipped by its neighbours' own
+  /* z-index so a focus ring on a middle segment isn't clipped by its neighbors' own
      overlapping border/background painting over it. */
   rfg-segmented-control .rfg-segmented-group > button:focus-visible {
     outline: 2px solid var(--color-brand-600);

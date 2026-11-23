@@ -26,7 +26,7 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
 
 - `design.md` — the design system itself: components, patterns, copy conventions, accessibility
   rules, backlog. Fully passed over once for the Portable/Local split.
-- `tokens/` — design tokens as a Tailwind v4 `@theme` block (colour, type, spacing, radius,
+- `tokens/` — design tokens as a Tailwind v4 `@theme` block (color, type, spacing, radius,
   elevation), with the Portable rule and the Local default value stated separately for each. See
   `tokens/README.md`.
 - `bin/design/` — the audit suite (~40 scripts: Ruby, JS/Playwright, Python), built on an
@@ -49,7 +49,7 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md) for the full
   build-out history, including several real defects axe-core found and fixed (shadow-DOM ID
   references breaking `aria-controls`/`<label for>`, inline `style` unable to hold `@media`,
-  WCAG AA contrast failures from tone-coloured text on tone-tinted backgrounds) — each one found
+  WCAG AA contrast failures from tone-colored text on tone-tinted backgrounds) — each one found
   by actually running the check, not assumed from reading the code.
 - `bin/design/adapters/storybook/` — a third audit adapter (alongside Rails and
   `examples/reference-app/`), pointed at the built Storybook site rather than a whole app. Only
@@ -58,7 +58,7 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   running it there is a vacuous pass by construction, not a check — see
   `docs/portability/adapter-storybook.md` for the measured outcomes, including a real
   `keyboard-audit.js` bug this adapter found and fixed. It also holds
-  `component-behaviour-audit.js`, a Storybook-only check (also in CI) that `<rfg-table>`'s cell
+  `component-behavior-audit.js`, a Storybook-only check (also in CI) that `<rfg-table>`'s cell
   styles apply and `<rfg-filter-bar>`'s controls submit, which axe and the keyboard audit can't
   see. Both shipped broken in v0.1.0, and the check fails all 20 of its assertions against that
   code.

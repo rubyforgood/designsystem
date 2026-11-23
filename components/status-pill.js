@@ -9,7 +9,7 @@
 // (e.g. `bg-emerald-50`), but tokens/ only exposes one value per semantic tone (--color-success,
 // not a scale). `color-mix()` approximates a -50-equivalent tint (15% of the tone mixed into
 // white) rather than a hand-picked shade — reasonable, but a real tint scale in tokens/ would be
-// more faithful if more semantic colours end up needing one.
+// more faithful if more semantic colors end up needing one.
 
 import { LitElement, html, css } from "lit";
 
@@ -44,7 +44,7 @@ export class RfgStatusPill extends LitElement {
       line-height: 1rem;
       padding: 0.125rem 0.625rem;
       border-radius: var(--radius-pill);
-      white-space: nowrap; /* a wrapped pill centres its icon across two lines */
+      white-space: nowrap; /* a wrapped pill centers its icon across two lines */
     }
 
     .icon-slot {
@@ -60,12 +60,12 @@ export class RfgStatusPill extends LitElement {
       background: var(--color-neutral-100);
       color: var(--color-neutral-700);
     }
-    /* Neutral-900 text, not the tone colour, for the four semantic tones: info/success/warning/
+    /* Neutral-900 text, not the tone color, for the four semantic tones: info/success/warning/
        danger's tokens are measured to clear WCAG AA 4.5:1 against *pure* white only (danger
        specifically by a 0.01 margin, per tokens/README.md), and any tint — even a light one —
        drops below that. Found by running axe-core against this element, not assumed; the same
        fix flash-message.js needed. The tone still shows in the background tint; neutral/brand
-       aren't affected (their tokens have a much larger contrast margin) and keep tone-coloured
+       aren't affected (their tokens have a much larger contrast margin) and keep tone-colored
        text as before. */
     :host([tone="info"]) .pill {
       background: color-mix(in oklch, var(--color-info) 15%, white);

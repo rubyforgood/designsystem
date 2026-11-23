@@ -106,7 +106,7 @@ const COLLECT = () => [...document.querySelectorAll("main a, main button")]
     await ctx.close();
   }
 
-  // The behaviour `title` cannot do, checked once rather than asserted in prose.
+  // The behavior `title` cannot do, checked once rather than asserted in prose.
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   const page = await ctx.newPage();
   await signIn(page, RUNS[0][0]);
@@ -124,14 +124,14 @@ const COLLECT = () => [...document.querySelectorAll("main a, main button")]
   await ctx.close();
   await browser.close();
 
-  console.log("\nbehaviour a `title` cannot manage:");
-  const behaviour = [];
-  if (!onFocus) behaviour.push("nothing appears on keyboard focus");
-  else if (onFocus.ariaHidden !== "true") behaviour.push("the bubble is not aria-hidden, so the action is announced twice");
-  if (afterEscape) behaviour.push("Escape does not dismiss it");
-  behaviour.forEach((b) => console.log(`  FAIL ${b}`));
-  if (!behaviour.length) console.log("  ok   appears on keyboard focus, aria-hidden, dismissed by Escape");
-  defects += behaviour.length;
+  console.log("\nbehavior a `title` cannot manage:");
+  const behavior = [];
+  if (!onFocus) behavior.push("nothing appears on keyboard focus");
+  else if (onFocus.ariaHidden !== "true") behavior.push("the bubble is not aria-hidden, so the action is announced twice");
+  if (afterEscape) behavior.push("Escape does not dismiss it");
+  behavior.forEach((b) => console.log(`  FAIL ${b}`));
+  if (!behavior.length) console.log("  ok   appears on keyboard focus, aria-hidden, dismissed by Escape");
+  defects += behavior.length;
 
   console.log(`\n${controls} icon-only controls across ${TARGETS.length} screens, ${defects} defects.`);
   process.exit(defects ? 1 : 0);

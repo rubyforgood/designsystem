@@ -45,7 +45,7 @@ gap a documented design system closes.
 
 1. Adopt [`design.md`](../../../design.md) at the repository root as the approved design system for
    Human Essentials, and treat it as normative for UI work: the component patterns, the Bootstrap 4
-   CSS / Bootstrap 5 JS dialect split, the Title Case copy convention, the semantic colour mapping,
+   CSS / Bootstrap 5 JS dialect split, the Title Case copy convention, the semantic color mapping,
    the `UiHelper` button rules, and WCAG 2.1 AA as the accessibility bar for new work.
 2. Reaffirm ADR 0009. Bootstrap plus AdminLTE remains the framework. No second CSS framework is to
    be introduced, and the leftover TailwindCSS classes are to be removed rather than revived.

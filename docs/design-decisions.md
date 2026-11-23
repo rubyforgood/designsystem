@@ -36,7 +36,7 @@ the entire navigation on every single page. This is the standard remedy and the 
   the zero-CSS option, but it reveals itself with `position: static`, which pushes the entire
   page down the moment the link takes focus. Absolute positioning is what GOV.UK, USWDS and the
   WAI skip-link pattern all use, precisely to avoid that reflow.
-- *A brand-coloured focus ring.* The obvious pick was `$diaper-color-orange-51` (`#f39c12`), the
+- *A brand-colored focus ring.* The obvious pick was `$diaper-color-orange-51` (`#f39c12`), the
   app's warning amber, but it is **2.15:1** against white and fails WCAG 1.4.11 (non-text
   contrast, 3:1). The ring is `$diaper-color-neutral-13` (`#222222`) instead, at 15.9:1. Link
   text is `$diaper-color-blue-26` (`#005384`) at 8.06:1 on white.
@@ -217,7 +217,7 @@ moves it.
 
 **Decision.** The three legacy view helpers keep their names, signatures and options
 (`type:`, `size:`, Font Awesome icon names) and emit design system markup instead. They were
-not deprecated in favour of the `essentials_*` helpers.
+not deprecated in favor of the `essentials_*` helpers.
 
 **Rationale.** Between them they have ~100 call sites. Replacing the API means touching all of
 them in the same change that migrates the views, which is how a mechanical migration turns
@@ -225,7 +225,7 @@ into a rewrite. Mapping `type: "success"` onto `variant: :primary` and `fa fa-pl
 `bi-plus-lg` inside the helper keeps every existing call site working *and* meaning the same
 thing, and leaves a single place to change later.
 
-The mapping is deliberately lossy in one direction: AdminLTE had seven contextual colours and
+The mapping is deliberately lossy in one direction: AdminLTE had seven contextual colors and
 the design system has four variants, so `info` and `warning` both land on `:secondary`. The
 distinction they encoded was decorative — the button's label already said what it did.
 
@@ -305,11 +305,11 @@ If system specs fail with `Failed to resolve module specifier`, the answer is
 ## 2026-08-18 · The browser's clock has to follow Rails' clock in tests
 
 **Decision.** The design system's `<head>` injects sinon's fake timer in the test
-environment, initialised from `Time.now`, exactly as the AdminLTE layout did.
+environment, initialized from `Time.now`, exactly as the AdminLTE layout did.
 
 **Rationale.** It was dropped in the migration, and nothing failed loudly. `travel_to` moves
 only Ruby's clock; anything computed in the browser — the reminder and deadline dates, for one
-— stays on real time, so the two disagree by however far the spec travelled. The shared
+— stays on real time, so the two disagree by however far the spec traveled. The shared
 example's own comment says "there isn't an easy way to spoof the current time in the test
 browser". There is, and this was it.
 
@@ -323,7 +323,7 @@ where Turbo Drive is enabled, and `@turbo` is set per action here — so switchi
 `data-turbo-confirm` quietly removed "are you sure?" from destructive actions on every page
 with Turbo off.
 
-## 2026-08-18 · Specs address behaviour and accessibility contracts, never styling
+## 2026-08-18 · Specs address behavior and accessibility contracts, never styling
 
 **Decision.** Where a spec named a Bootstrap class, it now names the thing that makes the
 element what it is:
@@ -475,7 +475,7 @@ wonders. Naming a thing you chose not to do is cheaper than either.
 Audited all 27 index tables: 17 use `:ghost` throughout, 7 mix weights.
 [table-audit.md](table-audit.md) has the measurements.
 
-The rejected alternative was the intuitive one — emphasise the most important action in each
+The rejected alternative was the intuitive one — emphasize the most important action in each
 row. It does not survive contact with a real table. On the partner list "Review profile" is
 bordered and "Request recertification" is not, but each is the main thing to do for its own row,
 so the emphasis is really tracking which action it is, not how much it matters. Read down the
@@ -494,7 +494,7 @@ table row, so the call site has to.
 Twelve tables badge only the exceptional state — "Inactive", "Expired", "Below minimum" —
 attached to the name rather than given a column. Five badge every row. The twelve are right.
 
-A column where every row carries a badge has spent colour on information the reader already
+A column where every row carries a badge has spent color on information the reader already
 has: they can see it is a list of partners, and "Approved" on most rows tells them nothing. The
 cost is not neutral, because the eye learns to skip a column that is always the same, and the
 exceptions go with it. The badge that matters is the one in a column that is usually empty.
@@ -508,7 +508,7 @@ place is badging it *twice* — see the next entry.
 `partners/_statuses.html.erb` builds its filter strip out of `EssentialsUiHelper::PILL_TONES` —
 the status palette itself. So the partner list shows 13 pills on a seeded org: seven that filter
 the list when clicked, six that report a row's state and do nothing. Same shape, same size, same
-colours.
+colors.
 
 design.md has said since the migration that a pill is "a state, not a control: not focusable,
 does not look pressable". Half of these are links. Nothing about them says which half.
@@ -521,13 +521,13 @@ status column, since the strip already communicates the same six states.
 
 ## 2026-08-18 · Filter with the shared filter bar, not with status chips
 
-The partner list filtered with a strip of coloured chips. Two of them — the statuses with no
-partners — rendered as greyed, non-interactive spans, which is a disabled control in everything
+The partner list filtered with a strip of colored chips. Two of them — the statuses with no
+partners — rendered as grayed, non-interactive spans, which is a disabled control in everything
 but name, and design.md rejects those: "a link cannot be disabled".
 
 The obvious fix was to restyle the chips. The right fix was to notice that this app answered
 the question fifteen times already. **Fifteen index pages filter with
-`shared/essentials/filter_bar`** — a labelled select, a Filter button, Clear filters. Exactly
+`shared/essentials/filter_bar`** — a labeled select, a Filter button, Clear filters. Exactly
 one page used chips. `/requests` filters by a status enum with a plain select and always has.
 
 So the chips went. The disabled-control problem does not need solving; it needs deleting,
@@ -563,7 +563,7 @@ shows it immediately, and that spec is now checked in.
 
 The fix is in the controller, not the helper: `filter_params.to_h.compact_blank`, so an
 all-blank filter set means the default view. Doing it in `class_filter` would have changed
-behaviour for the fifteen other pages that use it, and doing it in `filter_select` would leave
+behavior for the fifteen other pages that use it, and doing it in `filter_select` would leave
 the next controller to rediscover the same thing.
 
 The general point, which is why this is written down rather than just fixed: a link that is
@@ -581,7 +581,7 @@ With one control the button is pure friction: you have already said what you wan
 button makes you say it twice. With nine, applying on every change fires a query per control
 while the user is still assembling the question, and each one throws away the scroll position.
 
-So `auto_submit:` is a per-bar option rather than a global behaviour, and the four single-filter
+So `auto_submit:` is a per-bar option rather than a global behavior, and the four single-filter
 pages take it. Two of those four filter on a checkbox, which is the clearest case of all: a
 checkbox behind an Apply button is a switch that does not switch anything.
 
@@ -613,18 +613,18 @@ The partner status column carried an icon on all six rows. Two problems, one rep
 found while fixing it.
 
 Reported: it reads as busy. The icon is decorative — `aria-hidden`, with the word beside it
-doing the work — so six of them are six pieces of noise in a column that is already colour-coded.
+doing the work — so six of them are six pieces of noise in a column that is already color-coded.
 Icons stay on pills that mark an exception, "Inactive" and "Expired", where they appear on one
 row in twenty and help it stand out.
 
-Found: "Recertification required" was wrapping to two lines, and a wrapped pill centres its icon
+Found: "Recertification required" was wrapping to two lines, and a wrapped pill centers its icon
 across both lines, so the icon sat between them looking misaligned. The icon was part of what
 pushed it over the width. Pills now carry `whitespace-nowrap` regardless, because a pill is a
 label and a label that reflows is a layout accident, not a design.
 
 ## 2026-08-18 · Order the status filter by lifecycle, not alphabetically
 
-Asked whether the dropdown should be alphabetical. No — and the reason generalises.
+Asked whether the dropdown should be alphabetical. No — and the reason generalizes.
 
 Alphabetical order helps when a list is long and its values have no inherent sequence: countries,
 partners, item names. You arrive knowing the label and need to find it. A status enum is the
@@ -649,7 +649,7 @@ and took it away a frame later.
 
 Hiding it server-side with an inline `display:none` and restoring it from a `<noscript>` rule
 inverts the default: it is hidden unless JavaScript is *absent*, rather than visible until
-JavaScript arrives. Same behaviour without JavaScript, no flash with it.
+JavaScript arrives. Same behavior without JavaScript, no flash with it.
 
 The general rule: if a control's resting state depends on JavaScript being present, render the
 resting state and let `<noscript>` undo it. Anything a controller does on connect happens after
@@ -680,12 +680,12 @@ The rules, which nothing on screen was saying:
 | A named status | exactly that one |
 
 So the six are **not** a subsection of either. Five of them sit inside Active; the sixth,
-Deactivated, only inside All. The `<optgroup>` labelled "By status" asserted a hierarchy that
+Deactivated, only inside All. The `<optgroup>` labeled "By status" asserted a hierarchy that
 does not exist, which is why the question came up. It is gone.
 
 On contrast: the optgroup computes to slate-900 on white, 17.9:1, so it passes on paper. That
 measurement is worth little, because the options list is drawn by the platform rather than by
-this stylesheet — macOS renders optgroup labels in its own grey, near enough slate-400 at 2.6:1,
+this stylesheet — macOS renders optgroup labels in its own gray, near enough slate-400 at 2.6:1,
 and no CSS here changes it. A control whose contrast is not ours to set is a control we cannot
 promise anything about, which is a second reason to avoid optgroup rather than restyle it.
 
@@ -699,7 +699,7 @@ no hierarchy to misread, and nothing whose rendering we do not control.
 commits. The instruction was still true in spirit and impossible to follow literally.
 
 Both affected pages now name the option that does the job — "Choose 'All statuses' to see every
-partner agency" — which meant giving the audits filter a labelled blank option ("All storage
+partner agency" — which meant giving the audits filter a labeled blank option ("All storage
 locations") so there was something to name. That is an improvement anyway: an unexplained empty
 first option is a worse control than a named one.
 
@@ -800,13 +800,13 @@ summary" and "Distributions — itemized" become one page with a view switcher. 
 structurally correct end state and a real refactor of twelve pages; the hub proves the grouping
 first.
 
-Two judgement calls inside it:
+Two judgment calls inside it:
 
 - **Annual survey stays on the hub**, not in the rail, though it is high-stakes for NDBN member
   banks. Permanent rail space is the wrong tool for an annual deadline; a dashboard prompt when
   the filing window opens is the right one, and is not built.
 - **History is not a report.** It is the inventory event log, and it sat under Reporting because
-  there was nowhere else. It is on the hub under "Everything else" and labelled as an audit
+  there was nowhere else. It is on the hub under "Everything else" and labeled as an audit
   trail rather than pretending the hub resolved it.
 
 `active_on` for the rail entry lists every controller that renders a report, so the entry stays
@@ -1031,7 +1031,7 @@ would mean either failing the build on cosmetics or letting real defects hide am
 
 Three exclusions, all deliberate: `shared/essentials/*`, because the components are the
 definition rather than a copy of it; mailer templates, where inline style is the only thing email
-clients honour; and `static/*`, which the migration map already records as standalone public
+clients honor; and `static/*`, which the migration map already records as standalone public
 documents outside the system.
 
 ## 2026-08-19 · A show page is a description list, not a one-row table
@@ -1045,7 +1045,7 @@ two-column grid it reads better than either, and it does not promise a reader th
 coming.
 
 Also fixed on those pages: `partners/requests/show` set its field labels at `text-2xl font-bold`
-above values at `text-lg`, so every label was larger than the thing it labelled — the same
+above values at `text-lg`, so every label was larger than the thing it labeled — the same
 inverted hierarchy the reports had.
 
 ## 2026-08-18 · Which modulepreloads to keep
@@ -1124,7 +1124,7 @@ misdescribes what is on screen. A range matching no preset reads as *Custom*.
 
 **Rejected: changing the wire format.** `filters[date_range]` is still one string,
 `"June 19, 2026 - September 19, 2026"`, split on `" - "` and parsed with `strptime`. Two ISO
-parameters would be cleaner — a localised month name is a fragile thing to parse, and the
+parameters would be cleaner — a localized month name is a fragile thing to parse, and the
 rescue silently resets to the default range with a flash. But that touches `DateRangeHelper`,
 ten call sites and their specs, and none of it is what makes the control look wrong. Kept as a
 follow-up rather than smuggled into a visual fix.
@@ -1215,16 +1215,16 @@ Linear do for a metric strip. It also fixed a smaller inconsistency: the tiles w
 order, not grid position, so in any arrangement of more than one row it draws lines in the wrong
 places — the second cell of a 2×2 gets a top border because it is the second *child*, not because
 it is below anything. A 1px gap showing a `slate-200` parent through it puts a hairline between
-every pair of actual neighbours, rows included, and needs no per-breakpoint reset.
+every pair of actual neighbors, rows included, and needs no per-breakpoint reset.
 
-The trade this makes: an **empty grid cell now shows as a grey block** rather than as whitespace,
+The trade this makes: an **empty grid cell now shows as a gray block** rather than as whitespace,
 because the backdrop shows through wherever a cell is missing. That is why the count and the
 columns have to agree, and why it is written down in `design.md` next to the table rather than
 left as a property of the implementation.
 
 **Rejected: the minimal fix** — keeping the filled tiles and only correcting the column count.
 It removes the orphan, which was most of the complaint, and it is one line. Rejected because it
-leaves the other half: four grey boxes floating on the page in no container, which is what
+leaves the other half: four gray boxes floating on the page in no container, which is what
 prompted the question.
 
 **Rejected: `divide-y` stacked with `lg:divide-x lg:divide-y-0`.** Simpler, and correct at both
@@ -1293,11 +1293,11 @@ states the period in its page header, and two statements of it is the duplicatio
 
 **`date_range_caption` is deleted.** It was added a commit earlier for the standalone-caption
 design, and the header supersedes it: the scope sentence uses `date_range_label` mid-sentence,
-where it stays lower case, so nothing needs the capitalised form. Its only remaining caller was
+where it stays lower case, so nothing needs the capitalized form. Its only remaining caller was
 its own spec.
 
-**Relabelled** `Default (recent and upcoming)` to `Last 2 months and next month`. The old label
-said neither what it included nor how far it reached. Behaviour is unchanged: the window still
+**Relabeled** `Default (recent and upcoming)` to `Last 2 months and next month`. The old label
+said neither what it included nor how far it reached. Behavior is unchanged: the window still
 runs into the future on purpose, because a distribution can be scheduled before it happens and a
 range ending today would hide everything already booked in. The spec that checks every preset has
 a phrase now identifies the default window by its dates rather than by its name, so a future
@@ -1392,7 +1392,7 @@ page.
 
 The date range cell carried `sm:col-span-2` permanently, because it holds three controls once
 *Custom* is chosen. It holds three controls only when Custom is chosen; the rest of the time it
-was one select in a cell twice the width of its neighbours. The custom dates now stack inside a
+was one select in a cell twice the width of its neighbors. The custom dates now stack inside a
 one-column cell. Two date inputs abreast in one column would leave about 119px each against a
 natural width of 149.
 
@@ -1413,7 +1413,7 @@ fewer is one row at desktop and hiding one row behind a click costs more than it
 `/items` stay open and drop to 64px from the two fixes alone.
 
 The threshold is counted **in the partial**, from the element children of the yielded block
-(Nokogiri, 26µs), so no call site decides it and the behaviour cannot drift from one page to the
+(Nokogiri, 26µs), so no call site decides it and the behavior cannot drift from one page to the
 next.
 
 **A collapsed filter set has to say what is active.** That is the whole condition on collapsing:
@@ -1445,14 +1445,14 @@ debounce, or "idle" is satisfied by the pause before the request has been sent.
 
 ## 2026-08-20 · One filter pattern, a date range popover, and every dialog was in the corner
 
-**The threshold is gone.** Every filter bar collapses, whatever its size. Two behaviours across
+**The threshold is gone.** Every filter bar collapses, whatever its size. Two behaviors across
 sixteen pages is worse than one whichever one it is: someone who learns the filter bar on
 donations and then meets something else on transfers has learned nothing transferable. The
 argument for the threshold — that hiding a single row behind a click costs more than it saves —
 was true in isolation and wrong in aggregate.
 
 **Every modal in the app opened in the top-left corner.** Not one page: twenty-eight files. A
-native `<dialog>` opened with `showModal()` is centred by the browser's own `margin: auto`, and
+native `<dialog>` opened with `showModal()` is centered by the browser's own `margin: auto`, and
 Tailwind's preflight resets `margin: 0` on every element. Measured on `/requests`: `:modal` true,
 `top: 0, left: 0`, `margin: 0px`. One rule in `@layer base` fixes all of it, along with the
 `max-height` and `max-width` preflight also takes, without which a long dialog grows past the
@@ -1461,7 +1461,7 @@ viewport and its top scrolls out of reach.
 **That bug is the more useful finding.** It survived `page-audit.rb`, which reads markup, and
 `wcag-audit.js`, which scans pages as loaded, because **neither had ever opened anything**. Both
 reported these pages clean while every dialog on them was unusable. `bin/design/overlay-audit.js`
-now opens all of them — 3 dialogs and 14 popovers — and checks centring, viewport fit, accessible
+now opens all of them — 3 dialogs and 14 popovers — and checks centering, viewport fit, accessible
 name, Escape, focus return and surface, and runs axe on the opened overlay. It found one more
 real thing on its first run: a `max-h-96 overflow-y-auto` list inside the calculate-totals dialog
 that could not be scrolled by keyboard, WCAG 2.1.1.
@@ -1513,7 +1513,7 @@ are both `h-14` with a full-bleed top border.
 Measured, all six at `left: 12`. So a top-level destination looked like a child that had lost its
 parent, which is what "the typography does not match" turned out to mean.
 
-The mistake underneath it is that the styling encoded **behaviour** (does this expand?) rather
+The mistake underneath it is that the styling encoded **behavior** (does this expand?) rather
 than **hierarchy** (how deep is this?). GitHub, Linear, Notion, Jira, Stripe and Vercel all do the
 opposite, and the reason is that a rail is scanned by indentation and weight: an affordance marks
 what a thing does, type marks where it sits. Dashboard only ever looked right because it was the
@@ -1750,7 +1750,7 @@ prose beside option A described it as "one change: the label", which is what was
 panel's pager was drawn idealised and that was an inconsistency in the mockup, not a decision.
 
 **The noun is lowercased word by word, not with `downcase`.** Kaminari's `entry_name` returns
-the humanised model name, which is capitalised and which an i18n entry may have set by hand —
+the humanised model name, which is capitalized and which an i18n entry may have set by hand —
 `ProductDrive` reads "Product Drive". A word keeps its case if it carries an internal capital,
 so `/admin/ndbn_members` will read "NDBN members" when it gets a pager rather than "ndbn
 members".
@@ -1833,7 +1833,7 @@ form itself. A row action is a whole-page navigation ending in a redirect and a 
 frame update, so opting out is what it wanted all along. 0 failures in 20 runs, against 4 in 8
 before. The full suite passes.
 
-**What this says about the earlier judgement.** Writing it down as "a pre-existing flake, not
+**What this says about the earlier judgment.** Writing it down as "a pre-existing flake, not
 mine" was true and verifiable — it did fail on a clean `HEAD` — and it was still the wrong
 place to stop. A test that fails half the time is not noise, it is a defect with a poor
 reproduction, and the reproduction here took about twenty minutes of instrumenting rather than
@@ -1893,7 +1893,7 @@ audits do that now.
 screenshot at rest is 33KB; the screenshot scrolled right is 5KB, and the only thing painted in
 it is the dev profiler badge.
 
-The cause is a genuine Chrome behaviour: content clipped inside a scroll container still counts
+The cause is a genuine Chrome behavior: content clipped inside a scroll container still counts
 towards the *root's* scrollable overflow. The table was in a working `overflow-x: auto`
 container, inside an ancestor with `overflow: hidden`, and the page scrolled anyway.
 `min-width: 0` on the flex ancestors changes nothing. Only clipping the root does:
@@ -2131,14 +2131,14 @@ column and must not be inert whatever the drawer's last state was.
 **It was invisible at 1280 and 27 stops deep at 375**, which is the argument for running the
 keyboard audit at both widths rather than one.
 
-### select2 names nothing it builds, and is initialised twice
+### select2 names nothing it builds, and is initialized twice
 
 select2 hides the `<select>` and builds a combobox, a value display marked `role="textbox"`, and
 a search input. None inherits the original's name, and the combobox's `aria-labelledby` points at
 its own value container — empty until something is chosen.
 
 The naming had already been written once, in `select2_controller`, for the search field. It did
-not apply to `/admin/users/new`, because **that select is initialised by `double_select_controller`
+not apply to `/admin/users/new`, because **that select is initialized by `double_select_controller`
 instead** — a second call site the first fix never knew about. It is a shared util now, used by
 both, and it names all three generated elements. The label's id goes in front of select2's
 container id rather than replacing it, so the control announces its name and then its value.
@@ -2147,7 +2147,7 @@ container id rather than replacing it, so the control announces its name and the
 
 Fifth audit, same lesson. Two false positives, both decoration:
 
-- the drawer scrim, which is `aria-hidden`, closes on click, and whose behaviour is also on
+- the drawer scrim, which is `aria-hidden`, closes on click, and whose behavior is also on
   Escape and on a real close button;
 - a `<dialog>`'s own click handler, which is backdrop dismissal — the keyboard equivalent is
   Escape, which the browser provides and `overlay-audit` checks on every dialog.
@@ -2230,7 +2230,7 @@ same modal is on the pre-migration view at `ae97376d1` — which is the interest
 faithful rewrite carries a broken feature across intact, because the rewrite's question is
 "does it look right", and it did.
 
-Removing the UI rather than leaving it pointed at nothing is the same judgement as the routes.
+Removing the UI rather than leaving it pointed at nothing is the same judgment as the routes.
 If manufacturer import is wanted, it is four small pieces and one of them is a one-line
 `include`; what should not stay is a button that offers it and raises.
 
@@ -2392,7 +2392,7 @@ will hit the fourteenth.
 
 ### Reported, not removed
 
-The 118 are a list, not a change. Removing dead code is a judgement per item — a `public/img`
+The 118 are a list, not a change. Removing dead code is a judgment per item — a `public/img`
 logo may be somebody's brand asset, a helper may be about to be used by the page being written
 this week — and the ask was an audit. The two **defects** are fixed, because those are bugs. The
 dead code is written down here and in the change log, and stays until someone decides item by
@@ -2413,7 +2413,7 @@ The name in the bar was the only text on the page guaranteed not to change betwe
 is precisely what makes it expensive — it sits at the top right, where the eye goes for the page
 actions, and it is the one thing there that is never the answer to anything. Both copies were
 already conceding the point at small widths (`hidden … sm:block`, `max-w-[12rem] truncate`), so
-the layout had two behaviours to reason about and the narrow one was the honest one.
+the layout had two behaviors to reason about and the narrow one was the honest one.
 
 **The chevron stays.** It was tempting to read "just the avatar" as the whole trigger, but the
 chevron is the only thing marking a circle of letters as a control rather than decoration, and
@@ -2739,7 +2739,7 @@ four are a straightforward swap — `reports/index` and `admin/ndbn_members/inde
 surfaces. The other two are not obviously the component's job: `admin/dashboard` and
 `partners/_show_header` use the card surface for a small `flex items-center gap-3` tile, and the
 card renders a title/subtitle/actions header a tile does not want. Converting all four is a
-judgement per file and a separate change; what this one fixes is that the audit can see them.
+judgment per file and a separate change; what this one fixes is that the audit can see them.
 
 ## 2026-08-23 · One of the two "straight swaps" was not one
 
@@ -2760,7 +2760,7 @@ and a `pb-2.5` divider. `shared/essentials/card` has none of that: no way to lab
 no icon slot, no meta slot, and a hardcoded `text-base` heading in a `px-5 py-4` header. Swapping
 it would:
 
-- **remove six labelled regions.** An unnamed `<section>` is not exposed as a region at all, so
+- **remove six labeled regions.** An unnamed `<section>` is not exposed as a region at all, so
   this is a real loss that axe would not report as a violation.
 - **grow each card by roughly 25px** — measured: the header is 39px today against the component's
   ~56px, and the body would go from `p-4` to `p-5`. The grid ends at 659px in a 900px viewport,
@@ -2795,7 +2795,7 @@ card's radius, border or shadow reached one of six.
 
 They are not all cards, which is why converting them was the wrong fix. `essentials_stats` builds
 its own container, `admin/dashboard` and `partners/_show_header` build `flex items-center gap-3`
-stat tiles, `reports/index` builds a compact labelled `<section>`, and
+stat tiles, `reports/index` builds a compact labeled `<section>`, and
 `shared/essentials/_disclosure` wraps a panel. None wants the component's title/subtitle/actions
 header. What they share is a *surface*.
 
@@ -2841,8 +2841,8 @@ new was added, which is the argument for the probes.
 
 The axe sweep came back with a `link-in-text-block` on `/admin/ndbn_members`: the Google Sheets
 link in that page's instructions. It is not from the surface work — it arrived with the rebuild a
-few commits earlier, which replaced a bare `<a>` (browser-underlined) with a brand-coloured
-`link_to` and no underline. Colour alone does not distinguish a link from the prose around it.
+few commits earlier, which replaced a bare `<a>` (browser-underlined) with a brand-colored
+`link_to` and no underline. Color alone does not distinguish a link from the prose around it.
 
 `app/views/help/show.html.erb` already had the right pattern and design.md did not write it down,
 so it does now: a link inside a sentence is `font-medium text-brand-700 underline
@@ -2877,7 +2877,7 @@ closed against draft, which is exactly what makes it worth a column.
 Four places in this app put an icon tile inside a loop. Three pass a value from the row —
 `stat[:icon]`, `metric[:icon]`, `option[:icon]` — and are correct. The two that were wrong passed
 a **string literal**. "Is the icon a literal or does it come from the row?" decides it without
-any judgement about whether the glyph is pretty, and it is now the wording in design.md.
+any judgment about whether the glyph is pretty, and it is now the wording in design.md.
 
 ### The card grew an `icon:` local rather than a captured title
 
@@ -2909,7 +2909,7 @@ the file's own comment says the grid was tuned to stay above the fold. So the he
 sizes already are, which gives the pair of legitimate sizes one definition instead of one
 definition and one copy.
 
-**The colour moved and that is the point.** Converting the hub takes its icon from
+**The color moved and that is the point.** Converting the hub takes its icon from
 `text-brand-700` to the helper's `text-brand-600`, 7.07:1 down to 5.62:1 against `bg-brand-50`.
 Both are far past the 3:1 that non-text contrast asks for, and the icon is `aria-hidden`
 decoration in a card whose heading carries the meaning. The alternative — moving the *helper* to
@@ -2918,7 +2918,7 @@ Geometry is unchanged: 28×28, 8px radius, same header, card and grid heights.
 
 ### The discriminator for the audit is `rounded-full`
 
-A tile check that matched every tone-coloured fixed-size rounded box would also flag the topbar
+A tile check that matched every tone-colored fixed-size rounded box would also flag the topbar
 avatars and the five numbered step badges on the getting-started card. It does not, because those
 are circles and tiles are not. That is not a convenience — design.md already keeps avatars and
 tiles disjoint on the grounds that it is what makes either readable at a glance, and the audit now
@@ -2927,7 +2927,7 @@ that emits markup: did someone rebuild a thing the design system already defines
 
 ### What was checked and left alone
 
-Eight tone-coloured rounded boxes exist in the app. Two are topbar avatars, five are the
+Eight tone-colored rounded boxes exist in the app. Two are topbar avatars, five are the
 getting-started step badges, one was the reports hub. Only the last was a tile. The step badges
 repeat the same 100-character class string five times in one file, which is its own small drift
 risk — but they are a numbered badge rather than an icon tile, and five copies in one file is a
@@ -2986,7 +2986,7 @@ A data-URI SVG copied into three places would have drifted the way the tile and 
 ### Verified by pixels, not by CSS
 
 The gaps above were measured by screenshotting each control at 4× and scanning for the stroke
-colour, because the thing that was wrong — a glyph inset inside its own background box — is
+color, because the thing that was wrong — a glyph inset inside its own background box — is
 invisible in the CSS and invisible to a computed-style check. All three now paint their chevron
 with its box edge 12px from the border, matching `pl-3` on the other side, and the app-wide sweep
 reports one signature for all 116 visible selects where it used to report three.
@@ -2995,9 +2995,9 @@ reports one signature for all 116 visible selects where it used to report three.
 
 Two changes, one of which reverses a call made on this branch three days ago.
 
-### The asterisk was grey, with three dots under it
+### The asterisk was gray, with three dots under it
 
-`<abbr title="required">*</abbr>` inherits the label's colour — slate-700 — and every browser's
+`<abbr title="required">*</abbr>` inherits the label's color — slate-700 — and every browser's
 default stylesheet gives `abbr[title]` `text-decoration: underline dotted`. Under a single
 asterisk that renders as a star with three dots beneath it. Nothing in the design system turned
 it off, so the marker was neither red nor cleanly an asterisk, on every form in the app.
@@ -3018,7 +3018,7 @@ hit it, fixed the one they could see, and moved on.
 unless the form actually had a required field. It was added deliberately, for WCAG 3.3.2, with
 the reasoning: *"`abbr@title` covers a screen reader; a sighted user got a bare glyph."*
 
-The counter-argument, and the one taken: a **red** asterisk is not a bare glyph. Grey-with-dots
+The counter-argument, and the one taken: a **red** asterisk is not a bare glyph. Gray-with-dots
 was, which is most of why the legend felt necessary. The line cost roughly 32px at the top of
 every form's card, and the two profile step pages carried a second one — an info callout reading
 "Instructions: Please fill out the following form sections carefully. Ensure that all required
@@ -3026,7 +3026,7 @@ fields are completed." — which pushed the first card from 274px down to 350px.
 
 **Nothing programmatic changed.** The `abbr@title` is still there and still read by screen
 readers; `aria-required="true"` is still put on every required input by `EssentialsInputAria`.
-What was removed is a visible restatement for sighted users, who now get colour and shape
+What was removed is a visible restatement for sighted users, who now get color and shape
 instead of a sentence. WCAG 3.3.2 asks for labels or instructions, not for a legend; Material and
 Polaris both mark required fields without one, and GOV.UK avoids asterisks entirely rather than
 explaining them. This is a defensible position rather than an obviously correct one, which is why
@@ -3037,14 +3037,14 @@ it is written down as a reversal rather than as a fix.
 **`form-validation-audit.js` asserted the legend exists.** Left alone it would have reported
 "asterisk with nothing saying what it means" on 26 forms — verified by running the old audit
 against the new app. The check is now `markerStyled`: the marker must not inherit the label
-colour and must not carry a text decoration. That is a test for the defect that actually existed,
+color and must not carry a text decoration. That is a test for the defect that actually existed,
 where the old one tested for the absence of a mitigation.
 
 **Four labels wrote their own asterisk.** `product_drive_participants/_form` marks four
 conditionally-required fields — business name or contact name, phone or email — with a literal
 `*` in the label text plus a parenthetical explaining the condition. Harmless while the real
-marker was also a grey glyph; not harmless once it is red, because the page then shows two
-asterisks in two colours meaning two different things. The asterisks went and the parentheticals
+marker was also a gray glyph; not harmless once it is red, because the page then shows two
+asterisks in two colors meaning two different things. The asterisks went and the parentheticals
 stayed, which is the half that ever carried the meaning.
 
 ### One finding this did not cause
@@ -3082,8 +3082,8 @@ rule fails without touching validation — `can_deactivate?` on an item, an inve
 a distribution, `validate_role_resource_params` raising before `admin/users` ever validates. Those
 would have re-rendered with no sign of trouble at all.
 
-`ApplicationController#flash_error_unless_summarised(record, message)` sets the flash only when
-there is nothing to summarise. Operational failure keeps its flash; validation failure gets the
+`ApplicationController#flash_error_unless_summarized(record, message)` sets the flash only when
+there is nothing to summarize. Operational failure keeps its flash; validation failure gets the
 summary; never both. 33 call sites across 21 controllers.
 
 Three of those flashes built their message *out of* `record.errors`, which the guard makes
@@ -3103,9 +3103,9 @@ The selector now excludes anything inside `turbo-frame#flash`. Reported as it ha
 the same mistake would flatter a future run: 18 → 0 is the number after fixing the check, not
 before.
 
-### The inline error had the colour and not the glyph
+### The inline error had the color and not the glyph
 
-`design.md`: *"Never colour alone. Every coloured signal carries a word, and usually an icon
+`design.md`: *"Never color alone. Every colored signal carries a word, and usually an icon
 too."* The message was the word; there was no icon. And a hint and an error render in the same
 place, at the same size, under the same field — `mt-1 block text-xs`, differing only in hue and
 weight. Hue was doing the work on its own, which is what WCAG 1.4.1 is about.
@@ -3118,31 +3118,31 @@ sitting there with a single child since the summary was written, space reserved 
 nobody added.
 
 **The text stays `rose-700`, and this is a deliberate departure from what was asked for.** The
-request was for grey. `design.md` maps a failure to the `danger` tone, says text tones use the
+request was for gray. `design.md` maps a failure to the `danger` tone, says text tones use the
 `-700` step, and says error text specifically is `rose-700` — and the instruction was to check
-the design system and match it. Grey is also the hint colour: `slate-500` at `text-xs`, in the
-same slot under the same field, so a grey error and the hint it replaces would be near
+the design system and match it. Gray is also the hint color: `slate-500` at `text-xs`, in the
+same slot under the same field, so a gray error and the hint it replaces would be near
 indistinguishable. The icon was the missing half, and it is the half that removes the reliance on
-colour.
+color.
 
-## 2026-08-23 · The error message goes slate, and three checks that were keyed to its colour
+## 2026-08-23 · The error message goes slate, and three checks that were keyed to its color
 
 A follow-up to the entry above, reversing the half of it that kept the inline message red.
 
 ### The glyph signals; the sentence reads
 
-The argument for `rose-700` was design.md's colour table: a failure is `danger`, text tones use
+The argument for `rose-700` was design.md's color table: a failure is `danger`, text tones use
 the `-700` step. The argument against is that **there is an icon now**, and it is the icon doing
-the signalling. Once that is true the sentence is just words, and words read better in body
+the signaling. Once that is true the sentence is just words, and words read better in body
 text: `slate-700` is **10.35:1** on white against rose-700's **6.29:1**. A form with six problems
 also stops being six lines of red.
 
-The objection raised the first time — that a grey error is indistinguishable from the grey hint
+The objection raised the first time — that a gray error is indistinguishable from the gray hint
 in the same slot — is answered by the same icon. The hint is `slate-500` with no glyph; the error
 is `slate-700` with one. Two differences, neither of them hue alone.
 
 The summary followed: `slate-900` heading, `slate-700` items, on the `rose-50` surface inside its
-`rose-200` border. The frame and the mark carry the danger; colouring the sentences as well says
+`rose-200` border. The frame and the mark carry the danger; coloring the sentences as well says
 it a third time, and slate-900 on rose-50 is 16.25:1 where rose-900 was 8.71:1.
 
 ### A tile on white, a plain glyph on a tint
@@ -3153,21 +3153,21 @@ design.md already says this about the flash bar: *"a message bar gets a plain gl
 icon tile: a soft `-50` tile on a `-50` surface is invisible."* A summary is the same kind of
 object. Measured before believing it: both came back `oklch(0.969 0.015 12.422)`.
 
-### The bullets had a red underline under grey words
+### The bullets had a red underline under gray words
 
 Each summary item is a link to its field, and they carried `decoration-rose-300`. That was
 coherent while the item text was `rose-800`; the moment the text became slate it was a red rule
-under grey words, matching nothing else in the app. They are ordinary links now — `brand-700`,
+under gray words, matching nothing else in the app. They are ordinary links now — `brand-700`,
 underlined, 7.19:1 on rose-50 — which is also what they should have looked like all along, since
 the entire point of the GOV.UK summary is that the items are clickable.
 
-### Three audit checks were testing for a colour
+### Three audit checks were testing for a color
 
 `form-validation-audit.js` looked for `main p.text-rose-700` to decide whether a field had an
 inline error, and for a `rose` class in the ancestry to decide whether `aria-describedby` pointed
 at one. Both went wrong the instant the message stopped being rose — reporting first 2 and then
 **27 forms** with defects that did not exist. They key on `.field-error` now, which is the thing
-being asked about rather than the colour it happens to be painted.
+being asked about rather than the color it happens to be painted.
 
 This is the third audit in three days found to be checking a proxy rather than the property:
 `page-audit`'s four page kinds, its substring match for a card, and now these. The pattern is
@@ -3214,7 +3214,7 @@ and quantity is always the narrow one — no inventory app does otherwise. What 
 field belongs to the document being built, not to a line of it. Square, Zoho Inventory, Odoo and
 Amazon Seller all put one scan field at the top of a receiving screen and append rows as you scan;
 this form rendered "Scan a barcode", an "or" and a full item picker **per row**, so a ten-line
-donation had ten scan fields. The behaviour that replaced it is the one the old code was reaching
+donation had ten scan fields. The behavior that replaced it is the one the old code was reaching
 for through a proxy: it used to detect a repeat scan by comparing the value left sitting in every
 row's own barcode input, which is why the three-scan package prompt worked at all. The count is
 `data-scan-count` on the row now — first scan sets the barcode's quantity, second adds it again,
@@ -3238,7 +3238,7 @@ third and later ask how many packages in total, exactly as before.
 - **`Capybara.enable_aria_label = true`.** It would have let `have_field("Quantity")` keep working
   now that the control's name comes from `aria-label` — and it would have made that selector
   *ambiguous*, because the barcode dialog has a Quantity field too. The one spec affected matches
-  by id, which is what its neighbours already did.
+  by id, which is what its neighbors already did.
 
 **A third thing measurement caught.** The first build put four columns on the row at every width,
 and at 320px that leaves the item picker **72px** — narrower than the quantity box beside it, on
@@ -3287,7 +3287,7 @@ the explicit carve-out that free text — a name, an address, a comment — take
 **The camera bug, which was three bugs.** Quagga is handed a `target` element and fills it with a
 `<video>` and a `<canvas>`. It was handed **the button**: `target: "#barcode-scanner-btn"`.
 Measured before and after a click, the glyph moved from x=730 to **x=391** — 339px outside the
-38px control that owns it — because the button is a centring flex box and its contents had
+38px control that owns it — because the button is a centering flex box and its contents had
 suddenly become a camera feed. Second, on a successful read the code called `.empty()` on that
 same button, deleting the glyph permanently. Both looked like they "reset on refresh" because
 neither was ever persisted. Third, and the reason a fix by id would not have held:
@@ -3326,7 +3326,7 @@ takes column one. Its left and right edges land on the storage location select's
 
 **This reverses the entry above it, one day old.** That entry sized the field to its content —
 `15rem`, from a 14-digit GTIN measuring 138px — citing GOV.UK and USWDS, and it stated the rule in
-`design.md` without the condition that makes it true. The condition is **neighbours**. GOV.UK's
+`design.md` without the condition that makes it true. The condition is **neighbors**. GOV.UK's
 narrow inputs sit in a column of stacked fields, where the field above and the field below share
 the left edge; that repetition is what makes a short width read as deliberate. The scan field is
 alone in a tinted band with nothing to establish a rhythm, so the same short width reads as
@@ -3436,7 +3436,7 @@ QuickBooks, Xero, Shopify and Stripe all end an editable line item with a bare g
 supplies the context a label would, and eight rows of "Remove" text is eight repetitions of a word
 that says nothing new. For a **one-off** action, no — a single destructive control in a page
 header gets its words. That distinction is now in `design.md`, because "use icon buttons" without
-it is how a page ends up with an unlabelled glyph nobody can identify.
+it is how a page ends up with an unlabeled glyph nobody can identify.
 
 > *Corrected 2026-08-30: the citation above asserts agreement across several systems without naming a component any of them publishes. Read it as **observed**, not published. The original wording is left as written — see "Auditing the industry citations" at the end of this log.*
 
@@ -3454,11 +3454,11 @@ second icon-only action ever joins it in the row, because then the two need tell
 
 **Are they screen reader compliant? They were not, and axe said they were.** The accessible name
 was fine — `aria-label="Remove this item"`, icon `aria-hidden`, and the accessibility tree read
-`{role: button, name: "Remove this item"}`. The **behaviour** was wrong. A native `<a>` fires on
+`{role: button, name: "Remove this item"}`. The **behavior** was wrong. A native `<a>` fires on
 Enter and ignores Space; the ARIA button pattern requires both, so a control that announces
 itself as a button and then ignores Space fails **WCAG 4.1.2 Name, Role, Value**. Measured on
 `/donations/new`: Enter removed a line item, **Space did nothing**. axe cannot catch it, because
-axe reads markup and this is behaviour, and the markup was impeccable.
+axe reads markup and this is behavior, and the markup was impeccable.
 
 The fix is not a keydown handler; it is to stop pretending. Both helpers render `<button
 type="button">` now — Enter and Space for free, no `href="javascript:void(0)"`, and they leave a
@@ -3477,7 +3477,7 @@ screen reader's *list of links*, where fourteen inert "Add another item" entries
 
 ---
 
-## 2026-08-24 · The labelled remove button, a destructive ghost that is not red, and the empty state
+## 2026-08-24 · The labeled remove button, a destructive ghost that is not red, and the empty state
 
 **Area.** `UiHelper#remove_element_button`, `EssentialsUiHelper::BUTTON_VARIANTS`,
 `line_items/_line_item_table`, `line_item_total_controller`, `design.md`.
@@ -3496,14 +3496,14 @@ away rendering "Remove" at 83×28. The 45px the label costs is smaller than the 
 having two appearances. It is one rendering now; the `icon_only:` branch and the
 `ICON_BUTTON_CLASSES` constant that existed only to serve it are both gone.
 
-**The colour, which the preview got wrong.** I drew the ghost button rose-700 at rest, and
+**The color, which the preview got wrong.** I drew the ghost button rose-700 at rest, and
 `ghost_danger` really was rose at rest — but `design.md` had *already* carried the opposite rule
 for this exact control: *"`slate-500` until hover… so an eight-row form does not carry eight red
 marks down its edge."* I had written that sentence for the icon and then contradicted it in the
 variant and again in the preview. It is `slate-600` at rest now, matching plain `ghost`, with rose
-reserved for hover and focus. The word and the trash glyph say the action is destructive; colour
+reserved for hover and focus. The word and the trash glyph say the action is destructive; color
 saying it a third time, on every row, makes the row you are pointing at no louder than the rest.
-Same reasoning as the grey error message. Verified: rest `oklch(0.446 0.043 257.281)`, hover
+Same reasoning as the gray error message. Verified: rest `oklch(0.446 0.043 257.281)`, hover
 `oklch(0.514 0.222 16.935)` on `rose-50`, focus outline `rose-600`.
 
 One consequence worth having: `partners/profiles/step/_attached_documents_form` was passing a
@@ -3776,7 +3776,7 @@ untested. Recorded rather than glossed.
 
 **Decision.** Option D of
 [`table-scroll-affordance.html`](mockups/table-scroll-affordance.html): a directional fade at
-whichever edge has content behind it, plus scrollbar styling where the platform honours it.
+whichever edge has content behind it, plus scrollbar styling where the platform honors it.
 
 **The defect, measured.** `/distributions` hid **486px of columns**, the scrollbar was an overlay
 one taking **0px** of height, and there was no fade, shadow or hint of any kind. The only signifier
@@ -3793,7 +3793,7 @@ a proxy reports what the proxy says.
 **The fade is the signal; the scrollbar is a bonus.** `::-webkit-scrollbar` makes Chrome and Safari
 draw a scrollbar that reserves space, but Firefox ignores the pseudo-element and `scrollbar-width`
 cannot force a scrollbar to take space at all. **It could not be verified in headless Chromium
-even with `--disable-features=OverlayScrollbar`**, so the preview labelled that panel unverifiable
+even with `--disable-features=OverlayScrollbar`**, so the preview labeled that panel unverifiable
 rather than implying it worked, and the CSS comment says the same. The fade depends on nothing and
 is what actually answers the complaint.
 
@@ -3849,7 +3849,7 @@ to keep readable. **Six of the seven tables that overflow have a frozen column**
 does not.
 
 **Why no audit caught it, again.** axe reported **0 violations across 156 pages** while this was
-live, because it computes contrast from *declared colours* — a gradient painted on top by a
+live, because it computes contrast from *declared colors* — a gradient painted on top by a
 pseudo-element does not appear in any element's computed style. This is the same failure mode as the
 overlay scrollbar the day before, and the same lesson for the third time this month: a check that
 reads a proxy reports what the proxy says. **A contrast question involving an overlay can only be
@@ -3897,7 +3897,7 @@ while **erasing 26% of the text** it lay over. Its only measurable effect was da
 
 A white scrim is the standard treatment for text running out of a box, and I applied it to a table
 whose rows are already white. **A scrim only works against content darker than the scrim.** Measured
-alternatives: a hard 3px rule 1.83 (also imperceptible), an inset shadow 8.35, a grey gradient 9.59.
+alternatives: a hard 3px rule 1.83 (also imperceptible), an inset shadow 8.35, a gray gradient 9.59.
 Chose the **inset shadow** — 0% text erased, and it matches the shadow the frozen column already
 casts. Shipped it measures 7.95 on `/distributions` and 8.12 on `/items`.
 
@@ -3920,7 +3920,7 @@ the fold, as Ant Design (`<Table sticky />`), Confluence and Jira all do.
 - **`aria-hidden`, exactly as a native scrollbar is.** The region is already a focusable named
   `role="region"` that the arrow keys scroll. A focusable rail would add a second tab stop per table
   duplicating a path that already works and is already announced. **This reverses what the preview
-  panel promised** — it advertised `role="scrollbar"` and arrow keys as a point in B's favour. On
+  panel promised** — it advertised `role="scrollbar"` and arrow keys as a point in B's favor. On
   reflection that was a worse design: it is a pointer affordance, and the keyboard was never the gap.
 - **Injected by the controller, not written into 66 views**, consistent with the earlier decision to
   mount one controller on the shell. It is removed again when a table fits.
@@ -3947,7 +3947,7 @@ the rail rather than under it, so nothing breaks — but the claim was stated wi
 
 **Area.** `table_stack_controller`, `.data-table[data-stack]`, `design.md`, `docs/onboarding.md`.
 
-**Decision.** Below **640px of card width** a data table becomes a list of labelled fields — one
+**Decision.** Below **640px of card width** a data table becomes a list of labeled fields — one
 field column below 416px, two above it. Option A of `docs/mockups/table-stacking.html`.
 
 **The defect, measured.** **All fifteen tables scrolled sideways at 320px, and at 375**; thirteen at
@@ -3979,7 +3979,7 @@ them would have been positioned against the wrong box. The controller sets an at
   and generated content is not reliably announced.
 - **The table's semantics restored explicitly.** A browser stops exposing rows and cells as a table
   the moment `display` is not `table`, and `thead` is `display: none` here — a screen reader would
-  have been left with unlabelled text in no structure. The roles go on always, because a role cannot
+  have been left with unlabeled text in no structure. The roles go on always, because a role cannot
   be applied conditionally.
 
 **Two defects found while building, both by things that were already passing.**
@@ -3996,7 +3996,7 @@ the trade being made: down a page you can read rather than sideways through one 
 
 **Alternative kept on the table.** Option B — the leading fields with the rest behind a per-row
 disclosure — measured **37% shorter** (245px per record against 388). It was recommended in the
-preview and not built, because it needs a judgement per table about which fields lead, and the
+preview and not built, because it needs a judgment per table about which fields lead, and the
 request described A. The machinery is shared, so B is an increment on this rather than a rewrite.
 
 
@@ -4006,7 +4006,7 @@ request described A. The machinery is shared, so B is an increment on this rathe
 
 **Area.** The `.table-scroll` edge shadow, `.pin-col`, `table_scroll_controller`, `design.md`.
 
-**Reported.** The grey overlay looks odd and quaint. It did, and the numbers agree: isolated by
+**Reported.** The gray overlay looks odd and quaint. It did, and the numbers agree: isolated by
 shooting the strip with the treatment and without it, what shipped changed the background by up to
 **62 of 255** and tinted **28.5% of the visible table**. Ant Design's production value for the same
 signal is **6% over 10px** — max change **10**, touching **6.6%**. What shipped was six times heavier
@@ -4044,7 +4044,7 @@ The fix is Ant Design's own arrangement, and now it is clear why they build it t
 - the boundary shadow moves to the **wrapper**, offset by a `--pin-width` the controller measures.
 
 **This revives an option I rejected two days ago.** Offsetting the start shadow by the frozen
-column's width was considered and dismissed as "more machinery than the question deserves" in favour
+column's width was considered and dismissed as "more machinery than the question deserves" in favor
 of a shadow on the cell. The shadow on the cell could not work, so the machinery is now the cheap
 option. Recorded because the earlier reasoning still reads as sound and was wrong for a reason
 nothing in it could have anticipated.
@@ -4090,7 +4090,7 @@ nothing. "Export" says what is inside. The rule is updated to say so.
 
 **A summary of a table is not a page action.** This is the diagnosis design.md predicts for a fourth
 button — "usually a section of the page wanting an action of its own". "Calculate product totals"
-does not act on the page; it summarises the rows below it. It is on that card now.
+does not act on the page; it summarizes the rows below it. It is on that card now.
 
 **On the feature itself.** It works, and it does follow the filters — narrowing to one partner took
 it from 46 items and 23,035 units to a smaller set, confirmed against the row count. My first test
@@ -4132,7 +4132,7 @@ under Export — it's only one export."
 
 **The defect is real and I introduced it yesterday.** Both items in that menu are conditional on the
 data: the CSV needs any requests at all, and the picklist only exists while something is
-*unfulfilled*. Those conditions are independent, so an organisation with requests but none
+*unfulfilled*. Those conditions are independent, so an organization with requests but none
 outstanding gets a menu containing **one entry**. Proved it rather than reasoned about it — the seed
 data is 119 pending requests, which can never produce the case, so it took a spec creating a single
 fulfilled request: `MENU ITEMS: ["Requests as CSV"]`.
@@ -4155,7 +4155,7 @@ four closely-related outputs belong in one menu, each item naming the content *a
 Past that, or for anything that is not a straight download, it belongs in the reports hub rather
 than a page header — `/reports` already carries Distributions, Donations, Purchases, Requests,
 Compliance and Activity. A page-header menu is for getting *this page's* data out; it is not a
-catalogue.
+catalog.
 
 The trigger says there is a choice with `aria-haspopup="true"` for a screen reader and a 12px
 chevron for everyone else. If a third output ever joins these two, the menu is already the right
@@ -4250,7 +4250,7 @@ check(s)` is a pass and is also exactly what a broken audit prints. Planting `Pl
 only thing separating "clean" from "not looking". Same principle as every other proxy this branch has
 found, applied to words.
 
-**Two things flagged and deliberately not changed**, because they are judgement calls about voice
+**Two things flagged and deliberately not changed**, because they are judgment calls about voice
 rather than defects, and they belong to whoever owns the product's tone:
 
 - **First and second person are mixed.** The app says "your bank", "you serve", then "Edit **my**
@@ -4355,7 +4355,7 @@ product would trip it. It has a `PROPER_NOUNS` list now, the same idea as `copy-
 
 Fixing that meant rewriting the scan, and the rewrite exposed how narrow the old one had been:
 
-- It only matched a capitalised run **starting immediately after the tag**, so
+- It only matched a capitalized run **starting immediately after the tag**, so
   `Race/Ethnicity of Client Base` was invisible — the offending words were mid-heading.
 - It captured `[^<]+`, so a heading whose text sits inside `<strong>` was **unreachable entirely**.
   Three of those existed in the partner profile forms.
@@ -4408,7 +4408,7 @@ action, and this is the shape the **pager** already uses for the same job.
   The existing `.fc-day-other` rule had already discovered this and said so; the new rules follow it.
 - **A palette swap breaks the contrast pair you did not touch.** Setting `--fc-today-bg-color` to
   `brand-50` put the *existing* slate-500 day number at **4.0:1**, and axe caught it on the first run
-  after. The text colour never changed; the background under it did. Today's date is `brand-700` now,
+  after. The text color never changed; the background under it did. Today's date is `brand-700` now,
   the pair the event chips already use — measured at **8.59:1** from painted pixels.
 - **The mobile list view had never worked.** `defaultView` and `eventLimit` are FullCalendar **4**
   spellings and this app is on **6**, so both were silently ignored. Verified rather than inferred:
@@ -4444,7 +4444,7 @@ horizon the page exists for: what is going out, and what has to be packed before
 
 **Which kind of week is the interesting question, and the data answers it.**
 
-- The times are **real**: the form takes `as: :datetime, minute_step: 15`, labelled "Distribution
+- The times are **real**: the form takes `as: :datetime, minute_step: 15`, labeled "Distribution
   date and time". A bank does record that a pick-up is at 9:00.
 - But a distribution has **no end**. The columns are `created_at`, `updated_at`, `issued_at`. On an
   hour axis every event is a zero-length block.
@@ -4501,7 +4501,7 @@ orphaned `DistributionEvent` rows** in the development database, holding about *
 event log and the distribution rows no longer agree there. `bin/rails reset_demo` is the clean
 repair. The calendar page itself is unaffected, since it reads distributions rather than inventory.
 
-**The generalisable part:** in an event-sourced app the model is not the source of truth, and
+**The generalizable part:** in an event-sourced app the model is not the source of truth, and
 `destroy` is not how you remove things — use the service that publishes the compensating event. And
 be suspicious of a delete that moves no numbers.
 
@@ -4530,7 +4530,7 @@ requirement belonging to a group rather than a control: *"A radio or checkbox gr
 `<legend>`, not on each option. The group is what is required."* Neither phone nor email is required
 alone; the pair is. The labels are now `Phone` and `Email`, and the rule is stated once.
 
-The rule in design.md is generalised from "a radio or checkbox group" to "a requirement that belongs
+The rule in design.md is generalized from "a radio or checkbox group" to "a requirement that belongs
 to a group", because that is what it always meant.
 
 ### The audit had a hole exactly where the report was
@@ -4549,10 +4549,10 @@ It found two things immediately:
   which shows it always.
 
 **Two mistakes in the audit change itself**, both caught before they shipped. A shared `formInView()`
-helper referenced from functions handed to `page.evaluate` — which serialises them and drops
+helper referenced from functions handed to `page.evaluate` — which serializes them and drops
 everything they closed over, so it would have been `undefined` in the browser. And `markedFor` still
 only consulted a legend for radios and checkboxes, so the moment the condition moved off the labels
-the audit would have stopped recognising these fields as conditional and said nothing at all.
+the audit would have stopped recognizing these fields as conditional and said nothing at all.
 
 **Left alone, and pre-existing:** `/partners/family_requests/new` shows no inline error and no
 `aria-invalid` — only a summary. Verified against a stashed tree: it reports identically without any
@@ -4648,7 +4648,7 @@ and was the first choice. It is a real picker in Chrome and Edge, and in desktop
 it degrades to a plain text box expecting `2026-08` — worse than a select, and silently so for a
 subset of users. Only Chromium is installed in the environment this was measured in, so **the
 cross-browser claim could not be made at all**, and this branch has been caught before asserting
-behaviour it verified by proxy rather than by measurement. Two selects need no such claim, and it is
+behavior it verified by proxy rather than by measurement. Two selects need no such claim, and it is
 the same argument that deleted Litepicker: native controls over a widget.
 
 Rejected: **a clickable title opening a month grid**, the Notion and Linear pattern. It keeps the
@@ -4670,13 +4670,13 @@ shareable however you arrived at it. That is a larger change than this one.
 
 **A date range does not belong on this page**, which is the half of the request that got a "no".
 The grid draws a month or a week; given "3 March to 19 August" there is nothing for it to render,
-and honouring it would mean changing what the page *is*. `/distributions` is the same data as a list
+and honoring it would mean changing what the page *is*. `/distributions` is the same data as a list
 and already carries the range filter — this was the only index page without one, because it is not
-an index. The subtitle links to it rather than growing a filter the calendar cannot honour.
+an index. The subtitle links to it rather than growing a filter the calendar cannot honor.
 
 **A select in a toolbar needed a new constant.** Every other select in the app is a form field:
 `SELECT_CLASSES` carries `mt-1.5 block w-full`, which in a row of buttons means full width, a stray
-top margin and 38px against neighbours at 30px. Rather than override three utilities at the call
+top margin and 38px against neighbors at 30px. Rather than override three utilities at the call
 site, `CONTROL_SURFACE_CLASSES` now holds the shared look with no size or layout in it, and
 `essentials_inline_select_classes` sizes from `BUTTON_SIZES`. Measured after: all five toolbar
 controls 30px, tops and bottoms flush.
@@ -4721,14 +4721,14 @@ experience from two unrelated causes.
 
 | | |
 | --- | --- |
-| **FullCalendar 6.0.1**, the library in use | **Disables it.** Measured by rendering its own default toolbar: `disabled` is `true` while the view holds today and `false` once you leave. Replacing its toolbar with ours is how the behaviour was lost. |
+| **FullCalendar 6.0.1**, the library in use | **Disables it.** Measured by rendering its own default toolbar: `disabled` is `true` while the view holds today and `false` once you leave. Replacing its toolbar with ours is how the behavior was lost. |
 | Google Calendar, Outlook, Apple Calendar, Notion | Keep Today **always enabled**; pressing it on today is a no-op. |
 
 So "industry standard" does not settle it. What does settle it is that the app already has a rule:
 [pagination's ends](../design.md#pagination) stay **drawn and disabled**, explicitly because a
 control set that changes width moves a target out from under the cursor. Today flips on *every* Prev
 and Next rather than only at the ends, so hiding it — the "Clear all" precedent, which was the other
-candidate — would shift its neighbours constantly.
+candidate — would shift its neighbors constantly.
 
 **"Disabled buttons are not ideal" is right, and the objection is about a different thing.** The
 case against them, as usually argued, is about *gating*: a Submit disabled until a form validates
@@ -4743,7 +4743,7 @@ from that case:
   is still focusable, and Playwright's actionability check treats it as disabled, so the semantics
   reach tooling.
 - **The reason is said out loud**, as sr-only text on the control — `"Today, you are already viewing
-  today"`, cleared to `"Today"` when live. "Greyed out with no explanation" is most of the
+  today"`, cleared to `"Today"` when live. "Grayed out with no explanation" is most of the
   complaint, and it costs one span to answer.
 
 axe reports **0 violations** across 156 pages with the dimmed button in place; 1.4.3 exempts
@@ -4800,10 +4800,10 @@ not.
 
 **The calendar convention is the other way, and the reason for it does not transfer.** Google and
 Outlook keep Today live — but in Google's case
-[because it also re-centres a scrolling day or week grid](https://support.google.com/calendar/thread/439515290/calendar-does-not-open-with-today-s-date-in-view?hl=en),
+[because it also re-centers a scrolling day or week grid](https://support.google.com/calendar/thread/439515290/calendar-does-not-open-with-today-s-date-in-view?hl=en),
 so it is never truly inert. That was nearly enough to reverse this. Measured on all three of our
 views: `scrollHeight` equals `clientHeight` — **35/35, 35/35, 478/478** — and today is on screen
-whenever it is in range. Nothing to re-centre. Ours is inert in a way Google's is not, so the
+whenever it is in range. Nothing to re-center. Ours is inert in a way Google's is not, so the
 convention arrives without its justification.
 
 **What is deliberately not added: a tooltip.** The tier-2 advice pairs a dimmed control with a
@@ -4834,9 +4834,9 @@ So the distinction is not *does it lead anywhere* but **does pressing it cost an
 that test Today was on the wrong side of the line. The rule in design.md now turns on the cost.
 
 **The convention was right and I under-weighted it.** Google, Outlook, Apple Calendar and Notion all
-keep Today live. I discounted that because Google's Today also re-centres a scrolling grid and ours
+keep Today live. I discounted that because Google's Today also re-centers a scrolling grid and ours
 has nothing to scroll — measured, `scrollHeight` equals `clientHeight` in all three views. That
-measurement is still true and it is still the reason this was a judgement call rather than an
+measurement is still true and it is still the reason this was a judgment call rather than an
 obvious correction. But it argues only that our Today is *more* of a no-op, not that a no-op is
 worth a disabled state.
 
@@ -4892,7 +4892,7 @@ since "Agenda" still does not say how long it is.
 **Clicking one axis writes both parameters.** Writing only the axis that moved would leave the other
 to a default that depends on the reader's window width — so a shared link would be the sender's view
 on the sender's screen and something else on the recipient's. `?view=` from before the split is
-still honoured.
+still honored.
 
 **`Intl` has no sensible pattern for a weekday and a bare day.** The caption first asked for
 `{weekday, day}` on the near end of a range and added the month only when it crossed one; en-US
@@ -4930,7 +4930,7 @@ report: the declared-counties table carried **no class at all** — a bare unsty
 app has `data-table`.
 
 **The modal was not a modal problem.** `#see-zipcodes` rendered at `top: 0`; a native `<dialog>` is
-centred by the browser's own `margin: auto`, and this one sat inside a `space-y-6` container whose
+centered by the browser's own `margin: auto`, and this one sat inside a `space-y-6` container whose
 spacing rule replaced those margins. `.modal-surface` now pins `margin: auto` in the shared partial
 with `!important`, because the container's selector is three class levels to the rule's one. Fixed
 in the partial rather than the call site on purpose: five of the six dialogs were fine only by
@@ -5032,14 +5032,14 @@ deduplicates and sorts now, and the two specs were corrected to expect **1**.
 
 **Recommended a grid, then withdrew it when asked why.** The argument was "columns are the rail".
 Measured at the real card width it does not survive: 1144px fits twelve five-digit codes across, so
-thirteen renders **12 × 2** — one row stretched by `1fr` with roughly 90px between neighbours, and
+thirteen renders **12 × 2** — one row stretched by `1fr` with roughly 90px between neighbors, and
 the thirteenth orphaned. That spacing is the *opposite* of the boundary problem being solved; it
 separates the codes until the group stops reading as a set. Columns help a list long enough to wrap
 into a block, and at a median of 8 per partner this one never is.
 
 **The second argument did not survive either.** I said a bordered chip already means "a filter you
 can remove". True only of the shape: both chip-shaped things in this app are `rounded-full`, the
-status pill carrying a tone and the filter chip an `×`. A `rounded` square box, uncoloured,
+status pill carrying a tone and the filter chip an `×`. A `rounded` square box, uncolored,
 monospace, inert, is not that object — and keeping these square is what keeps *"a pill is a state"*
 true rather than eroding it.
 
@@ -5056,22 +5056,22 @@ with an unstated order reads as arbitrary.
 ## 2026-08-27 — Form width and placement, which the design system had never said anything about
 
 The new-item and new-kit forms sit in a 672px card with **480px of empty page** beside them, and the
-question was whether they should be centred.
+question was whether they should be centered.
 
 **The first finding is that there was no rule.** Thirty-six views set their own max-width and nothing
 documented what it should be; measured at 1440px they had drifted into 672px and 1120px. So the
 answer had to be established rather than looked up.
 
-**Centring is ruled out by a measurement, not a preference.** Every `h1` in this app sits at 288 — on
-index, show and form pages alike. Centring a form moves its heading with it: 144px at `max-w-4xl`,
+**Centering is ruled out by a measurement, not a preference.** Every `h1` in this app sits at 288 — on
+index, show and form pages alike. Centering a form moves its heading with it: 144px at `max-w-4xl`,
 208px at `max-w-3xl`, 256px at `max-w-2xl`. Clicking "New item" from the items list would slide the
 page title a quarter of the screen sideways between two views of the same resource, and the heading
 is the thing the eye returns to.
 
-It is also not the convention it is assumed to be. Centring belongs to standalone pages — sign in,
+It is also not the convention it is assumed to be. Centering belongs to standalone pages — sign in,
 checkout, onboarding — which have nothing around them to align against. An in-app form under a page
 heading is left-aligned in GOV.UK, GitHub, Stripe, Shopify and Atlassian. This app's own auth screens
-are not centred either: a split panel with the form at `left 888`.
+are not centered either: a split panel with the form at `left 888`.
 
 **So the fix was width, and the honest way to spend width is not to stretch.** Widening the column to
 896px would have given a twenty-character name an 896px box — the space filled by making every field
@@ -5094,9 +5094,9 @@ layout saves anyone else.
 **Decision: leave the layout as it is.** `<main class="flex-1">` stays uncapped. Recorded here so
 the measurements are not lost and the question is not reopened from scratch.
 
-**What prompted it.** The item form's card looked stranded, and the question was whether to centre
-it. Centring the card is the wrong fix for a measured reason — every `h1` in this app sits at 288, so
-centring a form moves its heading 144–256px and the page title slides sideways between an index and
+**What prompted it.** The item form's card looked stranded, and the question was whether to center
+it. Centering the card is the wrong fix for a measured reason — every `h1` in this app sits at 288, so
+centering a form moves its heading 144–256px and the page title slides sideways between an index and
 its form. But investigating that turned up something larger: the layout has no maximum width, so
 every page grows to fill any monitor.
 
@@ -5120,8 +5120,8 @@ index and its form because the cap applies to every page equally. `docs/mockups/
 holds the before/after screenshots.
 
 **Why it is fine to leave.** The cost is real but it is bounded to wide monitors, and the trade runs
-both ways: a cap letterboxes anyone who deliberately maximises a window to see more of a table at
-once. Nobody has reported the wide-monitor behaviour as a problem — it was found by measuring, not
+both ways: a cap letterboxes anyone who deliberately maximizes a window to see more of a table at
+once. Nobody has reported the wide-monitor behavior as a problem — it was found by measuring, not
 by using — and a layout change touching every page in the app is a poor thing to do on a hunch.
 
 **What would change the answer:** a bank actually working at 1920 or above and finding the tables
@@ -5159,7 +5159,7 @@ computed yet.
 
 **axe will never find this.** Nothing in the markup identifies that div as a control, so no automated
 pass knows to hold it to 1.4.11 — the same shape as the fade over the frozen column earlier on this
-branch, which axe also missed because it reads declared colours rather than what a thing is.
+branch, which axe also missed because it reads declared colors rather than what a thing is.
 
 **What was kept.** The 24px height, because the track is the pointer target and 2.5.8 asks for 24 —
 the visible bar is 6px of a transparent 24px band. And the reserved strip, so at rest the rail
@@ -5198,7 +5198,7 @@ for it asserts the *computed* `border-radius`, since asserting the declaration w
 throughout.
 
 **A contrast floor says which values are available, not which one to use.** This is the second time
-on this branch that 1.4.11 has decided this thumb's colour, and the first time it decided it *too*
+on this branch that 1.4.11 has decided this thumb's color, and the first time it decided it *too*
 far. slate-500 measures 4.35:1 against the slate-100 track where the floor is 3:1 — it was chosen not
 because 4.35 was wanted but because the Tailwind scale has nothing between slate-400 (2.40:1, fails)
 and slate-500, so clearing the floor meant taking the whole step. "Very dark" was a fair report of
@@ -5207,7 +5207,7 @@ lightest slate-hued value that still clears the floor gives `oklch(0.636 0.044 2
 `rgb(122, 140, 166)` and measures **3.13:1**.
 
 The general form, since I got this wrong in both directions within a week: a standard is a
-constraint to satisfy, and satisfying it is not the same as maximising it. The previous entry records
+constraint to satisfy, and satisfying it is not the same as maximizing it. The previous entry records
 me recommending slate-300 on taste and having to withdraw it because I had not computed the number.
 This one records the opposite error — taking the number as the whole answer and shipping a value
 45% past the threshold without asking whether anything between was reachable.
@@ -5237,7 +5237,7 @@ to hit — a moving target over a moving table. A shadow paints without occupyin
 undoes the reason the rail exists: on a long table the only horizontal control would be below the
 fold again, and the platform will not supply one, since its scrollbar is an overlay taking 0px.
 *Keeping slate-500 and rounding the corners only* was plausible — a pill reads lighter than a
-rectangle of the same colour, so some of "very dark" was the radius bug — but it leaves a value that
+rectangle of the same color, so some of "very dark" was the radius bug — but it leaves a value that
 was picked by accident of the scale rather than chosen.
 
 **Also offered and not taken: `absolute` rather than `fixed` once the rail settles.** It has no
@@ -5286,7 +5286,7 @@ first fix moved 0.14 → 8.14 and barely shifted the ratio: 3.4:1 became 2.6:1.
 This is not a new principle here — `shared/essentials/_pagination` already carries a comment saying
 it draws no border of its own because doing so *"put the pager inside two stacked hairlines twelve
 pixels apart"*. The same defect, the same answer, five weeks apart; I had read that comment while
-looking for the footer markup and did not recognise it as the precedent it was until after measuring.
+looking for the footer markup and did not recognize it as the precedent it was until after measuring.
 The strip also goes to **44px**, giving 29px of clear space — enough to breathe, short of the 53px
 row.
 
@@ -5303,12 +5303,12 @@ position: **0** positions where the footer has neither a rule nor a bar above it
 tried once. *Moving the bar up to sit against the table* would group it correctly, but placing the
 rail over the last row is the thing three passing specs caught the first time, because a control that
 overlaps a row takes the pointer from it. *Lightening the bar* so it stops competing with the rule
-runs straight into the 1.4.11 floor that set its colour two changes ago.
+runs straight into the 1.4.11 floor that set its color two changes ago.
 
 **`!important` on the border override**, because the border is a Tailwind utility on the footer div
 and a utility beats a rule in `@layer components` whatever its specificity — the same reason
 `.modal-surface` carries one. `design.md` already records this at the stacked-table rules, where the
-same cascade behaviour silently ate a `font-weight` on a card title earlier on this branch.
+same cascade behavior silently ate a `font-weight` on a card title earlier on this branch.
 
 
 ## 2026-08-28 — Four goes at one gap, and the unit I kept measuring was the wrong one
@@ -5320,7 +5320,7 @@ time in the opposite direction from the previous three.
 **The through-line: I kept adjusting the strip, and nobody can see the strip.** The reserved strip
 went 24 → 32 → 44 → 24. Each time I reasoned about its height, and each time the thing being
 reported was the distance from the *visible bar* to the *pager's controls* — which differs from the
-strip by a constant 9px, because the rail carries 24px of pointer target with a 6px bar centred in
+strip by a constant 9px, because the rail carries 24px of pointer target with a 6px bar centered in
 it. Three fixes in a row were aimed at a number that is not the number anyone was looking at. The
 general lesson, and the reason this entry exists: **when a report and a measurement disagree four
 times, the measurement is of the wrong object.** The specs now assert the gap above the pager against
@@ -5333,7 +5333,7 @@ above the controls, 12px. Measured before: **42px**.
 **Getting there ran into a floor I had to design around.** The strip cannot go below 24px without the
 rail's box reaching past it into the footer, and the rail's box is a pointer target — the track jumps
 the scroll when clicked, so overlapping the pager means a click meant for *Next* scrolls the table
-sideways instead. With the bar centred, that floor puts the closest possible gap at **22px** against
+sideways instead. With the bar centered, that floor puts the closest possible gap at **22px** against
 12px below. Still lopsided, and no amount of strip arithmetic gets past it.
 
 **So the bar moves within its track instead.** The 24px is required by 2.5.8 and stays; what is
@@ -5344,7 +5344,7 @@ painted pixels: 23px of white above the pager's text, 21px below it.
 
 **Only when settled**, because while the rail rides the fold its bottom edge is the bottom of the
 window, and a bar sitting there would be pinned to the edge of the screen and awkward to grab. It
-stays centred and 9px clear while floating, exactly where it has always been. The cost is that the
+stays centered and 9px clear while floating, exactly where it has always been. The cost is that the
 bar shifts 9px within its track at the moment of settling; that happens at the window's bottom edge
 mid-scroll, and it is the price of the two states wanting different things.
 
@@ -5388,7 +5388,7 @@ content; the submit commits the *form*. On seven forms the form spans two or thr
 to none of them — and those seven already worked this way, which is the tell: the app had already
 derived the right rule for the case where the distinction is visible, and only got it wrong where
 the distinction is invisible. C ends with **one** rule for all 42 forms; A would have ended with two
-(footer slot for single-card, below for multi-card) and a judgement call at every new form.
+(footer slot for single-card, below for multi-card) and a judgment call at every new form.
 
 **The structural change is the risky part, not the styling.** 31 views had `card > form`, and a
 submit cannot be outside the card and inside the form at once, so the nesting had to swap. A form
@@ -5421,7 +5421,7 @@ at the row's alignment edge and the two rows align at opposite edges.
 and `users/registrations/edit` use the same border utility but divide *bands of fields* within a
 card, which is the line item card's band pattern and is correct. And `partners/profiles/edit` puts a
 status pill in `data-page-header="actions"` while `_page_header` carries a comment saying a pill
-among buttons reads as a greyed-out button — a real inconsistency, unrelated to this change, and not
+among buttons reads as a grayed-out button — a real inconsistency, unrelated to this change, and not
 fixed here.
 
 
@@ -5540,7 +5540,7 @@ happened referencing 165 commits that no longer exist, on top of 78 conflict res
 was one pass over **21 conflicted files** with 110 auto-merged, and every hash still resolves. Both
 numbers were measured in a throwaway worktree before choosing.
 
-**The resolution rule was: main's behaviour, design's presentation.** Where the two disagreed about
+**The resolution rule was: main's behavior, design's presentation.** Where the two disagreed about
 *what the software does* — a finalized audit cannot be edited, a donation names its drive
 participant, participants filter by name — main won. Where they disagreed about *how it looks or is
 built*, design won. Three cases needed both halves at once:
@@ -5656,7 +5656,7 @@ throws no JavaScript error and passes `undefined-classes`, `button-audit` and th
 check this app has says it is migrated. What it actually had, measured live: **28 label/value pairs
 and zero `<dl>`**; **six `<hr>` rendering `oklch(0.208 0.042 265.755)` — slate-900**, because
 preflight sets `border-color: currentColor` and an unstyled `<hr>` therefore draws in the *text*
-colour; **seven different vertical gaps** (24/36/44/45/54/61/93px); **15 of 28 labels in Title Case**;
+color; **seven different vertical gaps** (24/36/44/45/54/61/93px); **15 of 28 labels in Title Case**;
 an icon on 14 rows; and invalid nesting that made the browser manufacture **two empty `<p>`**.
 
 **"No Bootstrap classes" is not the same as "migrated", and nothing automated can tell the
@@ -5670,7 +5670,7 @@ open and the browser reparsed the rest of the card inside it. That is the profil
 again, and again invisible: it renders, it greps clean, and no spec looks.
 
 **Option A, one card of eight bands.** The bands are the line item card's — a tinted strip marking a
-change of kind — which is what makes six `<hr>` unnecessary rather than merely recoloured. Fields
+change of kind — which is what makes six `<hr>` unnecessary rather than merely recolored. Fields
 become a `<dl>` on a two-column grid through a new `essentials_detail` helper, so the em dash for a
 blank value is decided in one place rather than 28. Two columns and not four because the labels in
 the approval and request sections would wrap at four.
@@ -5687,7 +5687,7 @@ exactly the coupling that makes a rewrite look like a regression. They read `<dt
 additionally assert what the page must *not* have: `hr` count zero, `dt` count 28.
 
 **`fa_icon` is not itself broken and stays in the codebase.** It is a shim mapping Font Awesome
-names onto Bootstrap Icons, so those glyphs render; dropping the 14 calls here was a judgement about
+names onto Bootstrap Icons, so those glyphs render; dropping the 14 calls here was a judgment about
 icons-per-row, not a bug fix. Worth noting where that leaves it: those 14 were nearly every use in
 the app, and **one call site now remains**, `users_helper.rb:12`. The helper is close to deletable,
 which is a thing for whoever migrates that helper next rather than for this change.
@@ -5829,7 +5829,7 @@ exist.
 Seven sections were `<fieldset class="border-t border-slate-200 pt-5">` with a `<legend>` inside.
 A legend is rendered **in** its fieldset's top border and the browser cuts a gap for it, so the rule
 began where the legend text ended. Correctly described as "not a pattern" — it is a fieldset
-rendering artefact that nobody chose.
+rendering artifact that nobody chose.
 
 **Chosen: the band, via a new `shared/essentials/form_section`.** design.md already argues that the
 detail card's band is "the reason a detail card needs no `<hr>` at all", and the page this form
@@ -5873,7 +5873,7 @@ is worth recording because it is a repeat: `f.input ... do` with a block *replac
 input, so the field skips the whole `:essentials` pipeline — no classes, no width, and on this
 branch previously no `aria-required`, no `aria-invalid` and no inline error either. The same shape
 was fixed on the partner profile form earlier. **If a field is rendered inside `f.input ... do`,
-assume it has none of the design system's behaviour until checked.**
+assume it has none of the design system's behavior until checked.**
 
 ### The rich text editor, which the design system did not have
 
@@ -5900,7 +5900,7 @@ check whether something is shrinking the element before overriding harder.
 ### Two specs that pinned the wrong thing
 
 `find('small[data-deadline-day-target="reminderText"]')` coupled the assertion to the element name,
-so replacing `<small>` with the design system's hint `<p>` failed 31 examples for no behavioural
+so replacing `<small>` with the design system's hint `<p>` failed 31 examples for no behavioral
 reason. The data attribute is the contract — the same conclusion `[data-flash]` reached earlier on
 this branch — and the selectors are tag-agnostic now.
 
@@ -6017,7 +6017,7 @@ runs in a container here. A browser that can reach `localhost:3000` cannot reach
 `bin/design/serve-mockup <name>` copies the mockup into `public/` — which Rails serves ahead of the
 router — and prints the URL. Self-containment is still required, for a different and smaller reason:
 it means the preview cannot render against a stale `mockup.css` snapshot, a trap that has already
-made one mockup lie about a disabled control's colour.
+made one mockup lie about a disabled control's color.
 
 **Why a script rather than a line in the README.** There was already a line in the README. It said
 `open docs/mockups/<file>.html`, which is exactly the advice that failed. Three occurrences of the
@@ -6026,7 +6026,7 @@ same failure is the point at which the thing being remembered should stop needin
 gitignore entry that keeps the served copy out of commits) instead of listing them as things to do
 by hand.
 
-Worth stating plainly because it generalises: **a deliverable is not delivered until the person it
+Worth stating plainly because it generalizes: **a deliverable is not delivered until the person it
 is for can open it.** The preview existed, was correct, was committed, and was described accurately
 in the summary — and none of that was worth anything.
 
@@ -6090,7 +6090,7 @@ where one is deeper. The alternative — editing 99 templates to pass a trail �
 information typed twice.
 
 **The structure is the W3C ARIA APG pattern**, which GOV.UK, Carbon, Material and Bootstrap 5 all
-implement identically, so "industry standard" here is not a judgement call: named `<nav>`, ordered
+implement identically, so "industry standard" here is not a judgment call: named `<nav>`, ordered
 list, ancestors as links, current page as plain text with `aria-current="page"`, and the separator
 generated and `aria-hidden` because a literal `/` between links is announced as "slash".
 
@@ -6098,7 +6098,7 @@ generated and `aria-hidden` because a literal `/` between links is announced as 
 
 ### The real finding was that ten screens could not be left
 
-The reports complaint generalised. Every report is listed on the hub, **none is in the sidebar, and
+The reports complaint generalized. Every report is listed on the hub, **none is in the sidebar, and
 none linked back** — so for all five reports plus the by-county report and three trend pages, the
 browser's back button was the only exit. `/events`, `/help` and `/users` were the same; `/users` is
 reached from the account menu's "Co-workers", which is a menu rather than a nav landmark, so nothing
@@ -6146,7 +6146,7 @@ the complaint and the rule did not cover it. `/partners` picked from a five-bran
 so the column measured **170, 120, 170, 241, 0 and 170px** down one screen.
 
 **Amendment 3: every control in the column is 28px.** A new `essentials_row_icon_link` renders a
-visible action icon-only at `size-7`, because a labelled `sm` ghost is 30px and the 2px step showed
+visible action icon-only at `size-7`, because a labeled `sm` ghost is 30px and the 2px step showed
 on `/vendors` and `/requests`. One helper so two callers cannot drift and a third cannot invent a
 size.
 
@@ -6191,20 +6191,20 @@ A commit earlier I made it `sr-only` and justified that partly on width — "a v
 `/donation_sites`. That is not a real cost and leaning on it was sloppy.
 
 The better argument is about what the column *holds*, and it had just changed underneath me.
-Hidden headers suit a column of labelled controls, which describes itself — that is why Salesforce,
+Hidden headers suit a column of labeled controls, which describes itself — that is why Salesforce,
 GOV.UK, Carbon and Atlassian hide theirs. Collapsing nine tables in the previous commit turned most
-of these columns into **one unlabelled glyph**. A column whose entire visible content is "⋯" is
+of these columns into **one unlabeled glyph**. A column whose entire visible content is "⋯" is
 exactly where a header earns its place, and Ant Design — the most table-heavy of the systems
 surveyed — shows one.
 
 Worth naming the general shape: **a decision can be right when made and wrong an hour later, because
 the thing it was about moved.** The fix is to re-derive it, not to defend it.
 
-### The disabled reason: optimising for one group is not a reason to withhold from another
+### The disabled reason: optimizing for one group is not a reason to withhold from another
 
 Reported as confusing on `/items`, and it was a defect I introduced. `reason:` rendered as `sr-only`
 text, so a screen reader heard *"Deactivate, unavailable while this item is still in inventory or
-used by a kit"* and everyone else saw a greyed-out word and nothing at all. There was no `title`
+used by a kit"* and everyone else saw a grayed-out word and nothing at all. There was no `title`
 either.
 
 The comment I wrote at the time said the reason was sr-only "so it reaches a screen reader without
@@ -6232,7 +6232,7 @@ moved onto the label alone; the reason is slate-500 at **4.75:1**.
 
 One measurement note for whoever checks this next: the painted-pixel minimum for the reason reads
 **3.40:1**, not 4.75. That is antialiasing at 12px, which affects all small text equally, and the
-declared colour is what 1.4.3 measures. Painted pixels are the right tool for an *overlay* — a
+declared color is what 1.4.3 measures. Painted pixels are the right tool for an *overlay* — a
 gradient or a scrim changing what reaches the eye — and the wrong one for plain text on a plain
 background.
 
@@ -6461,7 +6461,7 @@ model, and for a `User` that is `users_path` — a helper that existed **only be
 rendering: `undefined method 'users_path'`. The page 500'd, and its request spec caught it.
 
 The URL is explicit now. `user_registration_path` is the same `/users`, so nothing about the
-behaviour changed — but the dependency is visible instead of incidental. **A `form_for` with no
+behavior changed — but the dependency is visible instead of incidental. **A `form_for` with no
 `url:` is coupled to a route you cannot see from the template**, and deleting an apparently unused
 index is exactly when that bites.
 
@@ -6497,7 +6497,7 @@ points into one code path is not. That is also why the form is a `form_tag` with
 `email` and `org` params rather than `form_for @user` — matching what the existing action reads is
 what keeps it on that action.
 
-**The password fields are gone**, and that is a behaviour change worth being explicit about: an
+**The password fields are gone**, and that is a behavior change worth being explicit about: an
 admin can no longer set someone's initial password from this screen. They never could — the form
 did not work — but a reader comparing the old template to the new one should see the removal
 justified rather than assumed. The invitee sets their own, which is what the modal has always done.
@@ -6548,7 +6548,7 @@ a border — rather than two controls with a gap between them. That is what keep
 height by construction; as separate boxes they had drifted to 38px and 42px."*
 
 **And the one I copied was broken in exactly the way that rule predicts.** `absolute right-2 top-8`
-over a `pr-10` field: a 38px field, a 36px button, 4px below the field's bottom edge, not centred.
+over a `pr-10` field: a 38px field, a 36px button, 4px below the field's bottom edge, not centered.
 The offset is tuned to one form's label height, so it broke the moment I pasted it onto a form with
 different spacing. Three of the four scan regions had it; only the line item table did not.
 
@@ -6578,7 +6578,7 @@ the two do different things:
   is "Scan the barcode on the box, or type the digits printed under the bars. Saving links it to
   the item and quantity above."
 
-Same control, same geometry, same behaviour. Different sentence, because a hint that described
+Same control, same geometry, same behavior. Different sentence, because a hint that described
 adding rows would be wrong on a form that adds none.
 
 **A leftover the audits caught:** `form-validation-audit.js` still opened its "Invite a new user"
@@ -6630,7 +6630,7 @@ had it since long before the migration.
 opened an empty distribution form and silently dropped the purchase. That is why I asked rather
 than shipping the link — it is the version that looks right and is wrong.
 
-**Generalised rather than duplicated.** `copy_line_items(itemizable_id, itemizable_type)` takes the
+**Generalized rather than duplicated.** `copy_line_items(itemizable_id, itemizable_type)` takes the
 type now, defaulting to `"Donation"` so the existing caller is untouched, and `copy_from_purchase`
 sits beside `copy_from_donation`. The line items were always polymorphic; only the query was not.
 A spec asserts the query is made with `itemizable_type: "Purchase"`, because the failure mode of
@@ -6642,7 +6642,7 @@ have copied the wrong record's items.
 the same kind of document and two receipts that differ by accident is worse than one duplicated
 file. What differs is what a purchase *is*: money going out to a vendor rather than goods coming in
 from a donor, so "Donation from" becomes "Purchased from" and "Money Raised" becomes "Amount
-spent". It honours `hide_value_columns_on_receipt`, because a bank that does not print values does
+spent". It honors `hide_value_columns_on_receipt`, because a bank that does not print values does
 not want them printed here either.
 
 **Verified end to end rather than asserted.** Clicking *Start a distribution* on purchase 21 lands
@@ -6714,7 +6714,7 @@ trigger** was chosen. The two rejected:
   reads as belonging to all of them. The indent and rule exist precisely to say *this one*.
 
 **The numbers are derived, not copied.** GOV.UK's 18px margin / 4px rule / 33px padding is sized to
-a 40px radio. Ours is 16px with a `gap-2` to its label, so the rule centres at `ml-1.5` (6px =
+a 40px radio. Ours is 16px with a `gap-2` to its label, so the rule centers at `ml-1.5` (6px =
 16/2 − 4/2) and `pl-3.5` (14px) lands the content at 24px — exactly the left edge of the label
 above it, verified in the browser (both at x = 333). Copying 55px would have indented it to nowhere.
 
@@ -6771,7 +6771,7 @@ Material React Table, Salesforce Lightning and Excel/Sheets/Handsontable all do 
   and it *composes* with pinning rather than replacing it, since most row actions here are
   per-record. Being built next.
 - **Fewer columns with a chooser** — the real fix for `/distributions`' twelve columns, but it needs
-  a stored per-user preference and a defaults decision across 200+ organisations. Its own work.
+  a stored per-user preference and a defaults decision across 200+ organizations. Its own work.
 
 **"Does this hurt tables with visible buttons?" — measured, and no.** `position: sticky` is inert
 where nothing overflows, so the widest actions columns in the app (`/manufacturers` **428px**,
@@ -6785,12 +6785,12 @@ or two stays visible. Collapsing a settled pair would hide a one-click action be
 every row forever. Checked against that rule, **exactly one table was wrong**: `/kits` branched on
 `kit.active` for Deactivate-or-Reactivate, the varying-set case, and was also the widest that
 scrolls at **273px**. It is a menu now — and while converting it, its unavailable Deactivate stopped
-being greyed out: the action is offered and `KitsController#deactivate` answers with the reason and
+being grayed out: the action is offered and `KitsController#deactivate` answers with the reason and
 the next step, which is what `/items` already did and what design.md already required.
 
 **The lever instead of collapsing was one design.md already contained**: a visible row action is
 icon-only at 28px. Extending that from "beside a kebab" to every inline actions column takes a
-labelled pair from **168–273px to a uniform 94px** — narrower than three of the five kebab columns —
+labeled pair from **168–273px to a uniform 94px** — narrower than three of the five kebab columns —
 at **no extra click**. 55 call sites across 30 files.
 
 **Which forced the tooltip question, and `title` is not the answer.** It is browser chrome:
@@ -6807,7 +6807,7 @@ breakpoint the labels come back as words, because touch has no hover.
 **The bug this uncovered is the most reusable part.** Making the cell `position: sticky` trapped the
 row menu: `position: fixed` escapes an ancestor's overflow but **not its stacking context**, so the
 panel's `z-30` resolved below the scroll rail's `z-index: 20`. Measured in the test environment —
-rail y=417–441, menu item centre y=423, `elementFromPoint` returning `.table-rail-track`. Removing
+rail y=417–441, menu item center y=423, `elementFromPoint` returning `.table-rail-track`. Removing
 the cell's `z-index` was not enough. The fix is the one `table_scroll_controller` already made for
 the rail: **the only reliable escape from an ancestor you do not control is not to be inside it**,
 so an open `fixed` panel is moved to `<body>` and put back on close. That in turn required
@@ -6934,7 +6934,7 @@ correct initial state; JavaScript may reveal, never un-draw*), broken in a file 
 **The interesting part is why the flash audit had not already found the second one.** It excused
 every `<select>`, on the grounds that select2 replaces one with its own container — a swap rather
 than a hide. That exclusion was mine, written a week ago, and it was too broad by exactly the amount
-that hid this: four real painted-then-hidden selects. It now recognises the *actual* swap —
+that hid this: four real painted-then-hidden selects. It now recognizes the *actual* swap —
 `select2-hidden-accessible`, a `.select2-container` sibling, or a tag input — and reverting the
 donation form makes it report those four and nothing else. **A blanket exemption for a tag is a
 blind spot with a plausible excuse attached.**
@@ -6974,7 +6974,7 @@ nothing about `@media`. The question was never re-asked.
 card: stack below 640px of it, one column below 416. Across four pages and twelve widths the
 container is the viewport less 34px at these sizes and identical on every page, and a 1px scan put
 the transitions at **450** and **690**. So `max-width: 689px` and `max-width: 449px` reproduce the
-previous behaviour to the pixel, and a spec now asserts all four boundaries.
+previous behavior to the pixel, and a spec now asserts all four boundaries.
 
 **Two attempts before it worked, and both failures were informative.**
 
@@ -7035,7 +7035,7 @@ mockup had an idle band reading *"Tick a row to select it."* It is not necessary
 removed the last of the design: there is no third band at all. The **filter row is the toolbar**, the
 bar replaces it, and "Show product totals" lives on it. Nothing is ever empty and nothing ever moves.
 
-**Covering the filters while a selection is live is the right behaviour, not just the tidy one.**
+**Covering the filters while a selection is live is the right behavior, not just the tidy one.**
 Filtering with rows selected is ambiguous — does the selection survive rows leaving the page? —
 and Carbon answers it the same way, by putting the filters out of reach until you are done.
 
@@ -7050,16 +7050,16 @@ belong beside the filters that decide them.
 Three things reported on Items & inventory, in the same 147px of card. Two of them were the same
 thing.
 
-**"The checkbox is floating and not centre aligned to the drop down"** — and that is also the
+**"The checkbox is floating and not center aligned to the drop down"** — and that is also the
 "unequal padding above and below the filter dropdown". The panel is a grid of equal columns whose
-cells stretch. A labelled filter brings 26px of label above a 38px control, so its control lands at
+cells stretch. A labeled filter brings 26px of label above a 38px control, so its control lands at
 the *bottom* of the cell; a checkbox has no label and landed at the *top*. Measured on `/items`: the
-select's centre at **y=327** and the checkbox's at **y=292**, **35px apart**. The band's own padding
+select's center at **y=327** and the checkbox's at **y=292**, **35px apart**. The band's own padding
 was already even at 16/16 — what read as missing padding was the gap under a checkbox that had
 floated to the ceiling.
 
 `filter_checkbox` is the grid cell now and bottom-aligns a 38px row inside it, so the box lands on
-its neighbour's centre line whatever the cell's height. Measured after: **0px apart.** Four views
+its neighbor's center line whatever the cell's height. Measured after: **0px apart.** Four views
 had been closing the gap with a hand-tuned `pb-2`; they no longer need it, which is the tell that
 the fix belonged in the component rather than at the call sites.
 
@@ -7068,7 +7068,7 @@ the eighteen filtered pages: **4 have one control**, 6 have two, 3 have three, a
 more, up to **9 on `/donations`**. On `/vendors` and `/donation_sites` the single control is a
 *checkbox* — a button, a chevron and a panel to conceal one tick box.
 
-**This does not reintroduce the two behaviours design.md rejected.** When the old five-filter
+**This does not reintroduce the two behaviors design.md rejected.** When the old five-filter
 threshold was removed the recorded reason was that *"learning the filter bar on donations and then
 meeting something else on transfers teaches nothing transferable"* — and that is about a reader
 having to learn where things are **hidden**. A filter that is simply visible teaches nothing wrong.
@@ -7115,20 +7115,20 @@ Ten of the eighteen filtered pages now show their filters; eight fold them.
 one `sm:w-72` box put two of them in a *column*, one under the other: measured on `/items`, a select
 and a checkbox **38px apart vertically** — the same 35px misalignment from the day before, rotated.
 The inline controls use the panel's own grid now, so a control is the same width whether the bar
-folds or not, and the two centres measure **equal**.
+folds or not, and the two centers measure **equal**.
 
 **A Ruby note worth keeping.** The first version wrote `INLINE_LIMIT = 2` in the template. An ERB
 template compiles to a *method body*, where that is a dynamic constant assignment and a SyntaxError
 — and the symptom was not an error page but **no filter bar at all, on every page**. A local.
 
-## 2026-08-30 — The selection bar floats, and I had generalised from one system
+## 2026-08-30 — The selection bar floats, and I had generalized from one system
 
 Reported: *"the print pick lists batch action makes the filter disappear. The filter and the picklist
 action are not simultaneously present. Why is this the case? They should not be mutually exclusive."*
 
 Correct on both counts, and the reasoning I recorded yesterday does not survive checking.
 
-**I generalised from Carbon.** design.md said the bar replaces the filter row because *"three of the
+**I generalized from Carbon.** design.md said the bar replaces the filter row because *"three of the
 four keep it in the toolbar"*, citing Carbon, Material, GitHub and Gmail. Only **Carbon** actually
 takes the filters away. **GitHub's** batch header replaces a *list header* that sits below its
 filter bar, which is untouched. **Gmail's** toolbar is its *action* toolbar; search is a separate bar
@@ -7167,7 +7167,7 @@ belongs to.
 
 ## 2026-08-30 — Auditing the industry citations, and six tables inset from their cards
 
-Asked to audit the app for other places I generalised from one system, and reported in the same
+Asked to audit the app for other places I generalized from one system, and reported in the same
 breath that the Partner announcements table has extra padding on the left.
 
 **The table first, because it was a live defect.** The table sat in a hand-written
@@ -7193,7 +7193,7 @@ this log that names two or more systems. **97 of them.** By the strength of what
 
 | | |
 | --- | --- |
-| **29** | name an artefact — `OverflowMenu`, `slds-truncate`, `<Table sticky />`, "Conditionally revealing a question". A reader can look it up and disagree. |
+| **29** | name an artifact — `OverflowMenu`, `slds-truncate`, `<Table sticky />`, "Conditionally revealing a question". A reader can look it up and disagree. |
 | **24** | attribute numbers to a system |
 | **34** | assert unanimity — "all", "none", "not one", "identically" |
 | **10** | plainly observational |
@@ -7202,7 +7202,7 @@ this log that names two or more systems. **97 of them.** By the strength of what
 form the selection-bar error took. Four were demonstrably wrong in form and are fixed:
 
 - *"None of the five puts a dependent field in a parallel column"* — **naming six systems**, and
-  crediting three of them with a behaviour they publish no component for. It now separates the
+  crediting three of them with a behavior they publish no component for. It now separates the
   three that ship the named pattern from the three where I was reading their forms, and says "I have
   not found a system that does" rather than "none does".
 - *"GOV.UK, Carbon, Material and Bootstrap all render identically"* — they follow the same APG
@@ -7222,7 +7222,7 @@ each does with the specific thing, not with the category it belongs to.
 
 Asked to fix the remaining unevidenced citations after the selection-bar error, where design.md
 justified covering the filter row with *"three of the four keep it in the toolbar"* — true of the
-category, false of the specific behaviour, and false the moment you check what each of the four
+category, false of the specific behavior, and false the moment you check what each of the four
 actually does.
 
 `bin/design/citation-audit.py` classifies every claim in `design.md` and this log that names two or
@@ -7276,8 +7276,8 @@ rule survives and `size-11` is still right; the two systems were not saying the 
 saying they were is the same compression that produced the original error. Annotated.
 
 **Prevention, and the honest limit of it.** A new section in design.md, **"Citing another system"**,
-states four rules: name the artefact or say you are describing an interface; check each system
-against the *specific behaviour*, not the category; a number belongs to whoever measured it; avoid
+states four rules: name the artifact or say you are describing an interface; check each system
+against the *specific behavior*, not the category; a number belongs to whoever measured it; avoid
 the absolute unless you have checked every case. It also says the thing the audit kept
 demonstrating — **the citation is rarely what decides anything.** Every decision that needed
 softening still had a measurement of this app behind it, and the measurement always survived.
@@ -7373,7 +7373,7 @@ had always used `id: @organization.intake_location`; only the admin copy was wro
 **The spec was correct the whole time.** It creates "Intake Center", sets it as the intake location,
 and asserts the page says so. It passed whenever the arbitrary row happened to be that one, which
 depends on how many storage locations earlier specs had inserted. That is not flakiness — **it is
-what a non-deterministic query looks like from outside**, and I mislabelled it twice: once as a
+what a non-deterministic query looks like from outside**, and I mislabeled it twice: once as a
 flake, and once as a "pre-existing order dependency", which sounded like a property of the suite
 rather than a bug in a controller.
 
@@ -7510,7 +7510,7 @@ is indistinguishable from a bug. *Next* — the calendar's pager is a `‹ Prev`
 points, the wizard's does not. *Reject request* — the label **toggles to "Close request"** while a
 glyph could not, so the fixed `bi-slash-circle` it carried was wrong on every closure.
 
-And one finding that was a labelling fault rather than an icon one: `/requests` had a row action
+And one finding that was a labeling fault rather than an icon one: `/requests` had a row action
 called **Cancel**, the word this app uses on **122 pages** to mean "abandon this form", while here it
 destroyed a record. It says *Cancel request* now, as the show page already did.
 
@@ -7657,7 +7657,7 @@ has history on its path; work in progress has none. That one query separates the
 *An exact tree match is the wrong test.* `matching_ancestor` demanded the disk equal a commit
 exactly, and **one stray untracked file defeats equality** — so on the one occasion the answer
 mattered it said "looks like work in progress" about a 412-file rollback. Closeness is the signal:
-6 files from the target against 412 from HEAD is not a judgement call. It is opt-in behind
+6 files from the target against 412 from HEAD is not a judgment call. It is opt-in behind
 `--identify`, because it costs a `git diff` per commit and the last rollback landed **215 commits
 back** — half a minute to say what the drift count already said.
 
@@ -7683,7 +7683,7 @@ screen reader say "Kids (Size 2), March, 3,042" rather than reading a bare numbe
 punishing the correct thing.
 
 **Pagination: no, and it should not be.** Every report table is **one row per item**, bounded by the
-bank's catalogue — 27, 46 and 47 rows measured — where an index table is one row per transaction and
+bank's catalog — 27, 46 and 47 rows measured — where an index table is one row per transaction and
 unbounded. A report is also read whole, exported whole and printed whole, and a pager breaks all
 three: you cannot scan a year of one item's figures with a quarter of them on page 2.
 `docs/migration-map.md` already lists the eight *index* tables that do not paginate and why; reports
@@ -7694,7 +7694,7 @@ so it does not read as an omission.
 the on-hand minimum" with `table-danger` — Bootstrap's class, defined nowhere since ADR 0011. The
 warning was not subtle, it was **invisible**: the cell rendered exactly like every other cell. It
 now uses the treatment the dashboard's low inventory table already had, unchanged — the number in
-rose *and* a pill carrying the word and an icon, because design.md does not allow colour alone. Had
+rose *and* a pill carrying the word and an icon, because design.md does not allow color alone. Had
 that cell still been Bootstrap-red it would have been a design system violation; being undefined, it
 was a functional one, and the two failure modes are easy to confuse when reading a diff.
 
@@ -7712,12 +7712,12 @@ sparkline.
 *completely* by the table directly under it — all 47, by month, with a total — and that table is
 also the accessible representation the design system requires of every chart. **B (top 8 and Other,
 stacked) was the near miss**, and it was rejected for one reason: it would have put a *partial*
-answer beside a complete one, and a reader who saw eight named items and a grey band would
+answer beside a complete one, and a reader who saw eight named items and a gray band would
 reasonably think that was the whole picture. The 75.2% figure that makes a top-8 cut viable is also
 the figure that makes it misleading — a quarter of everything distributed would have been "Other".
 
 **Why D as well.** A sparkline per row is the 47-series chart that the summary cannot be. Every item
-gets its own shape, with no legend, no shared colour and no interaction. Rendered as inline SVG on
+gets its own shape, with no legend, no shared color and no interaction. Rendered as inline SVG on
 the server rather than through a charting library: 47 to a page, none of them interactive, so a
 library would cost an instance per row and a layout shift with it. Shopify's `polaris-viz` ships
 `SparkLineChart` as a component in its own right, which is the same recognition — a trend inside a
@@ -7725,7 +7725,7 @@ row is a different problem from a series inside a legend.
 
 **The accessibility of a sparkline was the part worth thinking about.** The drawing is `aria-hidden`,
 and the cell carries an `sr-only` sentence: *"Peaks at 3,042 in Aug 2026."* Two wrong answers were
-available. Leaving the SVG unlabelled announces "image" and nothing else. Restating the row's twelve
+available. Leaving the SVG unlabeled announces "image" and nothing else. Restating the row's twelve
 figures is redundant — a screen reader has just read them. Naming **the peak and its month** is the
 one thing the shape says that reading twelve numbers in order does not hand you, so that is what the
 alternative carries.
@@ -7754,7 +7754,7 @@ is not a check.**
 
 With the trend pages rebuilt, all eleven reports were walked as three roles and measured. The good
 news first: **one `h1` each, no heading-level skips, a card on every page, every scroll region
-labelled, no leftover Bootstrap classes, and no console errors.** Four things were wrong, all of them
+labeled, no leftover Bootstrap classes, and no console errors.** Four things were wrong, all of them
 rules the design system already had and nothing was checking.
 
 **Three tables had no `<caption>`.** design.md says every table gets one, visually hidden, saying
@@ -7773,7 +7773,7 @@ measured CLS 0.352 on the trend pages before it was fixed there. It happened to 
 that is luck rather than a guarantee: the box is reserved now.
 
 **And it had no table.** design.md: a chart is never the only representation of its data, because a
-chart is not readable by a screen reader and not printable in colour. Every other chart page had one;
+chart is not readable by a screen reader and not printable in color. Every other chart page had one;
 this was the last that did not.
 
 **A spec of mine broke, correctly.** `layout_shift_system_spec` asserted `min-height == "850px"` —
@@ -7843,8 +7843,8 @@ Marked four ways, three of them words:
 - the table header for that month reads *"so far"*
 - the card subtitle says *"Aug 2026 is still running."*
 
-Only one of those is a fill, deliberately. **A fill pattern is a colour by another name**, and
-design.md does not allow colour alone; it is the least of the four signals rather than the only one.
+Only one of those is a fill, deliberately. **A fill pattern is a color by another name**, and
+design.md does not allow color alone; it is the least of the four signals rather than the only one.
 The marking also correctly *disappears* on the last day of a month, when the bucket is not partial —
 which is why the spec travels to a date rather than trusting whatever today happens to be, and why
 there is an example asserting the absence as well as one asserting the presence.
@@ -7883,7 +7883,7 @@ wide at x=1266**, against **271px at x=288** for the date picker on `/reports/it
 — the same kind of control, on a sibling page.
 
 I had put it in the page header's `actions:` slot. That is a **right-aligned flex row sized for
-buttons**, and it shrinks a labelled control to its content, so a `sm:w-64` came out at 142. The six
+buttons**, and it shrinks a labeled control to its content, so a `sm:w-64` came out at 142. The six
 report pages that already had a date filter all put it in `shared/essentials/filter_bar`, below the
 header and aligned with the page. **A filter is not a page action**, and the app had already said so
 by construction six times over; I did not look before building the seventh.
@@ -7929,23 +7929,23 @@ last year". Twelve months becomes the twelve before it; six becomes the six befo
 wrong for any window that is not a whole year, and a control that is right only for the default is
 worse than no control.
 
-Drawn as **one dashed grey line over the columns**. The preview drew both periods as lines; I kept
+Drawn as **one dashed gray line over the columns**. The preview drew both periods as lines; I kept
 the current period as columns so the chart does not change shape when you press a button, which
 satisfies the same argument — the point was never "lines", it was "not two sets of columns a month".
-It is also a `tfoot` row of the same figures, named with the window it covers, because a dashed grey
+It is also a `tfoot` row of the same figures, named with the window it covers, because a dashed gray
 line is exactly the thing a reader who cannot see it needs written down. And the change is in
 **words** — *"up 241% on the previous period"* — since a percentage alone reads as a quantity.
 
-**Categories, and the three judgement calls in them.** With nothing chosen the chart stacks by item
+**Categories, and the three judgment calls in them.** With nothing chosen the chart stacks by item
 category; choosing one narrows to a single series.
 
 - **It stacks only when more than one band has data.** An organization that does not use categories
   gets the single-series chart approved as option A, unchanged — and so does anyone who narrows to
   one category. The stacked view is not a new default so much as what the default *is* when there is
   something to stack.
-- **`Uncategorised` is an option.** 16 of the 51 items here have none. Leaving it out would have
-  hidden almost a third of the catalogue behind a filter with no way to reach it.
-- **Band colours are capped by the palette, not the data.** `CHART_BAND_COLOURS` has eight. Past
+- **`Uncategorized` is an option.** 16 of the 51 items here have none. Leaving it out would have
+  hidden almost a third of the catalog behind a filter with no way to reach it.
+- **Band colors are capped by the palette, not the data.** `CHART_BAND_COLORS` has eight. Past
   about eight a legend stops being a key, which is the fault the 47-series chart was rebuilt to
   escape, and a cap in the constant is what stops it coming back through a different door.
 
@@ -8055,7 +8055,7 @@ handled* — is the one that decides whether B is any better than the stack it r
 cap it is not: it is the same unbounded series count, handed to the user instead of taken from the
 data.
 
-**So: yes, a cap, and four.** Measured rather than picked, and both non-colour distinguishers run
+**So: yes, a cap, and four.** Measured rather than picked, and both non-color distinguishers run
 out at the same number:
 
 - **Four dash patterns** — solid, dashed, dotted, dash-dot — are the most that stay distinct at 2px.
@@ -8064,13 +8064,13 @@ out at the same number:
   and 18px at three lines and **6px** at four, against the 16px a 12px label needs. Five gives three
   collisions.
 
-**Colour is not the distinguisher and cannot be.** Of 28 pairs from an eight-colour candidate set,
+**Color is not the distinguisher and cannot be.** Of 28 pairs from an eight-color candidate set,
 **not one** clears 3:1 across normal vision and deuteranopia, protanopia and tritanopia. Each line
-colour *is* ≥3:1 against the white plot — that is WCAG 1.4.11, and a different question from telling
+color *is* ≥3:1 against the white plot — that is WCAG 1.4.11, and a different question from telling
 two lines apart. The pattern and the legend word do that.
 
 **At the cap the remaining boxes are disabled and the reason is visible**: *"4 of 4 plotted. Clear
-one to plot another."* Not `sr-only`. A greyed-out control whose explanation only a screen reader
+one to plot another."* Not `sr-only`. A grayed-out control whose explanation only a screen reader
 gets is the fault this app already fixed once, in the row action menus. The four already chosen stay
 enabled, so there is always a way out.
 
@@ -8221,7 +8221,7 @@ Worse, my replacement had **no `expires_in`**. On `solid_cache_store` that cache
 window's figures would have frozen until the window itself moved — next month. A distribution
 recorded today would not have appeared. That is a correctness bug I introduced and the sentence
 would have gone on excusing it. Five minutes now, against 6ms measured to compute, and the subtitle
-says what the page is for instead of apologising.
+says what the page is for instead of apologizing.
 
 **Two flaky examples turned out to be one fault, and mine.** `layout_shift` and `request_units` each
 failed once in a full run and passed alone. Both read with `evaluate_script` immediately after a
@@ -8236,7 +8236,7 @@ Approved: take the current month's marking off the chart's axis. Done, and the s
 before it was right.
 
 **The measurement.** *"so far"* sat on a second line under the last category, making that label
-**29px against every other one at 14** — one column's label twice its neighbours' height, and the
+**29px against every other one at 14** — one column's label twice its neighbors' height, and the
 axis 12px deeper than it needed to be for one word. All twelve labels measure 14px now.
 
 **Nothing was lost.** The month was marked four ways and is marked three: the lighter fill and
@@ -8349,7 +8349,7 @@ column and a name.
 
 **Two renames that were corrections, not tidying.** `donation_count` → **`items_donated`**: it is a
 sum of quantities, so under the old name the page printed an items figure as though it counted
-donations, directly beneath a stat labelled *Items donated* holding the same number. And
+donations, directly beneath a stat labeled *Items donated* holding the same number. And
 `by_donation_date` → **`donating_in`**, because the order changed: largest first, not most recent.
 The page is a summary of who gives most, the period is the date filter's job, and the old ordering
 was invisible anyway since no dates were shown.
@@ -8363,7 +8363,7 @@ width and the figure is what survives. **Verified at 390px: the bar is 0px and t
 
 **Two faults a table would not have fixed on its own.** *New donation* was in the card body, so
 `shared/filtered_card` takes an `actions:` local now and every report can put a page action in the
-page header. And *"Manufacturers donating: 1 Manufacturer"* repeated its own label and capitalised a
+page header. And *"Manufacturers donating: 1 Manufacturer"* repeated its own label and capitalized a
 word mid-value; it is a figure.
 
 **Three things measured on the way.**
@@ -8508,7 +8508,7 @@ caller — so the check was broader than the sentence describing it, and the app
 defects that were not defects. A finding that is always there and always fine is how an audit stops
 being read.
 
-That is not licence to widen it until it passes, which is the obvious failure mode here. So: is
+That is not license to widen it until it passes, which is the obvious failure mode here. So: is
 there a way to express these *without* a style attribute at all?
 
 - **A Tailwind class.** Not possible. Tailwind v4 compiles the classes it can see in the source, so
@@ -9031,7 +9031,7 @@ own measurement rather than to code.
 - **The enumerator was itself missing a screen.** `SKIP_ACTION` in `route-targets.rb` matches on the
   bare action name, so `inventory` — added to skip a storage-locations partial — also skipped
   `items#inventory`, a full screen with an `<h1>`, the app shell, and a place in the item
-  catalogue's tab strip. **Every audit built on route enumeration inherited that blindness**, which
+  catalog's tab strip. **Every audit built on route enumeration inherited that blindness**, which
   is a hardcoded list wearing a different hat. Controller-specific skips are now `SKIP_PAIR`.
 - **`sweep.js` was deleted, not migrated.** `route-sweep.js` performs every check it did, including
   the console-error capture that only looked missing because the variable is called `errors` there.
@@ -9071,7 +9071,7 @@ below it is Rails. `TARGETS_CMD` overrides the one command that knows which fram
 
 `tab-set-audit` did not just get a longer list — it stopped having one. A tab set is identifiable
 from the page: the strip is the `<nav>` inside `main` holding the `aria-current` link, and the set is
-the hrefs in that strip. Pages sharing a strip are one set. It rediscovered the Kits-in-catalogue
+the hrefs in that strip. Pages sharing a strip are one set. It rediscovered the Kits-in-catalog
 case that the fixture had hand-coded with an explanatory comment, and it will find the next tab set
 without being told.
 
@@ -9102,7 +9102,7 @@ rather than letting the claim "no audit hardcodes its pages" stand at 95% true.
 ## 2026-09-03 — The overlay audit, and four guesses before one measurement
 
 `overlay-audit` took **58 seconds a page**. Widening it to every screen was tried and reverted
-because 150 screens would have been two hours, and four rounds of optimisation followed — cheap
+because 150 screens would have been two hours, and four rounds of optimization followed — cheap
 discovery before expensive work, a per-screen instance cap, hoisting axe-core's half-megabyte
 injection out of a per-dialog loop, a `Promise.race` time budget. **None of them helped, because
 none of them was the cause.**
@@ -9160,12 +9160,12 @@ that renders one.
 
 ### What this says about the earlier attempt
 
-The four failed optimisations were not bad ideas; they were answers to a question nobody had asked.
+The four failed optimizations were not bad ideas; they were answers to a question nobody had asked.
 **"Why is this slow" was never measured — only "why did widening make it slow", which presupposed
 something untrue.** The baseline measurement took ninety seconds and would have redirected the whole
 effort.
 
-`audit-suite`'s "measure before you optimise — including the baseline" now says this in one line.
+`audit-suite`'s "measure before you optimize — including the baseline" now says this in one line.
 
 ## 2026-09-03 — Two accessibility defects, and a to-do that was wrong about both
 
@@ -9343,8 +9343,8 @@ that the layout underneath it had been fixed independently, so deleting it chang
 rule removed *and* a 2000px element injected did the page actually pan — 900px, `h1` from `left: 16`
 to `left: -884` — and the audit reported `swipes 900px sideways` on the first run.
 
-Generalised into `audit-suite`'s control harness as its own failure mode, because the shape recurs
-well beyond CSS: a validation with no invalid record, a rate limiter with no traffic, a sanitiser
+Generalized into `audit-suite`'s control harness as its own failure mode, because the shape recurs
+well beyond CSS: a validation with no invalid record, a rate limiter with no traffic, a sanitizer
 with nothing dangerous in the input. `guard + condition = safe`; removing the guard tests nothing
 if the condition has gone.
 
@@ -9403,7 +9403,7 @@ focused container is a plain `<div tabindex="-1">` and the `role="alert"` sits o
 within it. That is the shape the GOV.UK error summary arrived at.
 
 **The limit is worth stating.** What was verified here is the mechanics: focus lands on the summary
-and the page scrolls to it, on four forms across both shells. The announcement behaviour follows a
+and the page scrolls to it, on four forms across both shells. The announcement behavior follows a
 published pattern, not a measurement — no screen reader can be driven from this environment, and
 claiming otherwise would be the kind of unearned assertion this project has spent three sessions
 removing from its own documents.
@@ -9436,7 +9436,7 @@ moment focus has been moved *for* someone is exactly when they need to see where
 after: `outlineWidth: 2px`, `outlineColor: rgb(79, 70, 229)`, `outlineOffset: 2px`.
 
 Kept `brand-600` rather than tinting it rose to match the component: a focus indicator is something
-users learn once, and it should not change colour with the surface it lands on.
+users learn once, and it should not change color with the surface it lands on.
 
 ### Verification
 
@@ -9451,7 +9451,7 @@ axe over 156 pages, no violations; `wcag22-audit` over 151 screens, no failures;
 
 ## 2026-09-04 — One inconsistency, and the blind spot that had been protecting it
 
-The ask was small: invitation status is plain text in the bank's user table and coloured pills in
+The ask was small: invitation status is plain text in the bank's user table and colored pills in
 the partner's. Make them agree. The fix is a helper. Getting to it turned up why the inconsistency
 had survived a whole migration.
 
@@ -9597,16 +9597,16 @@ The `responsive-audit` flicker, which is what led here, is still open. It is at
 was not its cause — the flicker is bimodal across all fifty spacing-exception targets, and this
 was one control.
 
-## 2026-09-08 — A target's own ancestor is not a neighbour, and what the noise was hiding
+## 2026-09-08 — A target's own ancestor is not a neighbor, and what the noise was hiding
 
 The `responsive-audit` flicker, closed at the fifth attempt. The decision worth recording is not
 the predicate; it is what to do about the two defects underneath it.
 
 ### The predicate
 
-WCAG 2.5.8's spacing exception excuses an undersized target when a 24px circle centred on it
+WCAG 2.5.8's spacing exception excuses an undersized target when a 24px circle centered on it
 reaches no *other* target's hit area. The audit implemented "other" as `o.el !== t.el`, which is
-true of the target's own parent — and a parent's box necessarily contains the child's centre, so
+true of the target's own parent — and a parent's box necessarily contains the child's center, so
 any target inside a focusable container could never pass. On `/items/inventory`,
 `clipped_text_controller` gives a truncated `<td>` `tabindex="0"` so a keyboard user can reach its
 tooltip, and that cell wraps each row's disclosure button. Fifty buttons, reported at every width.
@@ -9627,7 +9627,7 @@ target and is still reported.
 
 They compared counts, then positions. Neither is wrong as a technique and neither could see this,
 because the number that moved was the size of the *comparison set* — the other elements the rule
-consults. A rule that takes a neighbourhood has the neighbourhood as an input, and inputs have to
+consults. A rule that takes a neighborhood has the neighborhood as an input, and inputs have to
 be dumped, not just outputs.
 
 ### The two defects it was hiding, and why they were not "out of scope"
@@ -9661,7 +9661,7 @@ resizing between them does not converge — the clipped scan runs on `resize` wh
 labels arrive on a `matchMedia` change. It no longer affects any audit result and has no reported
 user symptom, so it is in `docs/todo.md` with the mechanism written down rather than chased.
 
-## 2026-09-09 — Merging 151 commits of `main`: design owns the markup, main owns the behaviour
+## 2026-09-09 — Merging 151 commits of `main`: design owns the markup, main owns the behavior
 
 `main` had moved 12 days and 151 commits, touching 180 files — 88 of which this branch had also
 changed, and 33 of those were views it had rewritten from scratch. That shape is not a line-by-line
@@ -9670,7 +9670,7 @@ old Bootstrap markup with a new feature embedded in it.
 
 ### The rule
 
-**Design owns the markup; main owns the behaviour.** For each conflict: take this branch's file,
+**Design owns the markup; main owns the behavior.** For each conflict: take this branch's file,
 then find what main's side actually *changed* against the merge base and re-apply that change in
 design-system terms. `git diff -w <base> origin/main -- <file>` per file, so a reindentation is
 visibly not a feature.
@@ -9680,7 +9680,7 @@ and was pure reindentation. `items/_form` looked similar and carried a whole fea
 
 ### Where main's version won outright
 
-Copy and behaviour are not symmetrical, and neither is always the newer one.
+Copy and behavior are not symmetrical, and neither is always the newer one.
 
 - **Both branches fixed the same bug** — a cancellation could be saved with no reason (#5641). main
   put the check in `RequestDestroyService`; this branch built a `Requests::Cancelation` form object
@@ -9698,7 +9698,7 @@ Copy and behaviour are not symmetrical, and neither is always the newer one.
 main's specs assert main's markup and copy. Where they asserted Font Awesome (`fa-undo`,
 `fa-search`), Bootstrap (`data-bs-toggle`, `btn btn-success`, `.alert-info`) or Title Case
 ("Submit Essentials Request", "All Human Essentials Organizations", "From Location"), the spec was
-updated to what ships here and the *behaviour being pinned* was preserved. Two of main's regression
+updated to what ships here and the *behavior being pinned* was preserved. Two of main's regression
 tests were ported rather than dropped, because the bug they guard is real even though the markup
 moved: #5632's "a modal toggle must not carry `data-disable-with`" and #5641's "the form must not
 cancel without a reason".
@@ -9713,7 +9713,7 @@ it would have meant two request specs asserting opposite things about one endpoi
 | --- | --- |
 | main's new `reminder_toggle_controller` toggled `d-none` | Defined nowhere since ADR 0011, so the dependent fields would never hide. `migration-map.md` records **four** earlier controllers with the identical fault; this was the fifth |
 | `items/_form` emitted `item[request_unit_ids][]` | The merged controller reads `item[unit_ids][]`, so custom units would have silently stopped saving |
-| main's unit-limit behaviour was an inline `<script>` | No inline scripts here; it became `unit_limit_controller` |
+| main's unit-limit behavior was an inline `<script>` | No inline scripts here; it became `unit_limit_controller` |
 | `_reminders_disabled_notice` arrived as `callout callout-info` | Three dead classes; migrated to the callout component |
 
 ### Two failures that were not the merge
@@ -9794,7 +9794,7 @@ words. So the primary measure asks the question with a stable answer:
 which is what "is the migration done" means. It reads **0 of 350**.
 
 Rejected: keeping the positive count as the headline and accepting that it undercounts. It is still
-printed, because it is a useful coverage indicator, but labelled as an indicator with the reason
+printed, because it is a useful coverage indicator, but labeled as an indicator with the reason
 attached — a four-line table row can be fully migrated and have nothing to mark.
 
 Also rejected: dropping the files that cannot match. The components in `shared/essentials/` cannot
@@ -9926,7 +9926,7 @@ three things at once:
   `spec/example_failures.txt` has history *and* a deleting commit, and rspec rewrites it every run.
   Deleting a live artifact on the word of the tool that exists to make the tree trustworthy is how
   that tool loses its nerve.
-- Matching bytes is the **licence to delete**: git can give the file back.
+- Matching bytes is the **license to delete**: git can give the file back.
 - It survives widening the scan to ignored paths, which the cheap test could not.
 
 ### Making it cheap, and the wrong turn on the way

@@ -57,7 +57,7 @@ rather than carrying one. **That is the whole point.** Its predecessor `sweep.js
 hardcoded list of 56 paths, and a list goes stale in silence: the three historical trend pages were in the
 sidebar and never on it, and they sat with no page header and no `<h1>` for the length of the
 migration while every audit reported clean. On its first run `route-sweep.js` found eleven
-unlabelled selects in the partner portal, which the old list never visited.
+unlabeled selects in the partner portal, which the old list never visited.
 
 A 404 from `route-sweep.js` is listed separately from the design findings rather than mixed in
 with them. It used to mean a route with no action behind it — `resources :x` generates seven and
@@ -101,11 +101,11 @@ design system partial that every other check skips as "the definition, not a cop
 `.card-surface` exists there is no definition left to protect — the component uses the class like
 everybody else. It reports 0, and the remedy for a finding is always the same: use the class.
 
-**A second sweep asks the same question of the icon tile.** A tone-coloured, fixed-size rounded
+**A second sweep asks the same question of the icon tile.** A tone-colored, fixed-size rounded
 box that is not `rounded-full` should have come from `essentials_icon_tile`. `rounded-full` is the
 whole discriminator, and it is doing real work: a circle is an avatar or a numbered step badge,
 which design.md keeps deliberately disjoint from tiles, and both appear in the app. The reports
-hub was the one copy, and it had drifted on size, radius *and* text colour — 28px/`rounded-lg`/
+hub was the one copy, and it had drifted on size, radius *and* text color — 28px/`rounded-lg`/
 `text-brand-700` against the helper's 36px/`rounded-xl`/`text-brand-600` — which is what a single
 hand-rolled component looks like after a while. The helper takes `size: :sm` now and the hub uses
 it.
@@ -210,14 +210,14 @@ python3 bin/design/citation-audit.py --list   # every claim
 ```
 
 It cannot check whether a claim is *true* -- nothing here can browse. It finds claims whose **form
-outruns the checking behind them**: naming an artefact (`OverflowMenu`, `slds-truncate`,
+outruns the checking behind them**: naming an artifact (`OverflowMenu`, `slds-truncate`,
 `<Table sticky />`) is evidence a reader can look up and disagree with; asserting that four systems
 all do something, with nothing named, is not.
 
 Written after a real error. design.md justified the selection bar covering the filter row with
 "three of the four keep it in the toolbar", citing Carbon, Material, GitHub and Gmail -- and only
 Carbon takes the filters away. The other three were counted as agreeing by describing them all as
-"keeping it in the toolbar", which is true of the category and false of the specific behaviour.
+"keeping it in the toolbar", which is true of the category and false of the specific behavior.
 **32 claims were in that form**; all are now evidenced, softened to "observed", or annotated.
 
 ```bash
@@ -227,7 +227,7 @@ python3 bin/design/citation-audit.py --bless   # record the current count as the
 
 `--check` is the part that prevents a repeat. It holds a baseline in `citation-baseline.json` and
 exits non-zero when the number of claims asserting agreement across four or more systems, with no
-artefact named, goes **up**. It cannot tell whether a claim is true -- nothing here can open another
+artifact named, goes **up**. It cannot tell whether a claim is true -- nothing here can open another
 product -- but it can stop the count growing unnoticed. Verified to fail: adding one sentence of the
 old form takes it from 2 to 3 and exits 1.
 
@@ -256,7 +256,7 @@ empty container was inflated to 850px on connect; the donation form's four sourc
 then hidden for **100px** of reflow; and, at 390px, **six screens past "poor"** -- `/admin/base_items`
 at **0.658** -- because tables were restacked into cards by JavaScript after paint. All three are
 fixed; the worst score in the app is now **0.068** at 390 and **0.007** at 1400. The second was invisible to `flash-of-hidden-audit.js`
-because that audit excused every `<select>` for select2's sake -- it now recognises the actual swap
+because that audit excused every `<select>` for select2's sake -- it now recognizes the actual swap
 instead.
 
 `tab-set-audit.js` checks that a **set of page tabs behaves as one place**.
@@ -335,7 +335,7 @@ Getting there widened seven audits and found four things:
 | | |
 | --- | --- |
 | `button-audit` | Six real violations on show pages its list of index pages never visited. `/donations/1` and `/purchases/1` emitted the primary action second; `/requests/1` gave the last slot to the destructive Cancel — the fault reported for `/product_drives` and fixed there but not here |
-| `route-targets.rb` | **The enumerator itself was missing a screen.** `SKIP_ACTION` matches on the action name alone, so `inventory` — there to skip a storage-locations partial — also skipped `items#inventory`, a full screen in the item catalogue's tab strip. Every audit built on the file was blind to it |
+| `route-targets.rb` | **The enumerator itself was missing a screen.** `SKIP_ACTION` matches on the action name alone, so `inventory` — there to skip a storage-locations partial — also skipped `items#inventory`, a full screen in the item catalog's tab strip. Every audit built on the file was blind to it |
 | `sweep.js` | Deleted. `route-sweep.js` performs every one of its checks, so keeping it was keeping a hardcoded list beside the thing built to replace it |
 | `table-audit` | Its list still named `/users`, deleted in August |
 
@@ -552,7 +552,7 @@ capture that looked missing until you notice it is called `errors` there rather 
 exact thing the replacement exists to remove, and the two would have drifted.
 
 A page is clean when it has no leftover Bootstrap/AdminLTE or Font Awesome classes, exactly one
-`<h1>` and one `<main>`, no skipped heading levels, no unlabelled form controls, no buttons
+`<h1>` and one `<main>`, no skipped heading levels, no unlabeled form controls, no buttons
 without an accessible name, no stylesheets from outside the app, no console errors, and is
 rendering in Figtree.
 
@@ -561,7 +561,7 @@ This complements the specs rather than repeating them. It catches what renders w
 a Stimulus controller toggling a class that no longer exists, a confirmation that never
 appears. Neither on its own is enough; that is the lesson of this migration.
 
-`route-shadow.rb` asks the neighbouring question and needs no browser either: is there a file in
+`route-shadow.rb` asks the neighboring question and needs no browser either: is there a file in
 `public/` that answers a route before the router sees it? Rails serves static files first, so
 `public/vendors.csv` answers `GET /vendors.csv` and the controller never runs — with a 200 and
 plausible content, so nothing looks wrong.
@@ -746,7 +746,7 @@ plus two that must stay **silent**, because the first draft flagged three migrat
 `card-surface` is ours and `\bcard\b` matches the "card" inside it, and `float-right` is a Tailwind
 utility as much as a Bootstrap one, so its presence says nothing.
 
-The positive count is still printed as an indicator, labelled as one: a four-line table row can be
+The positive count is still printed as an indicator, labeled as one: a four-line table row can be
 fully migrated and have nothing to mark. Files that cannot carry a marker for the system they *are*
 — the components in `shared/essentials/`, plus gem and framework partials — are reported separately
 rather than counted as failures.

@@ -164,7 +164,7 @@ const MARK = ({ text, aria, inPanel }) => {
   console.log(`\n${controls} confirmations on ${pages} pages, all dismissed`);
   console.log(`\n-- not the app's own dialog (${findings.length}) --`);
   for (const f of findings) {
-    console.log(`  ${f.path}  ${f.text || f.aria || "(unlabelled)"}${f.triggerLabel ? `  (in "${f.triggerLabel}")` : ""}`);
+    console.log(`  ${f.path}  ${f.text || f.aria || "(unlabeled)"}${f.triggerLabel ? `  (in "${f.triggerLabel}")` : ""}`);
     console.log(`      ${f.verdict}${f.native ? `  -> "${f.native}"` : ""}`);
   }
   if (!findings.length) console.log("  none -- every confirmation is the styled dialog");

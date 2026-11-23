@@ -33,7 +33,7 @@ and adopting apps hear about a breaking release before it ships.
 
 **Fixed 2026-11-23** (see `components/README.md`'s `<rfg-table>` and `<rfg-filter-bar>`
 sections for the fix and how it was checked). The story-level check proposed in the last paragraph
-below now exists too: `bin/design/adapters/storybook/component-behaviour-audit.js`, run in CI. It
+below now exists too: `bin/design/adapters/storybook/component-behavior-audit.js`, run in CI. It
 fails all 20 of its checks against the v0.1.0 code (see
 [`adapter-storybook.md`](portability/adapter-storybook.md)). The original entry follows.
 
@@ -54,7 +54,7 @@ flagged as known issues on their Storybook pages until fixed.
   Fix options: render into light DOM (as `<rfg-button>` does, for the same reason), or drop the
   internal form and document that the host wraps the bar in its own `<form>`.
 
-Neither was caught before because axe and the keyboard audit don't check either behaviour. A
+Neither was caught before because axe and the keyboard audit don't check either behavior. A
 story-level check (computed `text-align` on a `numeric` cell; `control.form` non-null) would catch
 both again.
 
@@ -68,7 +68,7 @@ one run in three. Afterwards: **3,298 examples, 0 failures, 1 pending, on eight 
 | --- | --- |
 | `request_system_spec:119` | no `wait_for_filters` after `click_on "Clear all"` — the only clear-all in the suite without one |
 | `donation_site_spec:198` | the spec queried `DonationSite.active`, unscoped and unordered, where the app queries `current_organization.donation_sites.alphabetized.active` |
-| `audit_system_spec:74` | `await_select2` took the starting `data-select2-id` from a non-retrying `Nokogiri` snapshot; before select2 initialised that read nil, so it waited for id `1` |
+| `audit_system_spec:74` | `await_select2` took the starting `data-select2-id` from a non-retrying `Nokogiri` snapshot; before select2 initialized that read nil, so it waited for id `1` |
 | *(one more)* | `PG::TRDeadlockDetected` — self-inflicted, a second `rspec` against the same test database |
 
 **What eight clean runs does and does not support.** At the previous rate it would happen about
@@ -189,7 +189,7 @@ Corroborating, though not sufficient by itself: the client binary
 operational ones like a `synced` subdirectory named in help text about a skills-sync setting. String
 evidence shows the path is *known*; only the canary shows it is *loaded*.
 
-Both test artefacts were removed afterwards and `~/.claude/skills/` was left absent, so this entry
+Both test artifacts were removed afterwards and `~/.claude/skills/` was left absent, so this entry
 still describes the machine as it stands. **The remaining tradeoff is unchanged** and is the only
 open question: a symlink points at a path, so if this repo moves or is deleted the skills stop
 working silently.
@@ -197,7 +197,7 @@ working silently.
 ## `responsive-audit` flicker: closed, and it was hiding two real defects
 
 Fixed on 2026-09-08 at the fifth attempt. Recorded in full because four attempts failed for the
-same reason and the shape is worth recognising.
+same reason and the shape is worth recognizing.
 
 **What it was.** Findings alternated 8/9, always `/items/inventory`. The audit reported "50
 target(s) under 24px" on that page at six or seven widths, and whether 320 was among them varied
@@ -211,7 +211,7 @@ that encloses the target always intersects that circle, so the exception was unp
 fifty buttons were reported. Whether the cell was marked depended on how the page had been reached,
 which is where the run-to-run variation came from.
 
-**A target's own ancestor is not a neighbour.** One predicate — `!a.contains(b) && !b.contains(a)`
+**A target's own ancestor is not a neighbor.** One predicate — `!a.contains(b) && !b.contains(a)`
 — and three runs of the full audit now produce byte-identical output. Verified the honest way: the
 underlying population still swings (`allTargets` 133 or 183 between runs) and the reported result no
 longer moves with it, which is better than suppressing the swing, because the audit no longer

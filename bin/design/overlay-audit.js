@@ -4,7 +4,7 @@
  *
  * This audit took **58 seconds a page** — 525 seconds for nine pages — and had always done so;
  * nobody had timed it. Widening it to every screen was tried and reverted because it would have
- * taken two hours, and four rounds of optimisation followed: cheap discovery, an instance cap,
+ * taken two hours, and four rounds of optimization followed: cheap discovery, an instance cap,
  * hoisting axe-core's injection out of a loop, a `Promise.race` budget. None helped, because none
  * of them was the cause.
  *
@@ -19,21 +19,21 @@
  *   525s for 9 screens   ->   254s for 154 screens
  *   58s per screen       ->   1.6s per screen
  *
- * The lesson is in the numbers rather than the fix: **time the thing before optimising it, and
+ * The lesson is in the numbers rather than the fix: **time the thing before optimizing it, and
  * time it per phase.** Guessing produced four wrong answers in a row; one measurement produced the
  * right one.
  */
 // Every overlay in the app, opened and checked.
 //
 // This exists because of a bug the other audits could not see. Every modal <dialog> in the app
-// opened in the top-left corner -- 28 files -- because a native modal is centred by the browser's
+// opened in the top-left corner -- 28 files -- because a native modal is centered by the browser's
 // own `margin: auto` and Tailwind's preflight resets `margin: 0`. `page-audit.rb` reads markup
 // and `wcag-audit.js` scans the page as loaded; neither of them ever opened a dialog, so neither
 // of them ever saw it.
 //
 // Two kinds of overlay, with deliberately different contracts:
 //
-//   dialog   a modal. Centred, inside the viewport, focus trapped by the browser, Escape closes.
+//   dialog   a modal. Centered, inside the viewport, focus trapped by the browser, Escape closes.
 //   popover  anchored to a trigger. On screen, NOT focus-trapped, Escape closes and returns
 //            focus to the trigger, aria-expanded tracks the state.
 //
@@ -99,19 +99,19 @@ async function checkDialogs(page, path, findings) {
       if (!d || !d.open) return null;
       const r = d.getBoundingClientRect();
       return {
-        centred: Math.abs((innerWidth - r.width) / 2 - r.left) < 4,
+        centered: Math.abs((innerWidth - r.width) / 2 - r.left) < 4,
         onScreen: r.top >= -1 && r.left >= -1 && r.bottom <= innerHeight + 1,
         isModal: d.matches(":modal"),
-        labelled: Boolean(d.getAttribute("aria-label") || d.getAttribute("aria-labelledby"))
+        labeled: Boolean(d.getAttribute("aria-label") || d.getAttribute("aria-labelledby"))
       };
     }, id);
 
     if (!state) continue;
     const where = `${path} dialog#${id}`;
     if (!state.isModal) findings.push(`${where}: opened with show(), not showModal()`);
-    if (!state.centred) findings.push(`${where}: not centred`);
+    if (!state.centered) findings.push(`${where}: not centered`);
     if (!state.onScreen) findings.push(`${where}: extends past the viewport`);
-    if (!state.labelled) findings.push(`${where}: no accessible name`);
+    if (!state.labeled) findings.push(`${where}: no accessible name`);
 
     for (const v of await axeOn(page, `#${id}`)) findings.push(`${where}: ${v}`);
 

@@ -12,7 +12,7 @@
 // outcome for each audit run against examples/reference-app -- some clean, some catching a
 // deliberately planted violation, some crashing on a known, written-up gap. Re-running them and
 // diffing against that documented outcome is a real regression check: it fails the way a control
-// harness should fail -- when behaviour drifts from what was actually verified -- rather than
+// harness should fail -- when behavior drifts from what was actually verified -- rather than
 // merely asserting "exit 0", which would be silently wrong for the three audits documented to
 // exit non-zero on purpose.
 //

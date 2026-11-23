@@ -43,7 +43,7 @@
 <div class="warn">
   <p><strong>Every modal in this app opens in the top-left corner.</strong> Not just Calculate
   product totals &mdash; all of them, in <strong>28 files</strong>. A native
-  <code>&lt;dialog&gt;</code> opened with <code>showModal()</code> centres itself using the
+  <code>&lt;dialog&gt;</code> opened with <code>showModal()</code> centers itself using the
   browser's own <code>margin: auto</code>. Tailwind's preflight resets <code>margin: 0</code> on
   every element, which takes that away. Measured on <code>/requests</code>: the dialog reports
   <code>:modal</code> true, and sits at <code>top: 0, left: 0</code> with <code>margin: 0px</code>.</p>
@@ -59,7 +59,7 @@
 </div>
 
 <h2><span class="n">2</span>The threshold was wrong</h2>
-<p class="note">You are right. Two behaviours across sixteen pages is worse than one, whichever
+<p class="note">You are right. Two behaviors across sixteen pages is worse than one, whichever
 one it is: someone who learns the filter bar on donations then meets a different thing on
 transfers has learned nothing transferable. <strong>The disclosure goes everywhere</strong>, and
 <code>FILTER_DISCLOSURE_THRESHOLD</code> is deleted.</p>
@@ -75,7 +75,7 @@ transfers has learned nothing transferable. <strong>The disclosure goes everywhe
 <p class="note">The stacking is the bug you are describing, and it is worse than it looks.
 Choosing <em>Custom</em> turns a 64px cell into a <strong>216px</strong> one &mdash; three stacked
 controls &mdash; and adds <strong>152px</strong> to the bar at every width. At 1360px and above
-the tall cell has no neighbours on its row at all, so there is a column of empty space beside it.</p>
+the tall cell has no neighbors on its row at all, so there is a column of empty space beside it.</p>
 <figure class="frame bad">
   <figcaption>Now &mdash; Custom open, 216px of cell in a row of 64px cells</figcaption>
   <div class="shot"><div class="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"><div class="min-w-0"><label class="block text-sm font-medium text-slate-700" for="filters_at_storage_location_23227eee-8be0-494a-9263-26907ea49780">Storage location</label><select class="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white py-2 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none filter-select pl-3 pr-10" id="filters_at_storage_location_23227eee-8be0-494a-9263-26907ea49780" name="filters[at_storage_location]"><option value="" label=" "></option>

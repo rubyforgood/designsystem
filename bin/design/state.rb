@@ -10,7 +10,7 @@
 # them. Now nobody does.
 #
 # It rewrites only what is between the markers. The prose around the table -- what the numbers mean,
-# which of them is not what it looks like -- is judgement and stays hand-written, because a generator
+# which of them is not what it looks like -- is judgment and stays hand-written, because a generator
 # has nothing to say about that.
 #
 # `--check` is what CI would run: it fails when the committed table no longer matches the tree, which

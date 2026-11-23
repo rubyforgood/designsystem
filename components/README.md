@@ -88,7 +88,7 @@ ancestor `<form>`'s submission, a tag/attribute-CSS-selector progressive-enhance
 (rails-ujs) can never match the custom element, and Capybara's default finders can't see into a
 shadow root at all. See the header comment in `button.js` for how each was confirmed.
 
-Two further values beyond the table above: `variant="ghost_danger"` (the same rest colour as
+Two further values beyond the table above: `variant="ghost_danger"` (the same rest color as
 `ghost`, rose on hover and focus only — design.md's "a repeated destructive control shouldn't
 shout at rest"; the component had no CSS for this variant until a story exercised it) and
 `size="xs"`, a fixed icon-only square sized by `--rfg-button-xs-size` (default `1.75rem`) rather
@@ -146,10 +146,10 @@ Default slot is the label; a named `icon` slot is decorative (`aria-hidden`) and
 "only earns its place when the pill itself is rare" — most pills should just be a tinted word.
 
 **Found by axe-core, fixed, not assumed:** the four semantic tones (info/success/warning/danger)
-render `neutral-900` text, not the tone colour — those tokens are measured to clear WCAG AA 4.5:1
+render `neutral-900` text, not the tone color — those tokens are measured to clear WCAG AA 4.5:1
 against *pure* white (danger by a 0.01 margin, see `tokens/README.md`), and any background tint
 drops below that. The tone still shows in the background; `neutral` and `brand` are unaffected
-(their tokens have a larger margin) and keep tone-coloured text.
+(their tokens have a larger margin) and keep tone-colored text.
 
 ## `<rfg-icon-tile>` and `<rfg-avatar>`
 
@@ -213,7 +213,7 @@ its tone — a "success" message carrying a one-time credential must not auto-di
 success messages usually can. Decide per message, not per tone, before setting `dismiss-after`.
 
 **Same `color-mix` contrast fix as the status pill**, for the same reason: message text is
-`neutral-900`, not the tone colour; the tone shows in the background tint and a left border.
+`neutral-900`, not the tone color; the tone shows in the background tint and a left border.
 
 ## `<rfg-page-header>`
 
@@ -316,7 +316,7 @@ Dispatches `rfg-close` (re-dispatched from the native, non-composed `close` even
 from outside the shadow root).
 
 design.md's one documented gotcha for this pattern — a global CSS reset's `margin: 0` defeating
-`<dialog>`'s own centring `margin: auto` — can't actually happen here: the shadow boundary already
+`<dialog>`'s own centering `margin: auto` — can't actually happen here: the shadow boundary already
 isolates this element's `<dialog>` from whatever reset the host page runs.
 
 ## `<rfg-popover>`
@@ -422,7 +422,7 @@ automatically.
 | `label` | text | |
 | `required` | boolean | Renders a red `<abbr title="required">*</abbr>` in the label. |
 | `optional` | boolean | Mark optional fields too on a form that mixes both — design.md's rule: a lone asterisk convention leaves every unmarked field ambiguous. |
-| `error` | text | Renders the message (neutral-700 text, danger-coloured glyph — "the glyph signals and the sentence reads") and wires `aria-invalid`/`aria-describedby`. |
+| `error` | text | Renders the message (neutral-700 text, danger-colored glyph — "the glyph signals and the sentence reads") and wires `aria-invalid`/`aria-describedby`. |
 
 `<rfg-error-summary>` is the page-level counterpart (`essentials_error_summary`): `role="alert"`,
 a heading, and the host's own message list (plain `<li>` text, deliberately **not** links —
@@ -517,7 +517,7 @@ section name, and a heading on it puts the figure in the page's navigable outlin
 | `heading` / `subtitle` | Optional; a bare row of numbers with no header reads as ambiguous or as belonging to whatever's printed above it. |
 | `figures` | Array property: `[{ label, value }]`. |
 
-A `gap-px` grid shows a neutral-200 backdrop through every pair of neighbours — rows as well as
+A `gap-px` grid shows a neutral-200 backdrop through every pair of neighbors — rows as well as
 columns, which `divide-x` alone can't do once a band wraps to more than one row. The column count
 maps to figure count (1/2/3/4/5/6 figures get their own breakpoint schedule, design.md's own
 measured table) so a flat responsive class never orphans a lone cell at a breakpoint it actually
@@ -575,7 +575,7 @@ Dispatches `rfg-toggle` with `{ open }`.
 Implements "Empty states": never bare empty collection chrome. `kind` (`cold-start` \|
 `no-results` \| `all-clear`) doesn't change rendering — there's nothing visually different between
 the three — it exists so a host's markup states which case it's handling, matching design.md's
-own three-flavour table (nothing exists yet → offer to create; a filter matched nothing → offer to
+own three-flavor table (nothing exists yet → offer to create; a filter matched nothing → offer to
 clear it; genuinely nothing to do → reassurance, not an action), and so a future audit can check
 the right action is present for the right kind.
 
@@ -689,7 +689,7 @@ multi-select mode, the same attribute that already means that natively).
 already makes** — the real `<select>` stays in the DOM (hidden, not removed) as the actual
 form-submitting control, so `simple_form`'s `f.select`/`options_for_select` keeps working
 unchanged and the field still submits something if this component's JS never loads at all.
-Contrast with this element's own `<rfg-tag-input>` neighbour above: that control has no
+Contrast with this element's own `<rfg-tag-input>` neighbor above: that control has no
 pre-existing native equivalent to lean on (free-form comma-separated text isn't a native input
 type) and became its own form-associated element; a `<select>` already *is* the native equivalent
 to this one's need, so wrapping is both less code and a real progressive-enhancement fallback.

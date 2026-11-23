@@ -4,7 +4,7 @@
 // navigable outline).
 //
 // A summary band is one reading, not N separate cards: no filled box around each figure, and the
-// separators are a `gap-px` grid showing a backdrop through every pair of neighbours — rows as
+// separators are a `gap-px` grid showing a backdrop through every pair of neighbors — rows as
 // well as columns, which `divide-x` alone can't do in a multi-row grid.
 import { LitElement, html, css } from "lit";
 

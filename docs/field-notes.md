@@ -12,7 +12,7 @@ Five documents record the Human Essentials migration this design system was extr
 
 | Document | What it records |
 | --- | --- |
-| [`design-decisions.md`](design-decisions.md) | Every UI judgement call not already settled by `design.md` — decision, rationale, alternatives rejected. ~10,000 lines. |
+| [`design-decisions.md`](design-decisions.md) | Every UI judgment call not already settled by `design.md` — decision, rationale, alternatives rejected. ~10,000 lines. |
 | [`changelog.md`](changelog.md) | What changed, in order, with the commit that carries it. |
 | [`migration-map.md`](migration-map.md) | What replaced the pre-migration Bootstrap/AdminLTE markup, and how to verify a page against it. |
 | [`table-audit.md`](table-audit.md) | Measured findings on row-action weight and badge usage, re-run over time. |

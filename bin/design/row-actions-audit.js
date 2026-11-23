@@ -12,7 +12,7 @@
 //
 //   3+ inline, no menu   design.md says three or more collapse. Three tables do not.
 //   varies row to row    the action set depends on status or role, so the column never settles.
-//   mixed heights        a labelled 30px ghost button beside a 28px kebab trigger.
+//   mixed heights        a labeled 30px ghost button beside a 28px kebab trigger.
 //   menu for <=2         a menu where the actions would fit inline.
 //
 // Usage: pw bin/design/row-actions-audit.js

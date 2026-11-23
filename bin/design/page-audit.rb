@@ -21,11 +21,11 @@ AUTH = %w[users/sessions users/passwords users/confirmations users/unlocks
   users/invitations users/registrations account_requests].freeze
 
 # Classes nothing defines. `text-bold` is the one that bites: the author meant `font-bold`.
-# Capitalised runs that are names rather than Title Case. The audit cannot infer these, and a
+# Capitalized runs that are names rather than Title Case. The audit cannot infer these, and a
 # heading naming the product is not a style violation.
 PROPER_NOUNS = ["Human Essentials", "Code for GoodOps", "Ruby for Good"].freeze
 
-# Capitalised runs inside a *label* that are names, not Title Case. Ethnicity and nationality
+# Capitalized runs inside a *label* that are names, not Title Case. Ethnicity and nationality
 # terms are proper adjectives and keep their capitals in sentence case exactly as a place name
 # does; `Form 990` is the name of an IRS form. Without this list the population-served fields
 # would be reported forever and the check would be the kind people learn to ignore.
@@ -77,7 +77,7 @@ def hand_rolled_card?(src)
   end
 end
 
-# An icon tile hand-rolled instead of calling `essentials_icon_tile`: a tone-coloured, fixed-size
+# An icon tile hand-rolled instead of calling `essentials_icon_tile`: a tone-colored, fixed-size
 # rounded box. `rounded-full` is excluded, and that is the whole discriminator -- a circle is an
 # avatar or a numbered badge, which design.md keeps deliberately disjoint from tiles. The reports
 # hub had built its own at 28px/`rounded-lg`/`text-brand-700` against the helper's
@@ -206,7 +206,7 @@ kinds.each do |kind, pattern|
     defects << "#{nbsp} &nbsp;" if nbsp.positive?
     # A proper noun is not Title Case, and the check could not tell the difference: "Contact Human
     # Essentials" was reported the moment that heading was written. Same idea as `copy-audit`'s
-    # ACRONYMS list -- the audit has to be told which capitalised runs are real names.
+    # ACRONYMS list -- the audit has to be told which capitalized runs are real names.
     # Inner tags are stripped rather than terminating the capture: `<h3><strong>Race/Ethnicity of
     # Client Base</strong></h3>` is a heading whose text the old scan could not reach at all.
     heading_text = src.scan(%r{<h[1-3][^>]*>(.{2,120}?)</h[1-3]>}m).flatten
@@ -220,12 +220,12 @@ kinds.each do |kind, pattern|
     # first of those -- so 30 Title Case labels sat on the partner profile forms for the whole
     # migration without ever being reported. A rule with no audit is a suggestion.
     #
-    # The test is a capitalised word that is *not* the first word of the label: `Agency Age` fails,
+    # The test is a capitalized word that is *not* the first word of the label: `Agency Age` fails,
     # `Agency age` passes. Acronyms are left alone (`FPL`, `ZIP`) because an all-caps token is not
     # Title Case, and the proper nouns above are removed before looking.
-    # A hand-written brand link. `.link-brand` carries the colour *and* the underline on hover and
+    # A hand-written brand link. `.link-brand` carries the color *and* the underline on hover and
     # focus, which is the part that matters: measured against the prose these sit in, the brand
-    # colour is 1.04:1 on slate-600, so colour alone marks nothing. 71 of these existed in 13
+    # color is 1.04:1 on slate-600, so color alone marks nothing. 71 of these existed in 13
     # different shapes before the class did; the pair is the signature.
     if src.include?("hover:text-brand-800")
       defects << "hand-written brand link (use .link-brand)"

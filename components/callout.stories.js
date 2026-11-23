@@ -36,7 +36,7 @@ export default {
     tone: {
       control: "select",
       options: ["info", "success", "warning", "danger"],
-      description: "Sets the colour and the ARIA role: warning/danger interrupt (`role=\"alert\"`), info/success announce politely (`role=\"status\"`).",
+      description: "Sets the color and the ARIA role: warning/danger interrupt (`role=\"alert\"`), info/success announce politely (`role=\"status\"`).",
     },
     heading: { control: "text" },
     body: { control: "text" },

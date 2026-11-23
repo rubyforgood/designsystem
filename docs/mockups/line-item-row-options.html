@@ -262,7 +262,7 @@
       </div>
 
       <div class="card-surface p-5 space-y-2">
-        <p class="text-sm font-semibold">4. Labelled button</p>
+        <p class="text-sm font-semibold">4. Labeled button</p>
         <div class="flex items-end gap-2">
           <div class="flex-1">
             <label class="block text-sm font-medium text-slate-700">Scan a barcode</label>
@@ -307,7 +307,7 @@
         <div class="flex h-14 items-center">
           <span class="inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600">Remove</span>
         </div>
-        <p class="text-xs text-slate-500">83px of every row. Reads as grey, though the code asks for rose-700 &mdash; the ghost variant&rsquo;s own <code>text-slate-600</code> collides with it and wins.</p>
+        <p class="text-xs text-slate-500">83px of every row. Reads as gray, though the code asks for rose-700 &mdash; the ghost variant&rsquo;s own <code>text-slate-600</code> collides with it and wins.</p>
       </div>
 
       <div class="card-surface p-4 space-y-2">
@@ -351,10 +351,10 @@
         &mdash; design.md already requires that of icon-only controls &mdash; and it stays
         <strong>slate until hover</strong>, going rose only on hover and focus, so a form with eight rows
         does not have eight red marks down its right edge. That is the same argument that took the
-        inline error message grey in <code>a5cef7c35</code>.
+        inline error message gray in <code>a5cef7c35</code>.
       </p>
       <p class="mt-2">
-        Whichever is chosen, the colour bug is worth fixing: passing
+        Whichever is chosen, the color bug is worth fixing: passing
         <code>extra: "text-rose-700"</code> to a <code>ghost</code> button cannot work, because both
         utilities land in the class attribute and the cascade, not the attribute order, picks the winner.
       </p>

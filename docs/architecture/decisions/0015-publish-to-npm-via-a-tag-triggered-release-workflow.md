@@ -55,7 +55,7 @@ real app) are the two gaps named.
 6. **The GitHub release's notes are `--generate-notes`, not a hand-written changelog file.** This
    repo has no `CHANGELOG.md`; the prose it already keeps (`docs/field-notes.md`,
    `docs/design-decisions.md`-style trails in its origin app) is aimed at a contributor explaining
-   a judgement call, not at a consumer deciding whether to upgrade. GitHub's own
+   a judgment call, not at a consumer deciding whether to upgrade. GitHub's own
    commits/PRs-since-last-tag summary is the right size for that question without inventing and
    then maintaining a second log of the same information by hand.
 

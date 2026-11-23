@@ -60,7 +60,7 @@ const COLLECT = () => {
   });
 
   // A reveal nested inside another reveal measures 0x0 while its ancestor is collapsed, which
-  // reads as "sits above its trigger" and is an artefact of the measurement, not a defect. So
+  // reads as "sits above its trigger" and is an artifact of the measurement, not a defect. So
   // un-hide the whole chain, measure, and put every one of them back.
   const withRevealed = (el, fn) => {
     const restored = [];
@@ -98,7 +98,7 @@ const COLLECT = () => {
       rule: parseFloat(cs.borderLeftWidth) || 0,
       indent: (parseFloat(cs.marginLeft) || 0) + (parseFloat(cs.borderLeftWidth) || 0) +
               (parseFloat(cs.paddingLeft) || 0),
-      // The rule hangs off the trigger's own left edge: 6px in, so a 4px rule is centred under a
+      // The rule hangs off the trigger's own left edge: 6px in, so a 4px rule is centered under a
       // 16px radio. This is what catches a reveal parked in a column of its own -- the shipping
       // cost field was 549px to the right of the radios that produced it.
       offsetFromTrigger: m.t ? m.p.x - m.t.x : null,

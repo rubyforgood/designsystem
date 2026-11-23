@@ -50,7 +50,7 @@ Organization
 
 | Model | Scope | What it is |
 | --- | --- | --- |
-| `BaseItem` | global | The catalogue entry every bank shares — "Diapers, size 1". Maintained by super admins. |
+| `BaseItem` | global | The catalog entry every bank shares — "Diapers, size 1". Maintained by super admins. |
 | `Item` | one organization | That bank's version: its own name, value, category, visibility to partners. Tied to its base item by `partner_key`. |
 | `Kit` | one organization | A bundle distributed as one unit. **`Kit < Item`, single-table inheritance on `items.type`** — a kit *is* an item rather than owning one. |
 
@@ -205,7 +205,7 @@ The workflow the app exists for.
 ```
 
 `Request belongs_to :distribution` and `Distribution has_one :request` — the link is set at
-fulfilment, and `validate_request_not_yet_processed!` is what stops a request being fulfilled
+fulfillment, and `validate_request_not_yet_processed!` is what stops a request being fulfilled
 twice.
 
 **Three things can seed a distribution**, and each has its own copier on `Distribution`:
@@ -249,4 +249,4 @@ one write path and a row can arrive by import, by console, or from an old backup
 | Complex reads | `app/queries` (7) |
 | Request handling | `app/controllers` (72), thin |
 | UI | `app/views` (421); design system in `shared/essentials` |
-| Behaviour | `app/javascript/controllers` (28), Stimulus |
+| Behavior | `app/javascript/controllers` (28), Stimulus |

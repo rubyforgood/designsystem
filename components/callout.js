@@ -49,8 +49,8 @@ export class RfgCallout extends LitElement {
       border: 1px solid transparent;
       font-family: var(--font-sans);
       font-size: 0.875rem;
-      /* Neutral text, tone-coloured border/icon only — same measured-contrast reasoning as
-         status-pill/flash-message: the semantic tokens are only safe as a glyph/border colour or
+      /* Neutral text, tone-colored border/icon only — same measured-contrast reasoning as
+         status-pill/flash-message: the semantic tokens are only safe as a glyph/border color or
          against pure white, not assumed safe as body text on any tint. */
       color: var(--color-neutral-700);
     }

@@ -23,7 +23,7 @@ export default {
           "A band of key figures, each a number with a label saying what it counts. The figures read as one summary, not a row of separate cards.",
           "",
           "**When to use**",
-          "- Summarising a few headline numbers at the top of a dashboard or report.",
+          "- Summarizing a few headline numbers at the top of a dashboard or report.",
           "",
           "**When not to use**",
           "- For detailed or comparable data across many rows. Use Table instead.",

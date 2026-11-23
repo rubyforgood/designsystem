@@ -58,7 +58,7 @@ actually landed, not just whether the request returned 200.
 **A repeating region with nothing in it is not the same claim as "this region has no defects."**
 An empty collection — a table with zero rows, a list with nothing to show — audits clean by
 construction: there's nothing there for a check to find anything wrong with. If the actual defect
-lives *inside* a row (an unlabelled checkbox, a status chip missing its accessible name), an audit
+lives *inside* a row (an unlabeled checkbox, a status chip missing its accessible name), an audit
 run against unseeded or freshly-reset data never sees it, and a clean report says nothing about
 whether the per-row markup is correct. Seed at least one row of every repeating region the audit
 claims to cover before trusting a clean scan — this is the same "vacuous pass" shape as an empty
@@ -86,7 +86,7 @@ read, so every helper-only class became its own justification and was filed as i
 
 The shape to watch for: a check with an **inclusion** rule and a **suppression** rule that overlap.
 Widen the first and the second silently eats the new findings. The intermediate run is the dangerous
-artefact — it reports clean, it is the number you were hoping for, and it reads as confirmation that
+artifact — it reports clean, it is the number you were hoping for, and it reads as confirmation that
 there was nothing there. **After widening a scope, plant a defect in the newly covered region.** Not
 in the region that already worked; that control passes either way and tells you nothing about the
 change you just made.
@@ -134,7 +134,7 @@ means, or make it compile to nothing at all — an audit's scope claim ("we chec
 can stay true in the letter while going false in the spirit.** Two concrete real shapes this took:
 a CSS framework removing an opacity-modifier utility outright between major versions, so every
 call site using the old name compiled to nothing and a component that used to render translucent
-silently rendered fully opaque with no build error; and a colour-space change in the same
+silently rendered fully opaque with no build error; and a color-space change in the same
 framework's compiled output shifting what a previously-measured value actually renders as, so a
 contrast figure recorded against the old build quietly stopped describing the current one. Neither
 produces a failing build or a visible error — the class still parses, the audit still finds the
@@ -155,7 +155,7 @@ just its output.** The names of the flagged elements were identical every run; w
 *population the rule compared them against* — a set of 50 elements that appeared and vanished — and
 nothing printed that. The rule was "is another target within 24px", and one of the others was the
 flagged element's own **ancestor**, which by definition overlaps it, so the exception it was
-testing could never be met. When a predicate takes a neighbourhood, the neighbourhood is a term in
+testing could never be met. When a predicate takes a neighborhood, the neighborhood is a term in
 the comparison and has to be dumped like any other.
 
 ## After a change, do not choose the audits from memory
@@ -213,7 +213,7 @@ red check: not the ignored run, but the true positive that arrives wearing its c
 **Read the DOM with the retrying finder, never with a snapshot.** A single
 `Nokogiri.parse(page.body)` is a photograph of whatever existed at that instant, and every
 conclusion drawn from it inherits that timing. One helper took a widget's starting id that way;
-when the snapshot preceded the widget's initialisation the attribute was absent, `nil.to_i` gave
+when the snapshot preceded the widget's initialization the attribute was absent, `nil.to_i` gave
 **0**, and the helper then waited ten seconds for an id of `1` that never arrives. It failed once
 in fifteen suite runs and passed every time the file was run alone — the signature of a read taken
 before the thing settled. Same rule as an assertion: if it can be early, it must retry.
@@ -335,12 +335,12 @@ See `reference/control-harness.md` for how to build this.
 | **Wrong metric** | measures a real quantity that is not the one the rule is about |
 
 **Wrong metric is the hardest**, because a check can pass both controls and still measure the wrong
-thing. The defence: state the rule in words, then ask whether the number answers *that*. "Appears in
+thing. The defense: state the rule in words, then ask whether the number answers *that*. "Appears in
 the same relative order" is a position, not a fraction of the page.
 
-## Measure before you optimise — including the baseline
+## Measure before you optimize — including the baseline
 
-A check was widened from 9 items to 150 and stopped completing. Four rounds of optimisation
+A check was widened from 9 items to 150 and stopped completing. Four rounds of optimization
 followed. None helped.
 
 **The nine-item version took 525 seconds too.** It had always been slow, and nobody had timed it.

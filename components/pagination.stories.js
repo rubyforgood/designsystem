@@ -20,7 +20,7 @@ export default {
           "- For a fixed-size report. Show it in full.",
           "",
           "**Accessibility**",
-          "- The page links sit in a `<nav>` labelled \"Pagination\". The current page has `aria-current=\"page\"`.",
+          "- The page links sit in a `<nav>` labeled \"Pagination\". The current page has `aria-current=\"page\"`.",
           "- The controls are real links, so each page has its own URL. Pass `hrefFor` to build it.",
           "- First, Previous, Next and Last stay in place at the ends and are marked `aria-disabled`, so the controls don't shift.",
           "- Set `entry-name` to the singular noun for one item. It's pluralised for you.",

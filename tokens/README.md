@@ -23,14 +23,14 @@ through `@tailwindcss/cli`, forcing every role utility class into scope with a t
 
 ## Rules vs. defaults, by category
 
-### Colour
+### Color
 
 **Portable:**
-- Never colour alone (WCAG 1.4.1) — every coloured signal carries a word, usually an icon too.
+- Never color alone (WCAG 1.4.1) — every colored signal carries a word, usually an icon too.
 - Semantic tones carry exactly one meaning each: success, warning, danger, info. Four is the
   count that's held up in practice; adding a fifth is a decision to write down, not a default to
   expect.
-- Text/icon colour needs to clear WCAG AA contrast (4.5:1) against its background. Human
+- Text/icon color needs to clear WCAG AA contrast (4.5:1) against its background. Human
   Essentials measured its `-700` step against white specifically — that number is an artifact of
   *this* palette and this background; a different hue or a dark-mode surface needs its own
   measurement, not an assumption that "the 700 step" is universally safe.

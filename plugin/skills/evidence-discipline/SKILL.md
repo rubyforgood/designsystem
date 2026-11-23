@@ -27,7 +27,7 @@ Three failures worth the specificity:
   **331**. Wrong by two when it was written.
 - A runtime estimate of **40 minutes** for a full audit pass. Measured: **4.5 minutes**. Wrong by
   roughly an order of magnitude, and it had already shaped a plan.
-- A claim that *"adjacent colour bands differ in lightness as well as hue"* was written into a
+- A claim that *"adjacent color bands differ in lightness as well as hue"* was written into a
   normative spec as justification for a design decision. It was never measured. It was false.
 
 The cost is not the wrong number. It is that somebody makes a decision on it.
@@ -91,7 +91,7 @@ One project re-measured every open item on its own to-do list. The pattern was c
 | Kind of claim | Held up? |
 | --- | --- |
 | Counts of strings in files — dead links, label casing, call sites | **All correct**, weeks later |
-| Claims about behaviour — what a form does, what an audit can see, what a test ordering produces | **Three in a row wrong** |
+| Claims about behavior — what a form does, what an audit can see, what a test ordering produces | **Three in a row wrong** |
 
 Nobody had been careless. Each was written immediately after measuring something true. What changed
 was the world around the sentence: the audit gained a check, the test file set grew, the layout got
@@ -122,14 +122,14 @@ consistent with it being found some entirely different way. Deleting only the sy
 on disk, same prompt — returned the "no such thing" answer, which excludes that and nothing else
 would have.
 
-Where the mechanism has an artefact you can read directly, read it, and rank it honestly. Grepping
+Where the mechanism has an artifact you can read directly, read it, and rank it honestly. Grepping
 the tool's binary found fourteen references to the path, which establishes that the path is *known*
-to it. It does not establish that anything *loads* from it. String evidence and behavioural evidence
+to it. It does not establish that anything *loads* from it. String evidence and behavioral evidence
 answer different questions, and the weaker one is worth recording as corroboration rather than
 proof.
 
 Two habits that go with it: make the canary's value random, so a lucky guess is not a pass; and
-**remove the artefacts afterwards and say so**, because a test that leaves a directory behind has
+**remove the artifacts afterwards and say so**, because a test that leaves a directory behind has
 quietly falsified the note you are about to write about the machine's state.
 
 ## A seed is not a reproduction
@@ -155,7 +155,7 @@ not a bug to bisect, and worth writing down as such rather than filing four tick
 
 **Keep the output of a failing run.** A hunt script that logs the seed and deletes the run is
 useless for a timing flake, because re-running the seed gives a different failure. The output is the
-only artefact. Establish which you have before spending a day on it —
+only artifact. Establish which you have before spending a day on it —
 and beware that running a second test process against the same database can manufacture failures
 (deadlocks, in one case) that look exactly like a defect in the code.
 

@@ -6,7 +6,7 @@
 // `kind` doesn't change rendering here beyond documenting intent (there's nothing visually
 // different about "nothing exists yet" vs "a filter matched nothing" that this element should
 // hardcode) — it exists so a host's own markup states which case it's handling, consistent with
-// the three-flavour table design.md documents, and so a future audit can check the right action
+// the three-flavor table design.md documents, and so a future audit can check the right action
 // is present for the right kind (a create action for `cold-start`, not for `all-clear`).
 import { LitElement, html, css } from "lit";
 

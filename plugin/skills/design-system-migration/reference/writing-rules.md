@@ -12,7 +12,7 @@ law.
 
 A rule reads:
 
-> **Every visible control in an actions column is an icon at 28px.** A labelled small button is
+> **Every visible control in an actions column is an icon at 28px.** A labeled small button is
 > 30px, and a column mixing the two steps by 2px — visible on two screens. Carbon and Salesforce
 > both ship uniform icon-only row actions, which is the part they evidence.
 
@@ -31,14 +31,14 @@ cargo-culted somewhere they are wrong.
 > *number* is a local decision.
 
 Roughly: WCAG criteria, naming, semantics and audit discipline are **Portable**. Spacing scales,
-colour ramps, pixel values and component inventories are **Local**.
+color ramps, pixel values and component inventories are **Local**.
 
 **When in doubt it is Local.**
 
 ## Evidence keeps its provenance
 
 *"Measured on this app at 1440px"*, never *"tables are 1,225px wide"*. Evidence is what makes a rule
-credible; unlabelled evidence is what makes it wrong somewhere else.
+credible; unlabeled evidence is what makes it wrong somewhere else.
 
 ## A rule with no audit is a suggestion
 

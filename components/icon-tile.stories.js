@@ -15,7 +15,7 @@ export default {
     docs: {
       description: {
         component: [
-          "A soft-coloured square that holds one icon, placed beside a figure or a heading to mark what it is about.",
+          "A soft-colored square that holds one icon, placed beside a figure or a heading to mark what it is about.",
           "",
           "**When to use**",
           "- Beside a stat, a card heading or a status, to give it a quick visual anchor.",
@@ -40,7 +40,7 @@ export default {
     tone: {
       control: "select",
       options: ["brand", "neutral", "info", "success", "warning", "danger"],
-      description: "The colour tone. Uses the same tone names as the rest of the system.",
+      description: "The color tone. Uses the same tone names as the rest of the system.",
     },
     size: {
       control: "select",

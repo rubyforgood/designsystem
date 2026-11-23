@@ -37,7 +37,7 @@ const TARGETS = targets().filter((t) => t.action === "new" && (!ONLY || ONLY.inc
 // a modal lives on an index page behind a button.
 //
 // The lookup is written out in both readers rather than shared: these are handed to
-// `page.evaluate`, which serialises the function and drops everything it closed over, so a helper
+// `page.evaluate`, which serializes the function and drops everything it closed over, so a helper
 // from this scope would simply be undefined in the browser.
 const readForm = () => {
   const openDialog = [...document.querySelectorAll("dialog")].find((d) => d.open);
@@ -93,7 +93,7 @@ const readForm = () => {
     markedNotRequired: markedNotRequired.length,
     // The marker is a red asterisk and nothing else -- there is no legend explaining it any
     // more, so there is nothing to check for. What still has to hold is that it is red rather
-    // than inheriting the label colour, and that the browser's dotted underline for
+    // than inheriting the label color, and that the browser's dotted underline for
     // `abbr[title]` is off: both were true for a year and neither was.
     hasAsterisk: !!form.querySelector("label .required-marker"),
     markerStyled: [...form.querySelectorAll("label .required-marker")].every((m) => {
@@ -110,11 +110,11 @@ const readErrors = () => {
   const fields = form ? [...form.querySelectorAll("input:not([type=hidden]), select, textarea")] : [];
   // `.field-error` is the class the wrapper puts on an inline message. This used to look for
   // `p.text-rose-700`, which stopped matching the moment the message went slate behind a glyph --
-  // a check keyed to a colour rather than to the thing it is checking for.
+  // a check keyed to a color rather than to the thing it is checking for.
   const inline = scope.querySelectorAll("p.field-error, .field_with_errors").length;
   const invalid = fields.filter((f) => f.getAttribute("aria-invalid") === "true").length;
   // The id points at a span inside the error <p>, and `.field-error` is on the <p>, so walk up.
-  // This used to test for a `rose` class anywhere in the ancestry -- keyed to the colour, like
+  // This used to test for a `rose` class anywhere in the ancestry -- keyed to the color, like
   // the `inline` check above, and just as wrong once the message stopped being rose.
   const described = fields.filter((f) => {
     const id = f.getAttribute("aria-describedby");
@@ -142,7 +142,7 @@ const readErrors = () => {
 const roleFor = (c) => (c.startsWith("partners/") ? "partner" : c.startsWith("admin") ? "super" : "bank");
 
 // Modal forms, which the `new`-route sweep above cannot reach, come from the adapter (see
-// targets.js's own MODALS comment): a modal is this app's own hand-catalogued inventory, not
+// targets.js's own MODALS comment): a modal is this app's own hand-cataloged inventory, not
 // something derivable from routes, and not every app has one. An adapter that doesn't export any
 // -- the reference app has no modal forms at all -- means this audit checks zero modals rather
 // than reporting N hardcoded ones as "could not be opened."
@@ -162,7 +162,7 @@ const MODALS = ADAPTER_MODALS || [];
   for (const [role, email] of Object.entries(users)) {
     let page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
     // Accept confirms. A row action or a submit carrying data-confirm otherwise has its dialog
-    // auto-dismissed, the submit is cancelled, and the form reads as "shows no errors" when it
+    // auto-dismissed, the submit is canceled, and the form reads as "shows no errors" when it
     // was never submitted -- which is exactly what /audits/new did.
     page.on("dialog", (d) => d.accept().catch(() => {}));
     await signIn(page, email).catch(() => {});
@@ -248,7 +248,7 @@ const MODALS = ADAPTER_MODALS || [];
     const p = [];
     if (r.marking.unmarked) p.push(`${r.marking.unmarked} required field(s) not marked in the label`);
     if (r.marking.markedNotRequired) p.push(`${r.marking.markedNotRequired} field(s) marked required but not required programmatically`);
-    if (r.marking.hasAsterisk && !r.marking.markerStyled) p.push("required marker not styled: it inherits the label colour, or keeps the browser's dotted underline");
+    if (r.marking.hasAsterisk && !r.marking.markerStyled) p.push("required marker not styled: it inherits the label color, or keeps the browser's dotted underline");
     if (r.errors) {
       if (!r.errors.inline) p.push("no inline error next to any field" + (r.errors.summary ? " (only a summary)" : " (and no summary either)"));
       if (!r.errors.invalid) p.push("no aria-invalid on any field");

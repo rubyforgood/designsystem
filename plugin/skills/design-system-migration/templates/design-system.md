@@ -16,7 +16,7 @@
 
 ### Typography
 ### Sentence case
-### Colour
+### Color
 ### Spacing, radius, elevation
 ### Iconography
 ### Accessibility

@@ -26,7 +26,7 @@ import { LitElement, html, css } from "lit";
 // touches tables inside one, and stays low-specificity so an app's own table CSS can override it.
 const STYLE_ID = "rfg-table-styles";
 const CELL_STYLES = css`
-  /* Every cell aligns to the top of its row, not the browser default centre — set table-wide,
+  /* Every cell aligns to the top of its row, not the browser default center — set table-wide,
      not row by row, since it's invisible until any cell in a row wraps. */
   rfg-table th,
   rfg-table td {

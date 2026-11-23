@@ -87,7 +87,7 @@
   <!-- the problem -->
   <section class="opt">
     <div class="opthead"><h2>Today, on three monitors</h2><span class="chip chip-no">The problem</span></div>
-    <p class="col" style="margin-top:.7rem">Scale models — sidebar in grey, the form card in white, wasted width hatched.</p>
+    <p class="col" style="margin-top:.7rem">Scale models — sidebar in gray, the form card in white, wasted width hatched.</p>
     <div class="screens">
       <div class="screen">
         <div class="cap"><span><strong>1440</strong> — a laptop</span><span>256px wasted · 22%</span></div>
@@ -135,10 +135,10 @@
 
   <!-- the rejected option -->
   <section class="opt">
-    <div class="opthead"><h2>Centring the card</h2><span class="chip chip-no">Fixes one page, leaves the rest</span></div>
+    <div class="opthead"><h2>Centering the card</h2><span class="chip chip-no">Fixes one page, leaves the rest</span></div>
     <div class="screens">
       <div class="screen">
-        <div class="cap"><span><strong>2560</strong> — card centred in the space</span><span>same 1376px, now split</span></div>
+        <div class="cap"><span><strong>2560</strong> — card centered in the space</span><span>same 1376px, now split</span></div>
         <div class="mon" style="width:640px">
           <div class="side"></div>
           <div class="area">
@@ -153,7 +153,7 @@
     <div class="col">
       <ul class="why">
         <li><strong>The heading moves with it.</strong> Every <code>h1</code> in this app sits at
-          <span class="num">288</span> — the blue line above. Centring the form pushes its title
+          <span class="num">288</span> — the blue line above. Centering the form pushes its title
           <span class="num">144–256px</span> right, so the page title slides sideways as you go from
           the items list to the item form.</li>
         <li><strong>It does nothing for the tables.</strong> Distributions still renders at 2238 for
@@ -168,7 +168,7 @@
     <div class="opthead"><h2>Capping the container</h2><span class="chip chip-rec">Recommended</span></div>
     <p class="col" style="margin-top:.7rem">
       One class on the layout — <code>mx-auto w-full max-w-[100rem]</code> — so the whole page has an
-      end, and centres once the monitor is wider than it.
+      end, and centers once the monitor is wider than it.
     </p>
     <div class="screens">
       <div class="screen">
@@ -179,7 +179,7 @@
         </div>
       </div>
       <div class="screen">
-        <div class="cap"><span><strong>1920</strong></span><span>page ends at 1600, centred</span></div>
+        <div class="cap"><span><strong>1920</strong></span><span>page ends at 1600, centered</span></div>
         <div class="mon" style="width:480px">
           <div class="side"></div>
           <div class="area">
@@ -191,7 +191,7 @@
         </div>
       </div>
       <div class="screen">
-        <div class="cap"><span><strong>2560</strong></span><span>page ends at 1600, centred</span></div>
+        <div class="cap"><span><strong>2560</strong></span><span>page ends at 1600, centered</span></div>
         <div class="mon" style="width:640px">
           <div class="side"></div>
           <div class="area">
@@ -213,11 +213,11 @@
           fits without scrolling.</li>
         <li><strong>No heading jump</strong>, because the cap applies to every page equally. An index
           page and its form both sit in the same container, so the <code>h1</code> stays put as you
-          move between them — which is the thing centring the card would have broken.</li>
+          move between them — which is the thing centering the card would have broken.</li>
         <li><strong>The card stays left</strong> inside the container. Its remaining space is bounded
           and the page around it is balanced, instead of a void hanging off one side that grows
           without limit.</li>
-        <li><strong>Against:</strong> anyone who deliberately maximises a wide window to see more
+        <li><strong>Against:</strong> anyone who deliberately maximizes a wide window to see more
           table at once will now get letterboxing instead. That is the trade — and at 2560 they were
           getting 733px of stretched whitespace inside the table, not more information.</li>
       </ul>
@@ -229,11 +229,11 @@
   <section class="col">
     <h2>Recommendation</h2>
     <p style="margin-top:.7rem">
-      <strong>Cap the container at 1600 and centre it. Leave the card left-aligned inside it.</strong>
+      <strong>Cap the container at 1600 and center it. Leave the card left-aligned inside it.</strong>
     </p>
     <p>
       You were right that something is wrong with the space — but the card was the place it happened
-      to show. Centring the card would have made one form look composed while every table in the app
+      to show. Centering the card would have made one form look composed while every table in the app
       kept stretching to 3120px on a wide monitor. Capping the page fixes both, and keeps the card's
       alignment correct.
     </p>

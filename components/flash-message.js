@@ -49,7 +49,7 @@ export class RfgFlashMessage extends LitElement {
       border-left: 3px solid transparent;
       font-family: var(--font-sans);
       font-size: 0.875rem;
-      /* Neutral-900 text, not the tone colour: rose-600 (the danger token) only clears WCAG AA
+      /* Neutral-900 text, not the tone color: rose-600 (the danger token) only clears WCAG AA
          4.5:1 against pure white, by a 0.01 margin (tokens/README.md's own measured note) — any
          tint, even a light one, drops it below threshold. Found by actually running axe-core
          against this element, not assumed. The tone shows in the left border and the icon

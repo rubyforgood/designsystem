@@ -3,7 +3,7 @@
 The one place that knows what framework this app is. Everything else is about design.
 
 `adapter-rails.md` beside this file is one filled-in example, from a suite of 34 audits over 155
-screens. It is a sample of one stack, not proof the shape below generalises — read it for the
+screens. It is a sample of one stack, not proof the shape below generalizes — read it for the
 faults each line was written to fix.
 
 ## Sign in

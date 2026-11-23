@@ -85,7 +85,7 @@ const PRIMARY = (p) => !ADMIN(p) && !SECONDARY(p);
 //
 // Env overrides (`PRIMARY_EMAIL`, `SECONDARY_EMAIL`, `ADMIN_EMAIL`) exist because several audits
 // had independently invented them before this was centralized -- consolidating the duplicates
-// without keeping the overrides would have been a silent behaviour change for anyone using them.
+// without keeping the overrides would have been a silent behavior change for anyone using them.
 // (Renamed from BANK_EMAIL/PARTNER_EMAIL/SUPER_EMAIL alongside the exports below -- SUPER_EMAIL
 // was already inconsistent with the ADMIN predicate it fed, which this rename also fixes.)
 const RUNS = [
@@ -103,7 +103,7 @@ const PRIMARY_ALT_EMAIL = process.env.PRIMARY_ALT_EMAIL || "user_1@example.com";
 /*
  * Modal forms, which `targets()`'s route sweep cannot reach: a modal lives on an index page,
  * behind a button, and its <form> is not on a route of its own -- nothing in `targets()` can
- * derive it, so it's hand-catalogued here. Four of them existed and none had ever been audited --
+ * derive it, so it's hand-cataloged here. Four of them existed and none had ever been audited --
  * which is how "(phone or email required)" sat in a label, making the field's accessible *name*
  * carry the condition, twice per pair.
  *

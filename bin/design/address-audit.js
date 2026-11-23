@@ -4,7 +4,7 @@
 // Seven screens collect one, and before this they did it in five different shapes: `state` was a
 // 52-option select on the organization form and a free text box on the partner profile; `zip_code`
 // was a string on one row and an *integer* on the next, which renders as `type="number"` and drops
-// the leading zero on every ZIP in New England; the same box was labelled "Street", "Street
+// the leading zero on every ZIP in New England; the same box was labeled "Street", "Street
 // address" and "Address (line 1)"; and **not one of the 17 inputs carried `autocomplete`**.
 //
 // Five assertions, per address field:
@@ -128,7 +128,7 @@ const COLLECT = () => [...document.querySelectorAll("main input, main select, ma
         // to the next, which is what "Zip code", "Zipcode" and "ZIP code" were: the qualifier is
         // free, the part is not.
         if (named && !named.endsWith(want.label)) {
-          bad.push(`${f.name} is labelled "${named}", which does not end in the app's "${want.label}"`);
+          bad.push(`${f.name} is labeled "${named}", which does not end in the app's "${want.label}"`);
         }
       }
 

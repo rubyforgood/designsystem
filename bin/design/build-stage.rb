@@ -89,7 +89,7 @@ STAGES = {
     # 8.0.2.1 against main's 8.1.3.1. `Gemfile.lock` then falls out of `bundle install`.
     gems: ['gem "tailwindcss-rails", "~> 4.6"'],
     # Files `main` already has that this stage is allowed to change. Everything else it touches
-    # must be *new*; an overwrite is a behaviour change hiding inside a foundation stage.
+    # must be *new*; an overwrite is a behavior change hiding inside a foundation stage.
     overwrite: %w[
       app/assets/config/manifest.js
       app/assets/stylesheets/custom.scss
@@ -288,7 +288,7 @@ if stage[:ignore]
   puts "  .gitignore: #{stage[:ignore].size} generated pattern(s)"
 end
 
-# Additive by default. A foundation stage that quietly replaces one of main's files is a behaviour
+# Additive by default. A foundation stage that quietly replaces one of main's files is a behavior
 # change nobody asked to review -- and this caught two: at COEXIST both confirmation_controller.js
 # and donations_modal_controller.js had been rewritten from Bootstrap's modal to the native
 # <dialog>, and stage 1 migrates no views, so main's `<div class="modal">` would have reached

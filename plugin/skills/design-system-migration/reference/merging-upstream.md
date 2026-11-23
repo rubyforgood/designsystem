@@ -10,7 +10,7 @@ on the branch, 33 of those views rewritten from scratch. 45 conflicts.**
 
 ## The rule
 
-**The branch owns the markup. Upstream owns the behaviour.**
+**The branch owns the markup. Upstream owns the behavior.**
 
 For each conflicted view: take the branch's file, then find what upstream *actually changed against
 the merge base* and re-apply that change in design-system terms.
@@ -47,11 +47,11 @@ Not every conflict is markup-versus-markup, and the newer side is not automatica
 
 ## Upstream's specs assert upstream's markup
 
-They will fail, and almost none of those failures mean the behaviour is wrong. On one merge every
+They will fail, and almost none of those failures mean the behavior is wrong. On one merge every
 spec failure was one of: a Font Awesome class name, a framework data attribute, a Title Case label,
 or a column header looked up by text.
 
-- **Update the assertion to what ships; keep the behaviour it pins.**
+- **Update the assertion to what ships; keep the behavior it pins.**
 - **Port their regression tests rather than dropping them.** The bug is usually still real even
   though the markup moved. Two were ported this way, each with a comment naming the upstream issue
   and what changed about the assertion.
@@ -98,6 +98,6 @@ byte-identical to before the merge. Have a check for this; it is two dozen lines
 
 The merge is the single largest opportunity for a silent regression in the whole migration, and the
 interesting part is not the conflict count. Record: **which of upstream's features were re-applied
-and where**, the defects the merge introduced (with the mechanism, so the next merge recognises
+and where**, the defects the merge introduced (with the mechanism, so the next merge recognizes
 them), and the failures that *were not* the merge — because the next person will hit the same two
 traps and the hour is only spent once if it is written down.

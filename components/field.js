@@ -52,10 +52,10 @@ const STYLES = css`
     margin-top: 0.375rem;
     font-family: var(--font-sans);
     font-size: 0.8125rem;
-    /* Error text is neutral-700, not the danger colour — only the glyph is rose-600/danger.
+    /* Error text is neutral-700, not the danger color — only the glyph is rose-600/danger.
        "the glyph signals and the sentence reads" (design.md). Same reasoning as the status
        pill / flash message contrast fix: the danger token is only measured safe as a glyph
-       colour or against pure white, not assumed safe for every use. */
+       color or against pure white, not assumed safe for every use. */
     color: var(--color-neutral-700);
   }
 

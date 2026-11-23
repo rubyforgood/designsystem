@@ -118,7 +118,7 @@ const measure = () => {
   // date link in a table cell that passes on spacing. An audit that cries wolf gets ignored.
   //
   //   Inline    -- the target sits in a sentence, so its size is set by the line box.
-  //   Spacing   -- a 24px circle centred on the target touches no other target's box, and no
+  //   Spacing   -- a 24px circle centered on the target touches no other target's box, and no
   //                other undersized target's circle.
   // select2 leaves the native <select> in the DOM at 1x1 and draws its own control beside it.
   // The 1x1 box is not a target anyone can hit; the select2 container is, and it is measured
@@ -151,8 +151,8 @@ const measure = () => {
     .filter(({ el }) => !el.closest("p, li"))
     .filter(({ r }) => r.width < 24 || r.height < 24);
 
-  const centre = (r) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
-  // A 24px-diameter circle -- radius 12 -- centred on the target's box.
+  const center = (r) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  // A 24px-diameter circle -- radius 12 -- centered on the target's box.
   const circleHitsBox = (c, r) => {
     const nx = Math.max(r.left, Math.min(c.x, r.right));
     const ny = Math.max(r.top, Math.min(c.y, r.bottom));
@@ -160,7 +160,7 @@ const measure = () => {
   };
 
   /*
-   * **A target's own ancestor is not a neighbouring target.** The spacing exception asks whether a
+   * **A target's own ancestor is not a neighboring target.** The spacing exception asks whether a
    * 24px circle on this target reaches *someone else's* hit area; a container that encloses the
    * target is not someone else, and its box necessarily intersects the circle, so counting it makes
    * the exception unpassable.
@@ -179,9 +179,9 @@ const measure = () => {
   const separate = (a, b) => a !== b && !a.contains(b) && !b.contains(a);
 
   const smallTargets = undersized.filter((t) => {
-    const c = centre(t.r);
+    const c = center(t.r);
     return allTargets.some((o) => separate(o.el, t.el) && circleHitsBox(c, o.r)) ||
-           undersized.some((o) => separate(o.el, t.el) && Math.hypot(c.x - centre(o.r).x, c.y - centre(o.r).y) < 24);
+           undersized.some((o) => separate(o.el, t.el) && Math.hypot(c.x - center(o.r).x, c.y - center(o.r).y) < 24);
   });
 
   const tiny = [...document.querySelectorAll("main p, main span, main td, main th, main li, main label")]

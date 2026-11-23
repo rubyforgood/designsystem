@@ -266,7 +266,7 @@ async function accessibleAuthentication(browser) {
         el.dataset.pasteDefaultPrevented = String(event.defaultPrevented);
       });
       const prevented = await pw.evaluate((el) => el.dataset.pasteDefaultPrevented === "true");
-      if (prevented) record("3.3.8 Accessible authentication", path, "a paste event is cancelled");
+      if (prevented) record("3.3.8 Accessible authentication", path, "a paste event is canceled");
     }
   }
   await ctx.close();

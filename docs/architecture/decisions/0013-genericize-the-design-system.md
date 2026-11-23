@@ -36,7 +36,7 @@ original documents didn't need to mark this distinction, and mostly didn't.
    project's own value; the *rule* to have a value may transfer, the *specific value* doesn't),
    per `docs/portability/design-md-tagging.md`'s pass and the convention in
    `.claude/skills/design-system-migration/reference/writing-rules.md`.
-3. Extract Local values that are genuinely swappable (colour, type, spacing, radius) into a
+3. Extract Local values that are genuinely swappable (color, type, spacing, radius) into a
    standalone token layer (`tokens/`), rather than leaving them stated only as prose and Tailwind
    classes inline in the spec.
 4. Classify the audit suite the same way: which checks are portable via an adapter seam
@@ -46,7 +46,7 @@ original documents didn't need to mark this distinction, and mostly didn't.
    actually building and running a second adapter (`examples/reference-app/`,
    `docs/portability/adapter-reference-app.md`) rather than asserting it.
 5. Keep the evidence — the measured numbers, the migration history, the decision log — intact and
-   clearly dated and labelled as historical (`docs/field-notes.md`), rather than deleting it for
+   clearly dated and labeled as historical (`docs/field-notes.md`), rather than deleting it for
    being Local. The evidence is what makes the *portable* rules credible; discarding it to make the
    document "purely generic" would have thrown away the only thing distinguishing this system from
    an untested one.
@@ -58,7 +58,7 @@ what's a rule to keep and what's a worked example to replace with their own answ
 spec that reads as uniformly authoritative and leaves them to guess which parts were arbitrary.
 
 The cost is the same kind ADR 10 named for the original spec: upkeep. A Portable/Local tag is a
-claim, and claims drift. The tagging pass was done once, in one project's judgement; the actual
+claim, and claims drift. The tagging pass was done once, in one project's judgment; the actual
 test of a `Portable` tag is whether it survives contact with a stack that isn't Rails and Tailwind
 — `docs/portability/adapter-reference-app.md` is the first such contact, not the last one this
 project should expect to need.

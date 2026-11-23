@@ -128,14 +128,14 @@ jobs:
           # on the exact regression this adapter found once already: 0 screens silently checked.
           grep -qE "^[1-9][0-9]* screens checked" /tmp/keyboard-audit.out
 
-      # Behaviour axe and the keyboard audit can't see: <rfg-table>'s cell styles actually apply,
+      # Behavior axe and the keyboard audit can't see: <rfg-table>'s cell styles actually apply,
       # and <rfg-filter-bar>'s controls actually submit. Both shipped broken in v0.1.0. Exits 1 on
       # any failure, and on a missing story or an empty example, so it can't pass vacuously.
-      - name: Run component-behaviour-audit.js against the table and filter bar stories
+      - name: Run component-behavior-audit.js against the table and filter bar stories
         working-directory: bin/design/adapters/storybook
         env:
           BASE_URL: http://127.0.0.1:4300
-        run: node component-behaviour-audit.js
+        run: node component-behavior-audit.js
 
   reference-app-control-harness:
     name: reference-app audits match their documented outcome
@@ -174,7 +174,7 @@ jobs:
 
       # See known-outcomes.js's own header: this is not audit-selftest.js (this repo has no Rails
       # app for that harness to run against) -- it's the closest thing to a control harness this
-      # repo can actually run, verifying each audit's documented, measured behaviour against
+      # repo can actually run, verifying each audit's documented, measured behavior against
       # examples/reference-app hasn't silently drifted, in either direction.
       - name: Run the known-outcomes harness
         working-directory: bin/design/adapters/reference-app

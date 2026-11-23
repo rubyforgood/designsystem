@@ -7,7 +7,7 @@ commit as the work.** A stale document is worse than none, because the next pers
 | --- | --- | --- |
 | The **spec** (`design.md`) | Normative. What the UI *must* do | A component, token, layout or convention changes |
 | The **change log** | What happened and when. One row per commit | Always |
-| The **decision log** | Why this and not the obvious alternative | A judgement call worth explaining |
+| The **decision log** | Why this and not the obvious alternative | A judgment call worth explaining |
 | The **domain model** | Models, associations, enums, roles | The data shape changes |
 | The **migration map** | Old pattern → new, and what is *not* migrated | Something is migrated or retired |
 | **Onboarding** | Setup, conventions, and a user-facing half | Anything a *user* sees changes |
@@ -34,7 +34,7 @@ that had never been checked and turned out to be false.
 leftover undocumented costs the next person an afternoon deciding whether it matters.
 
 **Record the alternatives you rejected, and why.** This is what makes a decision log more useful
-than a component catalogue. "We chose B" is not a decision; "we chose B because C would have broken
+than a component catalog. "We chose B" is not a decision; "we chose B because C would have broken
 every saved import file" is.
 
 **Append; do not rewrite history.** A decision log entry that turns out wrong gets an annotation,

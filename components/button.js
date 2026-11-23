@@ -166,10 +166,10 @@ const STYLES = css`
     background: var(--color-neutral-100);
   }
 
-  /* A destructive row/toolbar action: ghost's own rest treatment (no fill, same text colour),
+  /* A destructive row/toolbar action: ghost's own rest treatment (no fill, same text color),
      tinted on hover rather than filled — found missing entirely, not assumed present: the
      component only ever recognized four variants, so every "ghost_danger" button rendered fully
-     unstyled (transparent, inherited text colour) while silently logging the unrecognized-
+     unstyled (transparent, inherited text color) while silently logging the unrecognized-
      variant warning below on every page load — a real, console-warning-only (not "error") bug
      missed for two prior migration passes by only filtering for errors. The 15%-tint technique
      matches rfg-icon-tile's own danger tone, since tokens/ exposes one value per semantic
@@ -183,9 +183,9 @@ const STYLES = css`
     color: var(--color-danger);
   }
 
-  /* Destructive variants get their own focus-ring colour — found missing, not assumed present,
-     the same way the ghost_danger variant itself was: every variant shared one brand-coloured
-     ring, so a focused destructive control's ring never matched its own danger colour. */
+  /* Destructive variants get their own focus-ring color — found missing, not assumed present,
+     the same way the ghost_danger variant itself was: every variant shared one brand-colored
+     ring, so a focused destructive control's ring never matched its own danger color. */
   rfg-button[variant="danger"] .control:focus-visible,
   rfg-button[variant="ghost_danger"] .control:focus-visible {
     outline-color: var(--color-danger);

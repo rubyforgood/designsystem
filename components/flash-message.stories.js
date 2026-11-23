@@ -23,7 +23,7 @@ export default {
           "",
           "**Accessibility**",
           "- `info` and `success` messages are announced politely (`role=\"status\"`). `warning` and `danger` messages interrupt (`role=\"alert\"`).",
-          "- The close button is labelled \"Dismiss\". Listen for `rfg-dismiss` and remove the message.",
+          "- The close button is labeled \"Dismiss\". Listen for `rfg-dismiss` and remove the message.",
           "- An auto-dismiss timer (`dismiss-after`) pauses while the message is hovered or focused (WCAG 2.2.1 Timing Adjustable).",
           "- Only auto-dismiss a message the user won't need once the timer runs out. Decide per message, not per tone. A success message holding a one-time code must stay.",
           "",

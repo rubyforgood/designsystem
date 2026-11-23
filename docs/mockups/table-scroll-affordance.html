@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Signalling that a table scrolls</title>
+<title>Signaling that a table scrolls</title>
 <link rel="stylesheet" href="/mockup.css" media="all">
 <style>
   [data-panel] .table-scroll { max-width: 700px; }
@@ -85,7 +85,7 @@
         <code class="rounded bg-slate-200 px-1 text-xs">::-webkit-scrollbar</code> takes 0px in this
         headless Chromium even with overlay scrollbars disabled, and Firefox ignores it and offers no
         way to force a scrollbar to reserve space. So it goes in as an improvement where the platform
-        honours it &mdash; not as the answer to "nothing says this scrolls". The fade is the answer,
+        honors it &mdash; not as the answer to "nothing says this scrolls". The fade is the answer,
         because it works everywhere and depends on nothing.
       </p>
       <p>
@@ -111,7 +111,7 @@
 
 </div>
 <script>
-  // Demo of the proposed behaviour. A shipped version is a Stimulus controller.
+  // Demo of the proposed behavior. A shipped version is a Stimulus controller.
   document.querySelectorAll(".fadewrap").forEach(function (wrap) {
     var sc = wrap.querySelector(".table-scroll");
     function update() {

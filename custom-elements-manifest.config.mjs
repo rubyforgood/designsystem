@@ -1,7 +1,7 @@
 // Config for `@custom-elements-manifest/analyzer` (the `npm run analyze` script).
 //
 // `--litelement`'s plain-`static properties`-object support reads JSDoc for a description but
-// does not honour an `@ignore` tag on an internal `{ state: true }` entry the way it does on a
+// does not honor an `@ignore` tag on an internal `{ state: true }` entry the way it does on a
 // constructor-assigned instance field — confirmed empirically while piloting this on
 // button.js/field.js: `_hasActions`/`_draft`/etc. still showed up, undocumented, in the raw
 // manifest. Rather than rely on a JSDoc tag with known, position-dependent gaps, this plugin

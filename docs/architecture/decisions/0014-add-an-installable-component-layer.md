@@ -92,7 +92,7 @@ avatar, card, flash-message, page-header, tabs, page-tabs, modal, popover — el
 button). Two more real defects found by actually running axe-core against every story, not
 assumed:
 
-1. Status pill and flash message both put tone-coloured text on their own tone-tinted background,
+1. Status pill and flash message both put tone-colored text on their own tone-tinted background,
    which drops below WCAG AA 4.5:1 for the four semantic tones — those tokens are measured to
    clear 4.5:1 against *pure* white only (danger by a 0.01 margin, `tokens/README.md`). Fixed to
    neutral-900 text, tone carried by the background/accent instead.
@@ -338,9 +338,9 @@ on the host *after* first render still gets moved — not just the ones present 
 **Update, a token-based compact icon-only size (`size="xs"`).** Human Essentials' icon-only row
 actions (`essentials_row_icon_link`/`essentials_row_icon_action`) were excluded from both migration
 passes above as "a distinct 28px circular treatment, not `<rfg-button>`'s vocabulary." Re-examined
-before building this: the reasoning was overstated. The danger tone is colour-identical to the
+before building this: the reasoning was overstated. The danger tone is color-identical to the
 existing `ghost_danger` variant at rest and on hover (only the fixed size and, in the hand-built
-version, the focus-ring colour differ — see below); design.md itself never calls this a protected
+version, the focus-ring color differ — see below); design.md itself never calls this a protected
 second vocabulary the way it explicitly does for `<rfg-icon-tile>`/`<rfg-avatar>`, framing the 28px
 figure purely as a layout decision (it matches a menu-trigger's own height elsewhere on the page).
 
@@ -362,7 +362,7 @@ it visibly stuck at its default dimension while the box grew around it, which a 
 
 Migrating onto the real `ghost`/`danger` variant CSS (rather than Human Essentials' own separate,
 shared-outline-color `ROW_ICON_CLASSES` rule) fixes a real, pre-existing bug as a side effect: that
-shared rule hardcodes one `focus-visible` outline colour for every tone, so a focused *destructive*
+shared rule hardcodes one `focus-visible` outline color for every tone, so a focused *destructive*
 row-icon button currently shows a brand/indigo ring rather than rose, unlike every other
 destructive control in the app. The component's own `danger` variant already gets this right.
 
@@ -384,13 +384,13 @@ Two more, found the same way, in the same pass:
   section names it explicitly ("a destructive action with no fill is `ghost_danger`") and
   Human Essentials' Ruby code has passed `variant: :ghost_danger` directly into `<rfg-button>`
   since the *first* `essentials_action_button` migration. Every such button rendered fully
-  unstyled — transparent background, inherited text colour, no hover state — while silently
+  unstyled — transparent background, inherited text color, no hover state — while silently
   logging `<rfg-button> received unknown variant "ghost_danger"...` on every page load. Missed
   for two migration passes because that line is a console *warning*, not an *error*, and every
   verification pass in both phases filtered for `console.type() === "error"` only. No Storybook
   story ever exercised this variant either, so the gap had no story, no audit, and no test to
   catch it. Fixed: `ghost_danger` is now a real fifth variant — `--color-neutral-700` at rest
-  (matching plain `ghost`'s own rest colour, differing only on hover/focus), a 15%
+  (matching plain `ghost`'s own rest color, differing only on hover/focus), a 15%
   `color-mix()` rose tint on hover (the same tinting technique `<rfg-icon-tile>`'s own danger
   tone already uses, since `tokens/` exposes one value per semantic tone, not a tint scale) —
   and a Storybook story now exercises it, so a regression here would show up in the next

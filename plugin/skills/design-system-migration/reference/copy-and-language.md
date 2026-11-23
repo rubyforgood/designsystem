@@ -32,7 +32,7 @@ gloss **and** the action. That is when a subtitle is genuinely load-bearing.
 ## Write to the reader, in the second person
 
 *"Say how many of each item you need"*, not *"Users should specify quantities"*. And not the first
-person plural: **"we" has no referent** in an app used by two hundred organisations. Sweep for it.
+person plural: **"we" has no referent** in an app used by two hundred organizations. Sweep for it.
 
 ## Inclusive, and check rather than assume
 
@@ -41,7 +41,7 @@ person plural: **"we" has no referent** in an app used by two hundred organisati
 - **No sensory-only instruction** — WCAG 1.3.3. *"The button on the right"* fails for a screen
   reader and after a reflow; name the control.
 - **No "please".** Politeness filler in UI copy is noise, and it reads as apologetic in an error.
-- **No shouting.** Capitalised runs that are not acronyms.
+- **No shouting.** Capitalized runs that are not acronyms.
 
 **Make it a check, not a review.** These are all greppable, and a list in a script catches the
 eleventh instance a human reviewer would miss. Plant a violation and confirm the check reports it —
