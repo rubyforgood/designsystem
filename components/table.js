@@ -17,6 +17,54 @@
 // shared classes a host's own cells opt into.
 import { LitElement, html, css } from "lit";
 
+// Cell-level rules live in a light-DOM stylesheet, not the shadow root's `static styles`. The
+// cells belong to the host's slotted <table>, and `::slotted()` only matches the slotted element
+// itself: `::slotted(table) td` is invalid and matched nothing, so in v0.1.0 none of these rules
+// applied (measured in the built Storybook: a `td.numeric` computed to `text-align: center` and
+// `font-variant-numeric: normal`). Injected once per document, the same pattern `<rfg-button>`,
+// `<rfg-menu>` and `<rfg-combobox>` use. Scoped by the `rfg-table` element selector, so it only
+// touches tables inside one, and stays low-specificity so an app's own table CSS can override it.
+const STYLE_ID = "rfg-table-styles";
+const CELL_STYLES = css`
+  /* Every cell aligns to the top of its row, not the browser default centre — set table-wide,
+     not row by row, since it's invisible until any cell in a row wraps. */
+  rfg-table th,
+  rfg-table td {
+    vertical-align: top;
+    padding: 0.625rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-neutral-200);
+  }
+
+  /* One visual treatment for a numeric column, applied uniformly — no per-cell emphasis. */
+  rfg-table .numeric,
+  rfg-table .quantity,
+  rfg-table .percent {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  rfg-table .date {
+    white-space: nowrap;
+  }
+
+  /* Free text of unbounded length clips to one line rather than breaking the row's height. */
+  rfg-table .notes {
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+function ensureCellStylesInjected() {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = CELL_STYLES.cssText;
+  document.head.appendChild(style);
+}
+
 /**
  * The Portable core of design.md's "Tables" section: a scroll-not-squeeze container and
  * top-aligned cells. The host provides the actual `<table>` markup; this element only wraps,
@@ -41,37 +89,12 @@ export class RfgTable extends LitElement {
       font-family: var(--font-sans);
       font-size: 0.875rem;
     }
-
-    /* Every cell aligns to the top of its row, not the browser default centre — set table-wide,
-       not row by row, since it's invisible until any cell in a row wraps. */
-    ::slotted(table) th,
-    ::slotted(table) td {
-      vertical-align: top;
-      padding: 0.625rem 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--color-neutral-200);
-    }
-
-    /* One visual treatment for a numeric column, applied uniformly — no per-cell emphasis. */
-    ::slotted(table) .numeric,
-    ::slotted(table) .quantity,
-    ::slotted(table) .percent {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-
-    ::slotted(table) .date {
-      white-space: nowrap;
-    }
-
-    /* Free text of unbounded length clips to one line rather than breaking the row's height. */
-    ::slotted(table) .notes {
-      max-width: 16rem;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
   `;
+
+  connectedCallback() {
+    super.connectedCallback();
+    ensureCellStylesInjected();
+  }
 
   firstUpdated() {
     const slot = this.renderRoot.querySelector("slot");

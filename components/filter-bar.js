@@ -9,6 +9,17 @@
 import { LitElement, html, css } from "lit";
 import "./disclosure.js";
 
+// The form lives in light DOM, not the shadow root. In v0.1.0 this element rendered
+// `<form method="get">` inside its shadow root and slotted the controls in from light DOM, but a
+// form only owns controls in its own tree: every slotted control's `.form` was `null`, so the bar
+// submitted nothing (measured in the built Storybook). Now a hidden, empty `<form>` is appended
+// as an unslotted light-DOM child (so it renders nothing), and every control inside the bar is
+// pointed at it with the standard `form="<id>"` content attribute — the same mechanism that lets
+// a control outside a form submit with it. Enter in a text field and a `type="submit"` button
+// in the actions slot both submit it natively, and so does a form-associated custom element.
+let formCount = 0;
+const CONTROLS = "input, select, textarea, button";
+
 /**
  * Filters submit as a real GET request — design.md's "Filter bar" section. A bar whose
  * controls fit on one line shows them; only a bar that doesn't fold composes
@@ -16,7 +27,7 @@ import "./disclosure.js";
  *
  * @element rfg-filter-bar
  * @slot fields - The filter controls, one wrapper element per field.
- * @slot actions - Trailing actions (e.g. an export button).
+ * @slot actions - Trailing actions (e.g. an export button, or a `type="submit"` button).
  */
 export class RfgFilterBar extends LitElement {
   static properties = {
@@ -33,7 +44,7 @@ export class RfgFilterBar extends LitElement {
       display: block;
     }
 
-    form {
+    .bar {
       display: flex;
       align-items: flex-end;
       gap: 0.75rem;
@@ -66,6 +77,54 @@ export class RfgFilterBar extends LitElement {
     this.action = "";
     this._count = 0;
     this._hasActions = false;
+    this._form = document.createElement("form");
+    this._form.method = "get";
+    this._form.id = `rfg-filter-bar-form-${++formCount}`;
+    this._form.hidden = true;
+    this._observer = new MutationObserver(() => this._associateControls());
+  }
+
+  /** The light-DOM `<form>` the bar's controls submit with — e.g. `bar.form.requestSubmit()` to submit on change. */
+  get form() {
+    return this._form;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    if (this._form.parentNode !== this) this.appendChild(this._form);
+    this._associateControls();
+    this._observer.observe(this, { childList: true, subtree: true });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._observer.disconnect();
+  }
+
+  updated(changed) {
+    if (changed.has("action")) {
+      if (this.action) this._form.setAttribute("action", this.action);
+      else this._form.removeAttribute("action");
+    }
+  }
+
+  // Points every control in the bar at the light-DOM form. A control that already names a form
+  // keeps its own; custom elements count only when they're form-associated. If the app has
+  // wrapped the whole bar in its own <form> (the v0.1.0 workaround), its controls already belong
+  // to that form, so leave them there.
+  _associateControls() {
+    if (this.parentElement?.closest("form")) return;
+    const candidates = [...this.querySelectorAll("*")].filter(
+      (el) => el.matches(CONTROLS) || el.constructor.formAssociated === true,
+    );
+    for (const el of candidates) {
+      if (!el.hasAttribute("form")) el.setAttribute("form", this._form.id);
+    }
+    // A custom element that isn't defined yet can't say whether it's form-associated (scripts can
+    // load in any order), so look again once it is.
+    for (const el of this.querySelectorAll(":not(:defined)")) {
+      customElements.whenDefined(el.localName).then(() => this._associateControls());
+    }
   }
 
   _onFieldsSlotChange(e) {
@@ -83,12 +142,12 @@ export class RfgFilterBar extends LitElement {
     const body = this._count > 2 ? html`<rfg-disclosure label="Filters"><div class="fields">${fields}</div></rfg-disclosure>` : html`<div class="fields">${fields}</div>`;
 
     return html`
-      <form method="get" action=${this.action || undefined}>
+      <div class="bar">
         ${body}
         <div class="actions ${this._hasActions ? "" : "hidden"}">
           <slot name="actions" @slotchange=${this._onActionsSlotChange}></slot>
         </div>
-      </form>
+      </div>
     `;
   }
 }

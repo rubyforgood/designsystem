@@ -29,7 +29,13 @@ as a draft. A minor release may break things, a patch release never does, the re
 the changelog, old names are deprecated for one minor release before removal where that's cheap,
 and adopting apps hear about a breaking release before it ships.
 
-## Two component bugs found while rewriting the Storybook docs
+## Two component bugs found while rewriting the Storybook docs: fixed in v0.1.1
+
+**Fixed 2026-11-23** (see `components/README.md`'s `<rfg-table>` and `<rfg-filter-bar>`
+sections for the fix and how it was checked). Still open: neither audit could catch these, and the
+story-level check proposed in the last paragraph below doesn't exist yet. The original entry
+follows.
+
 
 *About this repo, not Human Essentials.* Added 2026-11-23. Both ship in v0.1.0, and both are
 flagged as known issues on their Storybook pages until fixed.

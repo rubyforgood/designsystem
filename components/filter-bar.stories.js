@@ -28,8 +28,6 @@ export default {
           "- Give every control a visible `<label>`.",
           "- When folded, the controls sit behind a Disclosure button, which announces whether it is open.",
           "",
-          "**Known issue (v0.1.0):** the bar's built-in form doesn't submit your controls, because they sit outside it. Until a fix ships, wrap the filter bar in your own `<form method=\"get\">` with a submit button.",
-          "",
           "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#filter-bar)",
         ].join("\n"),
       },

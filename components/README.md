@@ -462,6 +462,18 @@ The host supplies the actual `<table>` markup (caption, thead, tbody) via the de
 element doesn't dictate column count or structure, only wraps, scrolls, and supplies the shared
 classes a host's own cells opt into.
 
+**Cell styles are a light-DOM stylesheet, injected once per document** (`#rfg-table-styles`,
+selectors scoped as `rfg-table td`, `rfg-table .numeric` and so on), not the shadow root's styles.
+The cells belong to the host's slotted `<table>`, and `::slotted()` only matches the slotted
+element itself. Fixed in v0.1.1: v0.1.0 wrote these rules as `::slotted(table) td`, which is
+invalid and matched nothing, so top alignment, cell padding, row borders and all three column
+classes silently never applied. Neither axe nor the keyboard audit could see that. Found while
+rewriting the Storybook docs: a `td.numeric` measured `text-align: center` and
+`font-variant-numeric: normal`. The selectors are kept low-specificity on purpose, so an app's own
+table CSS overrides them (checked: an app rule `.app td.numeric { text-align: center }` wins).
+Like `<rfg-button>`'s injected styles, this assumes the table lives in the main document, not
+inside another component's shadow root.
+
 ## `<rfg-date-range-picker>`
 
 Implements "Date range picker": one trigger showing the current range, a popover (composing
@@ -600,7 +612,23 @@ one or two controls is a click that buys nothing.
 Composes `<rfg-disclosure>` for the folded case (reuse, not a second accordion implementation).
 Slots: `fields` (each filter control, counted via `slotchange` to decide fold vs. inline — verified
 in a real browser: two controls render inline with no disclosure at all, four render behind one),
-`actions` (right end of the row).
+`actions` (right end of the row). Put a `type="submit"` button in `actions` to submit, or call
+`bar.form.requestSubmit()` to submit on change.
+
+**The form lives in light DOM.** The bar appends a hidden, empty `<form method="get">` as its own
+unslotted child, and points every control inside it at that form with the standard `form="<id>"`
+attribute. Native controls and form-associated custom elements (e.g. `<rfg-tag-input>`) both
+submit with it, including controls added later and custom elements defined after the bar. Enter
+in a text field submits too. If the app has already wrapped the bar in its own `<form>`, the bar
+leaves its controls with that form.
+
+Fixed in v0.1.1: v0.1.0 rendered `<form method="get">` inside the shadow root, but a form only owns
+controls in its own tree, so every slotted control's `.form` was `null` and the bar submitted
+nothing. Checked in Chromium against the built standalone file (2026-11-23): with four controls (so
+the bar folds) and a submit button in `actions`, clicking it navigates to
+`action?owner=…&q=…&status=…&tags=`. Enter in a text field submits the same way, a control added
+later is included, and a bar inside an app's own `<form>` submits with that form. The same check
+against the published v0.1.0 file fails.
 
 ## `<rfg-pagination>`
 

@@ -25,8 +25,6 @@ export default {
           "- Use real `<th>` header cells.",
           "- Wide tables scroll horizontally instead of reflowing, which WCAG allows for data tables.",
           "",
-          "**Known issue (v0.1.0):** the `numeric`, `quantity`, `percent`, `date` and `notes` column classes don't take effect yet. The component's styles can't reach cells inside the slotted table. Until a fix ships, style these columns in your own CSS.",
-          "",
           "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#tables)",
         ].join("\n"),
       },
