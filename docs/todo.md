@@ -20,6 +20,15 @@ or what an adopter gets. It now opens with what the system is and who it's for, 
 gets, gives the first step, and links Storybook in context. The evidence-first story follows as
 "How it was built."
 
+## Agree the 0.x versioning policy
+
+*About this repo, not Human Essentials.* Added 2026-11-23.
+
+[CONTRIBUTING.md](../CONTRIBUTING.md) has a drafted policy for breaking changes before 1.0: a minor
+release may break things, a patch release never does, and the release notes are the changelog.
+It's marked as a draft. It needs agreeing (by whoever maintains this with the adopting apps)
+before a second app depends on the package. Then remove the draft line.
+
 ## Test suite
 
 **Three flakes fixed on 2026-09-04, and eight consecutive clean runs since.** Before them, 15

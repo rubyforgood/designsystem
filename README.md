@@ -202,6 +202,11 @@ rule against real defects on real screens. It was forked out and genericized int
 adoptable project; see [ADR 13](docs/architecture/decisions/0013-genericize-the-design-system.md)
 for that decision and what genericizing it actually involved.
 
+## Contributing
+
+Issues and pull requests are welcome, from any app. [CONTRIBUTING.md](CONTRIBUTING.md) has the
+rules for a pull request and the versioning policy for 0.x releases.
+
 ## License
 
 MIT, see [`LICENSE`](LICENSE). Carried forward from
