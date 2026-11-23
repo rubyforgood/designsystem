@@ -49,11 +49,13 @@ portable beyond the app it was first found on, including where it turned out *no
 First install the skills into Claude Code, from inside any project:
 
 ```
-/plugin marketplace add rubyforgood/designsystem
+/plugin marketplace add https://raw.githubusercontent.com/rubyforgood/designsystem/main/.claude-plugin/marketplace.json
 /plugin install design-system@rubyforgood
 ```
 
-This downloads only the `plugin/` folder (about 150 KB), not the whole repository. The skills
+This downloads only the `plugin/` folder, about 150 KB. (`/plugin marketplace add
+rubyforgood/designsystem` also works, but it clones the whole repository, about 58 MB, to get
+there.) The skills
 appear as `design-system:design-system-migration`, `design-system:audit-suite` and so on. To get
 updates later, run `/plugin marketplace update rubyforgood`.
 

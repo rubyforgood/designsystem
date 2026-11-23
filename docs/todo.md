@@ -91,7 +91,7 @@ other a position in a list.
 **Closed 2026-11-23, by a plugin, not the symlink proposed below.** The five skills now live in
 `plugin/skills/`, packaged as the `design-system` plugin and listed by this repo's own marketplace
 (`.claude-plugin/marketplace.json`). Anyone can install them with
-`/plugin marketplace add rubyforgood/designsystem` and then
+`/plugin marketplace add https://raw.githubusercontent.com/rubyforgood/designsystem/main/.claude-plugin/marketplace.json` and then
 `/plugin install design-system@rubyforgood`. `.claude/skills` is now a symlink to
 `../plugin/skills`, so they still load when working in this repo. This removes the tradeoff below:
 an installed plugin is a versioned copy managed by Claude Code, so it doesn't break if a checkout
@@ -100,9 +100,12 @@ moves, and it updates when `plugin.json`'s version changes.
 Checked 2026-11-23: `claude plugin validate` passes for both the marketplace and the plugin. A
 local install into an empty, separate config directory came to 144 KB and contained all five
 skills. An earlier layout, with the whole repo as the plugin, came to 2.4 GB because it copied
-`node_modules`. `claude --plugin-dir plugin -p` listed all five as `design-system:*`. Not yet
-checked: an install from GitHub rather than from a local path, which can only happen after this is
-pushed.
+`node_modules`. `claude --plugin-dir plugin -p` listed all five as `design-system:*`. Installs from
+GitHub, each into a fresh, separate config, also checked 2026-11-23. With the marketplace added by
+the raw URL of `marketplace.json` and the plugin's `git-subdir` source, all five skills install and
+the whole `plugins/` directory is about 150 KB. Added as `rubyforgood/designsystem` instead, it
+works too, but the marketplace clone alone is 58 MB, mostly `videos/`. That's why the README gives
+the URL form.
 
 The original entry follows, unedited, as history.
 
