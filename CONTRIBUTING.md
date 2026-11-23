@@ -36,8 +36,6 @@ else's app. These rules keep that safe. Read [README.md](README.md) first for wh
 
 ## Versioning while we're on 0.x
 
-*Draft policy. Not yet agreed; edit it here when it is.*
-
 The package follows [semantic versioning](https://semver.org) and is still pre-1.0. On 0.x:
 
 - **A minor release (0.1 → 0.2) may break things.** Examples: a renamed or removed attribute,
