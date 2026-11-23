@@ -42,6 +42,9 @@ import "@rubyforgood/design-system/components/button";
 <rfg-button variant="primary">Save</rfg-button>
 ```
 
+**In a Rails app with importmap**, vendor the standalone files. The root README's
+["Using it in a Rails app"](../README.md#using-it-in-a-rails-app) has the full steps.
+
 ## `<rfg-button>`
 
 Implements `design.md`'s Buttons section (variant × size as two independent axes) and the

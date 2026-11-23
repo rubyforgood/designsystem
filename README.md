@@ -23,7 +23,7 @@ portable beyond the app it was first found on, including where it turned out *no
 | --- | --- |
 | [`design.md`](design.md) | The spec. Every rule is tagged **Portable** (holds on any app) or **Local** (this project's own answer: the practice of deciding may transfer, the specific value doesn't). See [`docs/portability/design-md-tagging.md`](docs/portability/design-md-tagging.md) for the full breakdown. |
 | [`tokens/`](tokens/) | Design tokens as a Tailwind v4 `@theme` block: colour, type, spacing, radius, elevation, with the Portable rule and the Local default value stated separately for each. |
-| [`components/`](components/README.md) | An installable Web Components layer (Lit) implementing `design.md`'s Components section in code — `npm install`-able or copy a single standalone file. Early: only `<rfg-button>` exists so far. See [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md). |
+| [`components/`](components/README.md) | An installable Web Components layer (Lit) implementing `design.md`'s Components section in code — `npm install`-able or copy a single standalone file. Twenty-nine components, every portable one in `design.md`'s catalog except Charts. See [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md). |
 | [Storybook](https://rubyforgood.github.io/designsystem/) | Every component, live and previewable in a browser — no clone required. Redeployed on every push to `main`. |
 | [`bin/design/`](bin/design/README.md) | ~40 executable audits (WCAG conformance, copy quality, dead code, and more) built on an adapter seam: point one small file (`targets.js`) at your app and most of the suite runs unmodified. |
 | [`examples/reference-app/`](examples/reference-app/) | A second, deliberately non-Rails adapter target: proof (and, honestly, some disproof) that the adapter claim holds. See [`docs/portability/adapter-reference-app.md`](docs/portability/adapter-reference-app.md). |
@@ -57,6 +57,65 @@ rather than a released version.
 That gives you the shipped default palette (indigo, Figtree, a 4px scale). Retheme by overriding
 the same token names; see [`tokens/README.md`](tokens/README.md) for which parts are load-bearing
 rules and which are just this default's answer.
+
+## Using it in a Rails app
+
+Most Ruby For Good apps are Rails with importmap and no Node build step. You don't need one: every
+component ships as a **standalone file** with `lit` bundled in and no imports of its own, so you can
+vendor it like any other file. Download the tokens and the components you use, at a pinned version:
+
+```bash
+V=https://cdn.jsdelivr.net/npm/@rubyforgood/design-system@0.1.0
+curl -fo app/assets/stylesheets/rfg-tokens.css $V/tokens/tokens.css
+curl -fo vendor/javascript/rfg-button.js       $V/dist/standalone/button.mjs
+curl -fo vendor/javascript/rfg-modal.js        $V/dist/standalone/modal.mjs
+```
+
+Pin them in `config/importmap.rb`:
+
+```ruby
+pin "rfg-button", to: "rfg-button.js"
+pin "rfg-modal",  to: "rfg-modal.js"
+```
+
+Import them once in `app/javascript/application.js`:
+
+```js
+import "rfg-button"
+import "rfg-modal"
+```
+
+Load the tokens before anything else in your layout, then use the elements in any view:
+
+```erb
+<%= stylesheet_link_tag "rfg-tokens" %>
+```
+
+```erb
+<rfg-button variant="primary" type="submit">Save</rfg-button>
+```
+
+**If the app uses `tailwindcss-rails` (Tailwind v4)**, download `$V/tokens/theme.css` instead of
+`tokens.css` into `app/assets/tailwind/` and `@import` it from `application.css` there. That
+gives you the tokens as Tailwind utilities (`bg-brand-600` and so on) as well as CSS variables.
+
+Things to know:
+
+- **Upgrading** means changing the version in `V` and downloading again. The version is in the URL
+  on purpose, so you can't pick up a new release without choosing to.
+- **Each standalone file carries its own copy of `lit`**, so each one is about 60 KB unminified
+  (`button.mjs`, v0.1.0). Vendor the components you actually use, not all twenty-nine. If the app
+  has a JS bundler (`jsbundling-rails`, Vite), use the npm import in
+  [`components/README.md`](components/README.md) instead: it shares one copy of `lit`.
+- **The tokens name Figtree but don't ship the font.** Self-host it, or set `--font-sans` to the
+  app's existing typeface (see [`tokens/README.md`](tokens/README.md)).
+- **Don't `bin/importmap pin` the package's npm build.** Those files import shared chunks by
+  relative path, so vendoring a single file breaks them. Use the standalone files above.
+
+How far this has been tested: the files above, downloaded from the CDN at v0.1.0 and loaded through
+an importmap, register `<rfg-button>` and `<rfg-modal>` and render with the brand colour in
+Chromium, with no console errors (checked 2026-11-23). It has not yet been run inside a real Rails
+app. Whoever does that first, please correct anything here that turns out wrong.
 
 ## Using the audits
 
