@@ -46,7 +46,9 @@ portable beyond the app it was first found on, including where it turned out *no
 
 ## Migrating an app onto this system
 
-First install the skills into Claude Code, from inside any project:
+The skills are the step-by-step way of working for a migration. They're optional: the spec,
+tokens, components and audits all work without them, and without Claude Code. To use them in
+Claude Code, install them as a plugin, from inside any project:
 
 ```
 /plugin marketplace add https://raw.githubusercontent.com/rubyforgood/designsystem/main/.claude-plugin/marketplace.json
@@ -55,8 +57,7 @@ First install the skills into Claude Code, from inside any project:
 
 This downloads only the `plugin/` folder, about 150 KB. (`/plugin marketplace add
 rubyforgood/designsystem` also works, but it clones the whole repository, about 58 MB, to get
-there.) The skills
-appear as `design-system:design-system-migration`, `design-system:audit-suite` and so on. To get
+there.) The skills appear as `design-system:design-system-migration`, `design-system:audit-suite` and so on. To get
 updates later, run `/plugin marketplace update rubyforgood`.
 
 Then load the `design-system-migration` skill in Claude Code and point it at the app you're migrating.
@@ -65,6 +66,22 @@ previews changes before building them, applies fixes app-wide rather than screen
 wires up an executable audit so a fixed defect can't silently come back. `audit-suite` and
 `wcag-conformance` are the supporting skills it leans on for building checks you can trust and for
 WCAG 2.2 conformance specifically.
+
+### Without the Claude Code plugin
+
+The skills are plain Markdown files in [`plugin/skills/`](plugin/skills/), one folder each, so
+there are other ways to use them:
+
+- **In Claude Code, without the plugin:** copy the folders from `plugin/skills/` into
+  `~/.claude/skills/` (for all your projects) or into your app's `.claude/skills/` (for that app
+  only). You'll need to copy them again to get updates.
+- **With another AI coding tool:** each skill is a folder with a `SKILL.md` file (a short header
+  saying what it's for, then instructions). Tools that read that format can use the same folders.
+  Only Claude Code has been tested.
+- **With no AI at all:** read them as a guide. Start with
+  [`plugin/skills/design-system-migration/SKILL.md`](plugin/skills/design-system-migration/SKILL.md);
+  its `reference/` and `templates/` folders hold the detail. A developer can follow it like any
+  other how-to.
 
 ## Using the tokens
 
