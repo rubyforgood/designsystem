@@ -1,3 +1,9 @@
+// Figtree, self-hosted from npm (design.md: one typeface, no CDN request), so this site shows the
+// default typeface tokens.css names rather than a system fallback.
+import "@fontsource/figtree/400.css";
+import "@fontsource/figtree/500.css";
+import "@fontsource/figtree/600.css";
+import "@fontsource/figtree/700.css";
 import "../tokens/tokens.css";
 import { setCustomElementsManifest } from "@storybook/web-components";
 import customElements from "../custom-elements.json" with { type: "json" };
@@ -12,6 +18,9 @@ setCustomElementsManifest(customElements);
 const preview = {
   parameters: {
     controls: { expanded: true },
+    options: {
+      storySort: { order: ["Introduction", "Foundations", ["Color", "Typography", "Spacing and elevation"], "Components"] },
+    },
     a11y: {
       // Fails the story in CI/local runs on a real violation — see components/README.md and
       // design.md's Accessibility section for the rules this is checking against.

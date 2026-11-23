@@ -9,11 +9,23 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          'Owns the page\'s only `<h1>` — design.md\'s "Page header" section; the host should ' +
-          "not also render its own `<h1>` elsewhere on the page. The back link and title sit as " +
-          "one block with an 8px gap, carries the breadcrumb (`back-href`/`back-label`), and " +
-          "alignment is derived from whether `subtitle` is set rather than kept in sync by hand.",
+        component: [
+          "The top of a page: its title, an optional subtitle, an optional back link, and page-level actions.",
+          "",
+          "**When to use**",
+          "- Once per page, at the top.",
+          "- Add a back link when the page sits under a parent page, labelled `Back to <noun>`.",
+          "",
+          "**When not to use**",
+          "- For a heading inside a page section, use a Card heading or a plain heading instead.",
+          "",
+          "**Accessibility**",
+          "- The title is the page's `<h1>`. Don't render another `<h1>` anywhere else on the page.",
+          "- The back link is a real link, so it works with the keyboard, middle-click and the browser's history.",
+          "- Give the back link a label that names where it goes, such as \"Back to projects\".",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#page-header)",
+        ].join("\n"),
       },
     },
   },
@@ -30,43 +42,43 @@ export default {
     heading: { control: "text" },
     subtitle: {
       control: "text",
-      description: "When set, aligns the header row with `items-start` (so an action can't be dragged down to the subtitle's baseline); absent, uses `items-end` so an action sits on the heading's own baseline.",
+      description: "A line under the heading. When set, actions line up with the top of the header instead of the heading's baseline.",
     },
     backHref: { control: "text" },
     backLabel: { control: "text" },
   },
-  args: { heading: "New donation" },
+  args: { heading: "New project" },
 };
 
-export const TitleOnly = { name: "Title only (no subtitle — items-end alignment)" };
+export const TitleOnly = { name: "Title only" };
 
 export const WithSubtitle = {
-  name: "With subtitle (items-start alignment)",
+  name: "With a subtitle",
   render: () =>
     html`
-      <rfg-page-header heading="New donation" subtitle="Record essentials coming in from a donor.">
+      <rfg-page-header heading="New project" subtitle="Set up a project for your team.">
         <rfg-button slot="actions" variant="secondary" size="sm">Import CSV</rfg-button>
       </rfg-page-header>
     `,
 };
 
 export const WithBackLink = {
-  name: "With back link",
+  name: "With a back link",
   render: () =>
     html`
-      <rfg-page-header heading="New donation" subtitle="Record essentials coming in from a donor." back-href="#donations" back-label="Back to donations">
+      <rfg-page-header heading="New project" subtitle="Set up a project for your team." back-href="#projects" back-label="Back to projects">
         <rfg-button slot="actions" variant="secondary" size="sm">Import CSV</rfg-button>
       </rfg-page-header>
     `,
 };
 
 export const WithActions = {
-  name: "With page-level actions",
+  name: "With page actions",
   render: () =>
     html`
-      <rfg-page-header heading="Distributions">
+      <rfg-page-header heading="Projects">
         <rfg-button slot="actions" variant="secondary" size="sm">Export</rfg-button>
-        <rfg-button slot="actions" variant="primary" size="sm">New distribution</rfg-button>
+        <rfg-button slot="actions" variant="primary" size="sm">New project</rfg-button>
       </rfg-page-header>
     `,
 };

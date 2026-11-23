@@ -1,0 +1,27 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SpacingScale, TokenSamples } from "./tokens.jsx";
+
+<Meta title="Foundations/Spacing and elevation" />
+
+# Spacing and elevation
+
+## Spacing
+
+All spacing comes from one 4px scale. Use the scale for padding, gaps and margins rather than
+picking values by eye, so related layouts line up.
+
+<SpacingScale />
+
+## Radius
+
+Three radii: one for surfaces such as cards and modals, one for controls such as buttons and
+inputs, and a full round for pills and avatars.
+
+<TokenSamples prefix="--radius-" kind="radius" />
+
+## Elevation
+
+Two levels. Surfaces such as cards sit just above the page. Overlays such as menus, popovers
+and modals float above everything else.
+
+<TokenSamples prefix="--shadow-" kind="shadow" />

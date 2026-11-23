@@ -38,7 +38,7 @@ export class RfgPagination extends LitElement {
     page: { type: Number },
     /** How many entries are shown per page — used to compute the range label. */
     pageSize: { type: Number, attribute: "page-size" },
-    /** The noun for one entry, e.g. "donation" — used in the range label. */
+    /** The noun for one entry, e.g. "project" — used in the range label. */
     entryName: { type: String, attribute: "entry-name" },
     /** `(page) => href` — supplies a real per-page URL; without it, falls back to dispatching `rfg-navigate` only. */
     hrefFor: { attribute: false },

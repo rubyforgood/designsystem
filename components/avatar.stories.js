@@ -8,12 +8,22 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "Circular initials avatar — design.md's \"Icon tiles and avatars\" section, the " +
-          "avatar half, kept as its own element rather than a `shape` switch on `<rfg-icon-tile>` " +
-          "(\"reserve two distinct visual vocabularies ... and never let them overlap\"). Carries " +
-          "an accessible name by default, computed from `name`, since an avatar is sometimes the " +
-          "only visible indicator of who it represents.",
+        component: [
+          "A circle showing a person's initials, worked out from their name.",
+          "",
+          "**When to use**",
+          "- To represent a person, such as the signed-in user in an account menu, or the members of a team.",
+          "",
+          "**When not to use**",
+          "- For a stat, a status or a thing, use Icon tile. Avatars mean \"a person\" and icon tiles mean \"a stat or status\". Keep the two apart.",
+          "",
+          "**Accessibility**",
+          "- By default the avatar is announced as an image named after the person, because it is sometimes the only sign of who it represents.",
+          "- Inside a control that already names the person, add `aria-hidden=\"true\"` to the avatar so the name isn't read twice.",
+          "- When you do that, start the control's label with the visible initials, so a voice-control user can say what they see (WCAG 2.5.3 Label in Name).",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#icon-tiles-and-avatars)",
+        ].join("\n"),
       },
     },
   },
@@ -29,37 +39,32 @@ export default {
       description: "Reuses the shared sm/md size vocabulary.",
     },
   },
-  args: { name: "Jamie Diaz", size: "md" },
+  args: { name: "Maya Chen", size: "md" },
 };
 
 export const Default = {};
 export const Small = { args: { size: "sm" } };
-export const OneWordName = { args: { name: "Madonna" }, name: "One-word name" };
+export const OneWordName = { args: { name: "Priya" }, name: "One-word name" };
 
 export const DecorativeInsideALabeledControl = {
-  name: "Decorative (inside a control that already names the person)",
+  name: "Decorative inside a button",
   render: () =>
     html`
       <button
         type="button"
-        aria-label="JD — account menu for Jamie Diaz"
+        aria-label="MC — account menu for Maya Chen"
         style="display:inline-flex; align-items:center; gap:0.5rem; border:1px solid var(--color-neutral-200); border-radius:var(--radius-control); padding:0.25rem 0.75rem 0.25rem 0.25rem; background:white; font-family:var(--font-sans); cursor:pointer;"
       >
-        <rfg-avatar name="Jamie Diaz" size="sm" aria-hidden="true"></rfg-avatar>
+        <rfg-avatar name="Maya Chen" size="sm" aria-hidden="true"></rfg-avatar>
       </button>
     `,
   parameters: {
     docs: {
       description: {
         story:
-          "design.md's own example: an account-menu trigger whose avatar carries no accessible " +
-          'name of its own, since the enclosing button already announces one. The aria-label ' +
-          'leads with "JD" deliberately — axe-core\'s label-content-name-mismatch check (WCAG ' +
-          "2.5.3 Label in Name) flagged a first draft that said only \"Account menu for Jamie " +
-          'Diaz\": a voice-control user saying the visible label ("JD") wouldn\'t match an ' +
-          "accessible name that doesn't contain it. design.md's own text describes the decorative" +
-          "-avatar-plus-named-button shape but doesn't address this; worth folding into design.md" +
-          " if this pattern gets used for real.",
+          "An account-menu button that names the person itself, so the avatar is hidden from " +
+          'screen readers. The label starts with the visible initials ("MC") so voice-control ' +
+          "users can say what they see.",
       },
     },
   },

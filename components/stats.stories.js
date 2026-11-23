@@ -2,14 +2,14 @@ import { html } from "lit";
 import "./stats.js";
 
 const FIGURES_2 = [
-  { label: "Items distributed this month", value: "1,284" },
-  { label: "Scheduled for future distribution", value: "310" },
+  { label: "Tasks completed this month", value: "1,284" },
+  { label: "Tasks scheduled for later", value: "310" },
 ];
 const FIGURES_4 = [
-  { label: "Donations", value: "1,284" },
-  { label: "Purchases", value: "412" },
-  { label: "Distributions", value: "908" },
-  { label: "Transfers", value: "56" },
+  { label: "Active projects", value: "24" },
+  { label: "Tasks completed", value: "1,284" },
+  { label: "Team members", value: "18" },
+  { label: "Overdue tasks", value: "56" },
 ];
 
 export default {
@@ -19,17 +19,27 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "A figure/label pair as a real description list relationship (`<dt>`/`<dd>`) — " +
-          'design.md\'s "Stats" section — never a generic `<div>` pair or a heading on the ' +
-          "value (a statistic is data, not a section name). The summary band reads as one " +
-          "band, not N separate cards: no filled box around each figure, and separators are a " +
-          "`gap-px` grid showing the backdrop through, which `divide-x` alone can't do across " +
-          "multiple rows.",
+        component: [
+          "A band of key figures, each a number with a label saying what it counts. The figures read as one summary, not a row of separate cards.",
+          "",
+          "**When to use**",
+          "- Summarising a few headline numbers at the top of a dashboard or report.",
+          "",
+          "**When not to use**",
+          "- For detailed or comparable data across many rows. Use Table instead.",
+          "- For a single record's fields. Use a description list or Card instead.",
+          "",
+          "**Accessibility**",
+          "- Each label and figure is a real description-list pair (`<dt>` and `<dd>`).",
+          "- Figures are never headings. A number is data, not a section name.",
+          "- Give the band a `heading`, and a `subtitle` for the period or scope it covers. A bare row of numbers is ambiguous.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#stats)",
+        ].join("\n"),
       },
     },
   },
-  render: () => html`<rfg-stats heading="Totals" subtitle="13 donations, from June 19, 2026 to September 19, 2026" .figures=${FIGURES_2}></rfg-stats>`,
+  render: () => html`<rfg-stats heading="Totals" subtitle="13 projects, from June 19, 2026 to September 19, 2026" .figures=${FIGURES_2}></rfg-stats>`,
 };
 
 export const TwoFigures = {};
@@ -39,6 +49,13 @@ export const FourFigures = {
 };
 
 export const NoTitle = {
-  name: "No heading/subtitle",
+  name: "Without a heading",
+  parameters: {
+    docs: {
+      description: {
+        story: "Supported, but use it only when nearby content already says what the figures cover.",
+      },
+    },
+  },
   render: () => html`<rfg-stats .figures=${FIGURES_2}></rfg-stats>`,
 };

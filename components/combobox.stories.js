@@ -8,25 +8,37 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "A searchable, single- or multi-select dropdown wrapping a native " +
-          "`<select>`/`<select multiple>` — the real control stays the thing that submits; this " +
-          "only reflects and edits it. `multiple` on the wrapped `<select>` decides the mode, " +
-          "the same attribute that already means that natively. Built to retire select2, still " +
-          "depended on for exactly this need in 14 Human Essentials views. Keyboard focus stays " +
-          "on the textbox throughout — `aria-activedescendant`, not real focus moving between " +
-          "options, the WAI-ARIA combobox pattern's own reason: typing *while* navigating " +
-          "results is the whole point.",
+        component: [
+          "A combobox is a dropdown you can type into to filter the options. Wrap a native `<select>` in it. The `<select>` still holds the value and submits with the form. Add `multiple` to the `<select>` to let people pick more than one option. Each choice then shows as a removable chip.",
+          "",
+          "**When to use**",
+          "- For a long, fixed list of options, where typing to filter is faster than scrolling.",
+          "- When people need to pick several options from that list.",
+          "",
+          "**When not to use**",
+          "- For a short list of options, use a native `<select>` or radio buttons.",
+          "- For free-text values people make up as they type, use Tag input.",
+          "- For a list of actions, use Menu.",
+          "",
+          "**Accessibility**",
+          "- Follows the WAI-ARIA combobox pattern. The text box has `role=\"combobox\"` and the list has `role=\"listbox\"`.",
+          "- Focus stays in the text box while you type. Down Arrow and Up Arrow open the list and move through options. Enter picks the highlighted option. Escape closes the list.",
+          "- With multiple selection, Backspace in an empty text box removes the last chip. Each chip's remove button has its own label, such as \"Remove Maya Chen\".",
+          "- Give the combobox a `label`. It is shown above the box and names the list.",
+          "- If the script never loads, the native `<select>` still works and submits.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#comboboxes)",
+        ].join("\n"),
       },
     },
   },
   render: () => html`
-    <rfg-combobox label="Storage location">
-      <select name="donation[storage_location_id]">
-        <option value="1">Omaha warehouse</option>
-        <option value="2">Lincoln warehouse</option>
-        <option value="3">Grand Island depot</option>
-        <option value="4">Kearney satellite site</option>
+    <rfg-combobox label="Project">
+      <select name="task[project_id]">
+        <option value="1">Website redesign</option>
+        <option value="2">Annual report</option>
+        <option value="3">Volunteer onboarding</option>
+        <option value="4">Spring newsletter</option>
       </select>
     </rfg-combobox>
   `,
@@ -35,51 +47,65 @@ export default {
 export const SingleSelect = {};
 
 export const SingleSelectPreSelected = {
-  name: "Single-select, a value already chosen",
+  name: "With a value selected",
   render: () => html`
-    <rfg-combobox label="Storage location">
-      <select name="donation[storage_location_id]">
-        <option value="1">Omaha warehouse</option>
-        <option value="2" selected>Lincoln warehouse</option>
-        <option value="3">Grand Island depot</option>
+    <rfg-combobox label="Project">
+      <select name="task[project_id]">
+        <option value="1">Website redesign</option>
+        <option value="2" selected>Annual report</option>
+        <option value="3">Volunteer onboarding</option>
       </select>
     </rfg-combobox>
   `,
 };
 
 export const MultiSelect = {
-  name: "Multi-select, with chips",
+  name: "Multiple selection",
+  parameters: {
+    docs: {
+      description: {
+        story: "Add `multiple` to the `<select>`. Each chosen option shows as a chip with its own remove button.",
+      },
+    },
+  },
   render: () => html`
     <rfg-combobox label="Assignees">
-      <select name="partner[user_ids][]" multiple>
-        <option value="1" selected>Jamie Diaz</option>
-        <option value="2">Sam Lee</option>
-        <option value="3" selected>Morgan Patel</option>
-        <option value="4">Avery Chen</option>
-        <option value="5">Riley Johnson</option>
+      <select name="project[member_ids][]" multiple>
+        <option value="1" selected>Maya Chen</option>
+        <option value="2">Sam Rivera</option>
+        <option value="3" selected>Priya Patel</option>
+        <option value="4">Jordan Lee</option>
+        <option value="5">Alex Kim</option>
       </select>
     </rfg-combobox>
   `,
 };
 
 export const LongList = {
-  name: "Long list (type to filter)",
+  name: "Long list",
+  parameters: {
+    docs: {
+      description: {
+        story: "Type part of a name to narrow the list.",
+      },
+    },
+  },
   render: () => html`
-    <rfg-combobox label="Item">
-      <select name="line_item[item_id]">
+    <rfg-combobox label="Task">
+      <select name="time_entry[task_id]">
         ${[
-          "Diapers, size 1",
-          "Diapers, size 2",
-          "Diapers, size 3",
-          "Diapers, size 4",
-          "Diapers, size 5",
-          "Diapers, size 6",
-          "Wipes, unscented",
-          "Wipes, scented",
-          "Formula, standard",
-          "Formula, sensitive",
-          "Training pants, size 2T-3T",
-          "Training pants, size 3T-4T",
+          "Draft homepage copy",
+          "Review homepage design",
+          "Update navigation",
+          "Write annual report summary",
+          "Collect annual report figures",
+          "Design annual report cover",
+          "Plan volunteer welcome session",
+          "Write volunteer handbook",
+          "Schedule volunteer training",
+          "Draft spring newsletter",
+          "Choose newsletter photos",
+          "Send spring newsletter",
         ].map((name, i) => html`<option value=${i + 1}>${name}</option>`)}
       </select>
     </rfg-combobox>

@@ -1,0 +1,69 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Ruby For Good Design System
+
+An open-source design system for building accessible, consistent web apps. It's made by
+[Ruby For Good](https://rubyforgood.org) for the nonprofit software its volunteers build, and it
+works in any app: Rails, Django, React, Vue or plain HTML.
+
+## What's in it
+
+- **Foundations**: colour, typography, spacing, radius and elevation, as design tokens you
+  can theme.
+- **Components**: 29 Web Components, from buttons and form fields to tables, menus and modals.
+  Each one is keyboard accessible and checked for WCAG 2.2 AA in every story on this site.
+- **Guidelines**: [design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md),
+  the written spec for components, layout, copy and accessibility.
+
+## Getting started
+
+Install the package:
+
+```bash
+npm install @rubyforgood/design-system
+```
+
+Load the tokens once, then import the components you use:
+
+```html
+<link rel="stylesheet" href="node_modules/@rubyforgood/design-system/tokens/tokens.css" />
+<script type="module">
+  import "@rubyforgood/design-system/components/button";
+</script>
+
+<rfg-button variant="primary">Save</rfg-button>
+```
+
+No build step? Every component also ships as a single standalone file. See the
+[installation guide](https://github.com/rubyforgood/designsystem#using-it-in-a-rails-app).
+
+If your app uses Tailwind v4, import `@rubyforgood/design-system/tokens/theme.css` instead of
+`tokens.css` to get the tokens as utility classes too.
+
+## Theming
+
+Components read their colours, font, radius and shadows from CSS custom properties. To make
+the system your own, override the token values, not the components:
+
+```css
+:root {
+  --color-brand-600: #0f766e;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+```
+
+## Principles
+
+- **Accessible by default.** Real buttons, links and form controls. Keyboard support and ARIA
+  are built in, not added later.
+- **Works anywhere.** Web Components run in any framework, or none.
+- **Every rule is enforced.** Rules come with automated checks, so a fixed problem stays fixed.
+- **Calm and readable.** Neutral surfaces, one brand colour, colour used for meaning.
+
+## Contributing
+
+Found something wrong, or something your app needs? Open an
+[issue](https://github.com/rubyforgood/designsystem/issues) or read the
+[contributing guide](https://github.com/rubyforgood/designsystem/blob/main/CONTRIBUTING.md).

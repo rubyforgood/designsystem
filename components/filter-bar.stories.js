@@ -12,21 +12,35 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "Filters submit as a real GET request — a filtered view stays a shareable, " +
-          'bookmarkable URL, never client-only state or POST — design.md\'s "Filter bar" ' +
-          "section. A bar whose controls fit on one line shows them; only a bar that doesn't " +
-          "fold composes `<rfg-disclosure>` for the folded case rather than a second accordion " +
-          "implementation.",
+        component: [
+          "A row of filter controls above a list or table, with room for actions such as Export at the end.",
+          "",
+          "**When to use**",
+          "- To narrow down a list or table.",
+          "- Up to two controls are shown in a row. With three or more, they fold behind a \"Filters\" disclosure.",
+          "- Submit filters with a GET request (set `action`), so every filtered view has a URL people can share, bookmark and return to with the Back button.",
+          "",
+          "**When not to use**",
+          "- Don't wrap it in a Card when it sits directly above the table it filters. Use a card only when the filters are a section in their own right.",
+          "- Don't keep filter state only in the page or send it as a POST. It breaks sharing and the Back button.",
+          "",
+          "**Accessibility**",
+          "- Give every control a visible `<label>`.",
+          "- When folded, the controls sit behind a Disclosure button, which announces whether it is open.",
+          "",
+          "**Known issue (v0.1.0):** the bar's built-in form doesn't submit your controls, because they sit outside it. Until a fix ships, wrap the filter bar in your own `<form method=\"get\">` with a submit button.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#filter-bar)",
+        ].join("\n"),
       },
     },
   },
   render: () => html`
     <rfg-filter-bar>
       <div slot="fields">
-        <label for="filter-bar-source" style=${labelStyle}>Source</label>
+        <label for="filter-bar-source" style=${labelStyle}>Owner</label>
         <select id="filter-bar-source" style=${fieldStyle}>
-          <option>All sources</option>
+          <option>All owners</option>
         </select>
       </div>
       <div slot="fields">
@@ -38,13 +52,16 @@ export default {
   `,
 };
 
-export const TwoControlsShownInline = {};
+export const TwoControlsShownInline = { name: "Two controls, shown in a row" };
 
 export const FourControlsFold = {
-  name: "Four controls (folds behind a disclosure)",
+  name: "Four controls, folded",
+  parameters: {
+    docs: { description: { story: "With more than two controls, they fold behind a \"Filters\" disclosure." } },
+  },
   render: () => html`
     <rfg-filter-bar>
-      ${["Source", "Date range", "Status", "Storage location"].map(
+      ${["Owner", "Date range", "Status", "Team"].map(
         (label, i) => html`
           <div slot="fields">
             <label for="filter-bar-fold-${i}" style=${labelStyle}>${label}</label>

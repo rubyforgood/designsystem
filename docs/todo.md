@@ -29,6 +29,28 @@ as a draft. A minor release may break things, a patch release never does, the re
 the changelog, old names are deprecated for one minor release before removal where that's cheap,
 and adopting apps hear about a breaking release before it ships.
 
+## Two component bugs found while rewriting the Storybook docs
+
+*About this repo, not Human Essentials.* Added 2026-11-23. Both ship in v0.1.0, and both are
+flagged as known issues on their Storybook pages until fixed.
+
+- **`<rfg-table>` column classes don't apply.** The styles target cells with selectors like
+  `::slotted(table) .numeric`. `::slotted()` can't reach a descendant of the slotted element, so
+  the rule matches nothing. Measured in the built Storybook: a `td.numeric` computes to
+  `text-align: center` and `font-variant-numeric: normal`, not right-aligned tabular digits. The
+  fix is probably styling those cells from light DOM, e.g. a stylesheet the component adopts into
+  its root document.
+- **`<rfg-filter-bar>` doesn't submit its controls.** It renders `<form method="get">` inside its
+  shadow root and slots the controls from light DOM. Light-DOM controls aren't part of a form in a
+  shadow root: in the built Storybook, the slotted control's `.form` is `null`, and the form's
+  `elements` doesn't include it. A slotted submit button wouldn't submit the shadow form either.
+  Fix options: render into light DOM (as `<rfg-button>` does, for the same reason), or drop the
+  internal form and document that the host wraps the bar in its own `<form>`.
+
+Neither was caught before because axe and the keyboard audit don't check either behaviour. A
+story-level check (computed `text-align` on a `numeric` cell; `control.form` non-null) would catch
+both again.
+
 ## Test suite
 
 **Three flakes fixed on 2026-09-04, and eight consecutive clean runs since.** Before them, 15

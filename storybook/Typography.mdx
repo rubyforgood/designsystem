@@ -1,0 +1,33 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { TypeRoles, TokenList } from "./tokens.jsx";
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+One typeface, a small set of text roles, and the same role always looks the same.
+
+## Typeface
+
+The default is [Figtree](https://fonts.google.com/specimen/Figtree), set by `--font-sans`.
+Self-host your font rather than loading it from a CDN, and use one typeface across the app.
+
+<TokenList prefix="--font-" />
+
+## Text roles
+
+Each kind of text has one treatment, used everywhere.
+
+<TypeRoles />
+
+## Headings
+
+- Use exactly one `h1` per page, the page title.
+- Choose a heading level for where it sits in the page outline, not for its size. Screen reader
+  users move through a page by its headings.
+- Don't skip levels for visual effect. Change the size with CSS instead.
+
+## Writing
+
+- Use sentence case for headings, labels and buttons: "Add team member", not "Add Team Member".
+- Keep body text at a comfortable reading width, around 60 to 80 characters per line.

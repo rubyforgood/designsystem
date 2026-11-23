@@ -14,12 +14,24 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "The icon half of design.md's \"Icon tiles and avatars\" section — reuses " +
-          '`<rfg-button>`\'s size vocabulary (sm/md) rather than inventing a second scale. ' +
-          "Deliberately a separate element from `<rfg-avatar>`, so the two distinct visual " +
-          'vocabularies ("a stat or status" vs. "a person") can\'t blur together by accident at ' +
-          "a call site.",
+        component: [
+          "A soft-coloured square that holds one icon, placed beside a figure or a heading to mark what it is about.",
+          "",
+          "**When to use**",
+          "- Beside a stat, a card heading or a status, to give it a quick visual anchor.",
+          "",
+          "**When not to use**",
+          "- To represent a person. Use Avatar instead. Tiles mean \"a stat or status\" and avatars mean \"a person\", and the two never mix.",
+          "- Repeated with the same icon on every row of a list. Put it once in the header instead.",
+          "",
+          "**Accessibility**",
+          "- The tile is always hidden from assistive tech. It must sit next to a heading or figure that already says what it means.",
+          "",
+          "**Sizes**",
+          "- `md` (default) sits beside a figure or a regular heading. `sm` suits a compact card header. The size names match Button's.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#icon-tiles-and-avatars)",
+        ].join("\n"),
       },
     },
   },
@@ -28,12 +40,12 @@ export default {
     tone: {
       control: "select",
       options: ["brand", "neutral", "info", "success", "warning", "danger"],
-      description: "Reuses the system's shared semantic tone vocabulary.",
+      description: "The colour tone. Uses the same tone names as the rest of the system.",
     },
     size: {
       control: "select",
       options: ["sm", "md"],
-      description: "Reuses `<rfg-button>`'s size vocabulary rather than a tile-specific scale.",
+      description: "The tile size. Uses the same size names as Button.",
     },
   },
   args: { tone: "brand", size: "md" },

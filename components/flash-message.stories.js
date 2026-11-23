@@ -10,14 +10,25 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          'A one-time, per-event notice ("that worked") — design.md\'s "Flash messages" ' +
-          "section — distinct from `<rfg-callout>`'s persistent, no-auto-dismiss notice. " +
-          "Severity decides the ARIA role (info announces politely, warning/danger interrupt), " +
-          "and an auto-dismiss timer, if used at all, pauses on hover and on focus (WCAG " +
-          "2.2.1 Timing Adjustable). Whether a given message *should* auto-dismiss depends on " +
-          "whether its content stays needed as long as the timer runs, not its tone — a " +
-          'judgment call for the host, not this component.',
+        component: [
+          "A short message about the result of something the user just did, such as saving or deleting.",
+          "",
+          "**When to use**",
+          "- Once, right after an action, to confirm it worked or explain why it didn't.",
+          "- Pick the tone by severity: `info`, `success`, `warning` or `danger`.",
+          "",
+          "**When not to use**",
+          "- For a notice that must stay on the page until it no longer applies, use Callout.",
+          "- For form validation errors, use Error summary and Field.",
+          "",
+          "**Accessibility**",
+          "- `info` and `success` messages are announced politely (`role=\"status\"`). `warning` and `danger` messages interrupt (`role=\"alert\"`).",
+          "- The close button is labelled \"Dismiss\". Listen for `rfg-dismiss` and remove the message.",
+          "- An auto-dismiss timer (`dismiss-after`) pauses while the message is hovered or focused (WCAG 2.2.1 Timing Adjustable).",
+          "- Only auto-dismiss a message the user won't need once the timer runs out. Decide per message, not per tone. A success message holding a one-time code must stay.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#flash-messages)",
+        ].join("\n"),
       },
     },
   },
@@ -40,7 +51,7 @@ export default {
 
 export const Info = {};
 export const Success = {
-  args: { tone: "success", message: "Donation recorded." },
+  args: { tone: "success", message: "Project created." },
   render: (args) =>
     html`
       <rfg-flash-message tone=${args.tone} ?dismissible=${args.dismissible}>
@@ -49,7 +60,7 @@ export const Success = {
       </rfg-flash-message>
     `,
 };
-export const Warning = { args: { tone: "warning", message: "This request is missing an item." } };
+export const Warning = { args: { tone: "warning", message: "This project has no owner yet." } };
 export const Danger = { args: { tone: "danger", message: "Could not save — check the highlighted fields." } };
 export const NotDismissible = {
   name: "Not dismissible",
@@ -57,7 +68,10 @@ export const NotDismissible = {
 };
 
 export const AutoDismiss = {
-  name: "Auto-dismiss (pauses on hover/focus)",
+  name: "Auto-dismiss",
+  parameters: {
+    docs: { description: { story: "Disappears after 4 seconds. Hover or focus it to pause the timer." } },
+  },
   render: () =>
     html`<rfg-flash-message tone="success" dismiss-after="4000">
       Link copied to clipboard. Hover or focus this message to pause the timer.

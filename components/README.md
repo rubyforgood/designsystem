@@ -82,6 +82,21 @@ accessibility rule):
 text and no `aria-label`/`aria-labelledby`, the component logs a console warning in development
 rather than silently shipping an inaccessible control.
 
+**Renders into light DOM, not a shadow root** — found necessary while dogfooding this component on
+Human Essentials (ADR 14): a shadow-rendered `<button type="submit">` doesn't participate in an
+ancestor `<form>`'s submission, a tag/attribute-CSS-selector progressive-enhancement library
+(rails-ujs) can never match the custom element, and Capybara's default finders can't see into a
+shadow root at all. See the header comment in `button.js` for how each was confirmed.
+
+Two further values beyond the table above: `variant="ghost_danger"` (the same rest colour as
+`ghost`, rose on hover and focus only — design.md's "a repeated destructive control shouldn't
+shout at rest"; the component had no CSS for this variant until a story exercised it) and
+`size="xs"`, a fixed icon-only square sized by `--rfg-button-xs-size` (default `1.75rem`) rather
+than a third point on the padding-based sm/md scale, which can't land on an exact box size.
+`ghost_danger` is what Human Essentials' row-icon actions use for their destructive tone
+(`essentials_row_icon_action`/`essentials_row_icon_link` map `tone: :danger` to
+`variant: :ghost_danger`).
+
 **Known gap**, named rather than silently omitted: `aria-labelledby` (an id reference) can't cross
 from the host's light DOM into this element's shadow DOM the way `aria-label` (a plain string)
 can. Use `aria-label` with the label text directly until this is revisited with
@@ -154,7 +169,9 @@ unconditionally decorative. Set `aria-hidden="true"` on the host when embedding 
 control that already announces the person's name (see the `Decorative` story) — and if that
 control's own label doesn't contain the avatar's *visible* initials text, a voice-control user
 saying the visible label won't match it (WCAG 2.5.3 Label in Name, found the same way, via
-axe-core against that exact story).
+axe-core against that exact story). design.md describes the decorative-avatar-inside-a-named-control shape but
+doesn't yet address this label-in-name detail; worth folding into design.md if the pattern gets
+used for real.
 
 ## `<rfg-card>`
 
@@ -207,6 +224,8 @@ Implements "Page header". Owns the page's only `<h1>` — a host shouldn't rende
 | `heading` | text | — |
 | `subtitle` | text | — |
 | `back-href` / `back-label` | a URL / text | — |
+
+The back link and title sit as one block with an 8px gap.
 
 Slot: `actions` (right-aligned). Alignment is derived from whether `subtitle` is set, not a
 separate attribute to keep in sync by hand: no subtitle aligns the row to `flex-end` (a 40px
@@ -594,7 +613,7 @@ renders no `<nav>` at all, and the empty case renders "No {entries}".
 | Attribute | Notes |
 | --- | --- |
 | `total` / `page` / `page-size` | |
-| `entry-name` | Singular noun, e.g. `"donation"` — pluralized automatically in the label. |
+| `entry-name` | Singular noun, e.g. `"project"` — pluralized automatically in the label. |
 | `hrefFor` | Property (function `page => href`): real, bookmarkable per-page URLs. Without it, controls only dispatch `rfg-navigate`, a degraded mode, not the default path. |
 
 **First/Last/Prev/Next don't change the control set's width** — present and disabled at the

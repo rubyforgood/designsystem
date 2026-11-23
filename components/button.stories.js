@@ -13,15 +13,29 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "Implements design.md's \"Buttons\" and \"Where a button goes\" sections (variant × " +
-          "size as two independent axes, never decided fresh per button) and the \"inert on " +
-          "arrival\" accessibility rule from the Accessibility section. Renders into light DOM " +
-          "— not a shadow root — found necessary while dogfooding this component on Human " +
-          "Essentials (ADR 14): a shadow-rendered `<button type=\"submit\">` doesn't participate " +
-          "in an ancestor `<form>`'s submission, a tag/attribute-CSS-selector progressive-" +
-          "enhancement library (rails-ujs) can never match the custom element, and Capybara's " +
-          "default finders can't see into a shadow root at all.",
+        component: [
+          "Buttons trigger an action or navigate. Every button picks a variant (what the action means) and a size (where it sits). The two are chosen separately, never per button.",
+          "",
+          "**When to use**",
+          "- `primary` for the one action a page is for. Use it once per page or section.",
+          "- `secondary` for every other action.",
+          "- `danger` for an action that deletes or rejects something. `ghost_danger` for a repeated destructive action, such as one per table row, that shouldn't stand out at rest.",
+          "- `ghost` for row and toolbar actions.",
+          "- Set `href` when the button goes somewhere. It then renders a real link.",
+          "",
+          "**When not to use**",
+          "- Don't use a link (`href`) for anything that changes data. Use a button inside a form.",
+          "- For a link inside running text, use a plain `<a>`.",
+          "- For a list of actions on one row, use Menu instead of a row of buttons.",
+          "",
+          "**Accessibility**",
+          "- Renders a native `<button>` or `<a>`, so Enter and Space (buttons) and Enter (links) work as usual.",
+          "- `disabled` on a button removes it from the tab order. `disabled` on a link keeps it focusable with `aria-disabled=\"true\"`, and reads out the `reason` you give.",
+          "- Give an icon-only button an `aria-label`. The component warns in the console if a button has no accessible name.",
+          "- Icons in the `icon` slot are hidden from assistive tech automatically.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#buttons)",
+        ].join("\n"),
       },
     },
   },
@@ -41,7 +55,7 @@ export default {
     variant: {
       control: "select",
       options: ["primary", "secondary", "danger", "ghost", "ghost_danger"],
-      description: "What the action means — not decided per-button. See design.md's Buttons table.",
+      description: "What the action means.",
     },
     size: {
       control: "select",
@@ -51,15 +65,15 @@ export default {
     disabled: {
       control: "boolean",
       description:
-        "Native `disabled` in button mode. In link mode (`href` set), renders \"inert on arrival\" instead — a focusable `aria-disabled` control, since a real `<a>` has no native disabled state.",
+        "Native `disabled` on a button. On a link (`href` set), the link stays focusable with `aria-disabled`, because a real `<a>` has no disabled state.",
     },
     href: {
       control: "text",
-      description: "Switches the component to link mode: a real `<a>`, for navigation (a GET), never a state-changing action.",
+      description: "Renders a real `<a>` instead of a button. Use it for navigation only, never for an action that changes data.",
     },
     reason: {
       control: "text",
-      description: "Visually-hidden text explaining why a disabled link is unavailable — only meaningful alongside `href` and `disabled`.",
+      description: "Why a disabled link is unavailable. Read by screen readers. Only used with `href` and `disabled`.",
     },
     label: { control: "text" },
   },
@@ -79,11 +93,7 @@ export const GhostDanger = {
     docs: {
       description: {
         story:
-          "A destructive control that shouldn't shout at rest — design.md: \"a repeated " +
-          "destructive control shouldn't shout at rest... a destructive action with no fill is " +
-          "`ghost_danger`\", the same rest colour as plain `ghost`, rose on hover and focus only. " +
-          "Previously unexercised by any story — the component silently had no CSS for this " +
-          "variant at all until it was actually looked at.",
+          "A destructive action with no fill. It looks like `ghost` at rest and turns red on hover and focus. Use it when the action repeats, such as once per row.",
       },
     },
   },
@@ -97,7 +107,7 @@ export const Small = { args: { size: "sm" } };
 
 export const DisabledButton = {
   args: { disabled: true, label: "Disabled button" },
-  name: "Disabled (button mode)",
+  name: "Disabled button",
 };
 
 // --- Link mode: plain, and "inert on arrival" ---
@@ -114,14 +124,12 @@ export const DisabledLink = {
     reason: "Not available right now",
     label: "Disabled link",
   },
-  name: 'Disabled (link mode — "inert on arrival")',
+  name: "Disabled link with a reason",
   parameters: {
     docs: {
       description: {
         story:
-          "A real `<a>` has no native disabled state, so a link that costs something to press " +
-          "renders a focusable `aria-disabled` control with the reason as visually-hidden text, " +
-          "instead of disappearing from the tab order. See design.md's Accessibility section.",
+          "A disabled link stays in the tab order and screen readers announce why it is unavailable. Keyboard users can still find it and learn the reason.",
       },
     },
   },
@@ -130,19 +138,20 @@ export const DisabledLink = {
 // --- Icon usage ---
 
 export const WithIcon = {
+  name: "With an icon",
   render: () =>
     html`
       <rfg-button variant="primary">
         <svg slot="icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
           <path d="M8 2a.75.75 0 0 1 .75.75V7.25H13a.75.75 0 0 1 0 1.5H8.75v4.5a.75.75 0 0 1-1.5 0v-4.5H3a.75.75 0 0 1 0-1.5h4.25V2.75A.75.75 0 0 1 8 2Z" />
         </svg>
-        New donation
+        New project
       </rfg-button>
     `,
 };
 
 export const IconOnlyWithLabel = {
-  name: "Icon-only (with aria-label)",
+  name: "Icon only",
   render: () =>
     html`
       <rfg-button variant="ghost" aria-label="Close">
@@ -162,38 +171,33 @@ const TRASH_ICON = html`
 `;
 
 export const CompactIconOnly = {
-  name: "xs (fixed-size icon-only, default token value)",
+  name: "Extra small, icon only",
   render: () => html`<rfg-button variant="ghost" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
   parameters: {
     docs: {
       description: {
         story:
-          "A fixed 28px square (the `--rfg-button-xs-size` default) — not a third point on the " +
-          "padding-based sm/md scale, which can't land on an exact box size. The exact dimension " +
-          "is an app choice (e.g. matched to a menu-trigger's own height elsewhere on the page), " +
-          "so it's a token, not a hardcoded number — see the next story.",
+          "`size=\"xs\"` is a fixed square for icon-only controls, 28px by default. Set `--rfg-button-xs-size` to change it.",
       },
     },
   },
 };
 
 export const CompactIconOnlyDanger = {
-  name: "xs, danger tone",
+  name: "Extra small, danger",
   render: () => html`<rfg-button variant="ghost_danger" size="xs" aria-label="Delete">${TRASH_ICON}</rfg-button>`,
   parameters: {
     docs: {
       description: {
         story:
-          "`ghost_danger`, not filled `danger` — this is what Human Essentials' row-icon " +
-          "actions actually use for their destructive tone (`essentials_row_icon_action`/" +
-          "`essentials_row_icon_link` map `tone: :danger` to `variant: :ghost_danger`).",
+          "Use `ghost_danger`, not filled `danger`, for a small repeated destructive icon such as Delete in each row.",
       },
     },
   },
 };
 
 export const CompactIconOnlyOverriddenToken = {
-  name: "xs with --rfg-button-xs-size overridden to 2.5rem",
+  name: "Extra small, custom size",
   render: () => html`
     <rfg-button
       variant="ghost"
@@ -205,7 +209,7 @@ export const CompactIconOnlyOverriddenToken = {
   parameters: {
     docs: {
       description: {
-        story: "Proves the override actually works, not just that it compiles — a consuming app sets its own value to match its own layout.",
+        story: "Sets `--rfg-button-xs-size: 2.5rem` on the element to match your own layout.",
       },
     },
   },

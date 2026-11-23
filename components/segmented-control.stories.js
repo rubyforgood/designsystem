@@ -8,16 +8,26 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          "A connected row of real buttons that switch between a few views without " +
-          "navigating — ported from a real, in-production Human Essentials pattern " +
-          "(`/distributions/schedule`'s calendar range/layout switches), not designed from " +
-          "scratch. `role=\"group\"` with independently-focusable `aria-pressed` buttons, not " +
-          "`role=\"radiogroup\"`: this toggles a state rather than submits a value, the " +
-          "reference implementation's own reasoning. Dispatches `rfg-change`; the host decides " +
-          "what the choice means — a URL parameter in the reference's own case, so the view " +
-          "stays bookmarkable and answers \"why does mine look different from yours\", the " +
-          "same argument design.md already settled for page tabs.",
+        component: [
+          "A connected row of buttons that switches between a few views of the same data, in place. For example, a calendar shown by month or by week.",
+          "",
+          "**When to use**",
+          "- Two to a few views of the same content, where the person flips between them and stays on the page.",
+          "- Each group answers one question. If you need to choose both a time range and a layout, use two controls, not one row of mixed options.",
+          "",
+          "**When not to use**",
+          "- To move between different screens or sections. Use Page tabs instead.",
+          "- To swap between different panels of content. Use Tabs instead.",
+          "- To pick a value a form submits later. Use radio buttons instead.",
+          "",
+          "**Accessibility**",
+          "- The row is a `role=\"group\"` of real buttons. Each button is its own Tab stop and shows its state with `aria-pressed`.",
+          "- There's no arrow-key navigation between segments. This toggles a view, it isn't a radio group.",
+          "- Give the group a `label` that names what it switches (\"Calendar range\").",
+          "- The control fires `rfg-change`. Store the choice in the URL (a query parameter) so the view can be linked to and bookmarked.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#segmented-controls)",
+        ].join("\n"),
       },
     },
   },
@@ -43,7 +53,14 @@ export const ThreeSegments = {
 };
 
 export const NoInitialValue = {
-  name: "No value set (defaults to the first segment)",
+  name: "No initial value",
+  parameters: {
+    docs: {
+      description: {
+        story: "When no `value` is set, the first segment is selected.",
+      },
+    },
+  },
   render: () => html`
     <rfg-segmented-control label="Calendar range">
       <button type="button" value="month">Month</button>

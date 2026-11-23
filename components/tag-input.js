@@ -31,7 +31,7 @@ export class RfgTagInput extends LitElement {
   static properties = {
     /** The field's label text. */
     label: { type: String },
-    /** A one-line hint shown below the label (e.g. "Type a unit and press Enter."). */
+    /** A one-line hint shown below the label (e.g. "Type a tag and press Enter."). */
     hint: { type: String },
     /** The committed chip values. */
     values: { type: Array },

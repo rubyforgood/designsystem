@@ -8,30 +8,41 @@ export default {
   parameters: {
     docs: {
       description: {
-        component:
-          'Panels swap in place at the same URL, using the full ARIA Tabs pattern — design.md\'s ' +
-          '"Tabs" section, the panel-tabs half — not a styled set of buttons: `role="tab"` makes ' +
-          "a real promise to assistive tech (\"activating this swaps a panel\") that only a true " +
-          "tablist keeps. Roving tabindex, automatic activation (arrow keys both move focus and " +
-          "select), Home/End jump to the first/last tab. See page-tabs.js for the URL-backed " +
-          "half, where each \"tab\" is its own page rather than a panel swap.",
+        component: [
+          "A row of tabs that swaps between panels of content on the same page. The URL doesn't change.",
+          "",
+          "**When to use**",
+          "- Related content about one thing, split into a few panels the reader moves between, like a project's details, tasks and history.",
+          "",
+          "**When not to use**",
+          "- When each tab is its own page with its own URL, or needs its own page-level action. Use Page tabs instead.",
+          "- To switch between views of the same data, like month or week. Use Segmented control instead.",
+          "",
+          "**Accessibility**",
+          "- Uses the ARIA tabs pattern: a `tablist` of `tab`s, each linked to its panel.",
+          "- Only the selected tab is a Tab stop. Left and Right arrow keys move between tabs and select them. Home and End jump to the first and last tab.",
+          "- Give the tab set a `label`, and each `<rfg-tab-panel>` a `label` for its tab.",
+          "- Keep the tab strip in the same place on every tab. Put per-tab controls inside the panel.",
+          "",
+          "[Full guidelines in design.md](https://github.com/rubyforgood/designsystem/blob/main/design.md#tabs)",
+        ].join("\n"),
       },
     },
   },
   render: () => html`
-    <rfg-tabs label="Donation views">
+    <rfg-tabs label="Project views">
       <rfg-tab-panel label="Details">
         <p style="font-family: var(--font-sans); font-size: 0.875rem; margin: 0;">
-          Donation details panel. Arrow Left/Right moves between tabs, Home/End jumps to the first/last.
+          Website redesign. Owner: Maya Chen. Status: Active.
         </p>
       </rfg-tab-panel>
-      <rfg-tab-panel label="Line items">
+      <rfg-tab-panel label="Tasks">
         <p style="font-family: var(--font-sans); font-size: 0.875rem; margin: 0;">
-          Line items panel — swaps in place, same URL.
+          12 open tasks, 30 completed.
         </p>
       </rfg-tab-panel>
       <rfg-tab-panel label="History">
-        <p style="font-family: var(--font-sans); font-size: 0.875rem; margin: 0;">History panel.</p>
+        <p style="font-family: var(--font-sans); font-size: 0.875rem; margin: 0;">Created by Sam Rivera on March 3, 2026.</p>
       </rfg-tab-panel>
     </rfg-tabs>
   `,
