@@ -125,10 +125,12 @@ Things to know:
 - **Don't `bin/importmap pin` the package's npm build.** Those files import shared chunks by
   relative path, so vendoring a single file breaks them. Use the standalone files above.
 
-How far this has been tested: the files above, downloaded from the CDN at v0.1.0 and loaded through
-an importmap, register `<rfg-button>` and `<rfg-modal>` and render with the brand colour in
-Chromium, with no console errors (checked 2026-11-23). It has not yet been run inside a real Rails
-app. Whoever does that first, please correct anything here that turns out wrong.
+How far this has been tested: Human Essentials (Rails, importmap, no Node) vendors six components
+this way: button, segmented-control, tooltip, menu, combobox and popover. On 2026-11-23 they were
+re-vendored from the published v0.1.0 files exactly as above. The 13 specs that touch them, 379
+examples including 7 system specs in headless Chrome, all pass. This was on a local branch
+(`design-rfg-v0.1.0`), not yet merged upstream. The `tailwindcss-rails` variant hasn't been tried
+in a real app yet.
 
 ## Using the audits
 
