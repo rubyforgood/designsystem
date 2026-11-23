@@ -11,20 +11,14 @@ was left, and what fixing it involves — so picking one up does not start with 
 This is not a wish list. Nothing goes here that has not been confirmed in the code, and anything
 fixed comes out in the same commit as the fix, with a row in [changelog.md](changelog.md).
 
-## README intro: rewrite before inviting adopters
+## README intro: rewritten
 
-*About this repo, not Human Essentials.* Added 2026-11-23.
+*About this repo, not Human Essentials.* Added and closed 2026-11-23.
 
-The README's opening is the first thing an org deciding whether to migrate will read, and it
-doesn't do that job well yet. The hosted Storybook link is the very first line, ahead of any
-sentence saying what this is or who it's for. The two paragraphs after it lean on how the system
-was built (rules started as real defects, the evidence trail) before saying what an adopter gets
-and what migrating involves.
-
-What fixing it involves: open with what the system is and who it's for in a sentence or two. Then
-say what an app gets from adopting it and what the first step is. Then move the Storybook link down
-into that context ("see every component live") rather than leading with it. Keep the
-evidence-first story, which is what sets this apart, but after the pitch, not instead of it.
+The intro led with the Storybook link and with how the system was built before saying what it is
+or what an adopter gets. It now opens with what the system is and who it's for, lists what an app
+gets, gives the first step, and links Storybook in context. The evidence-first story follows as
+"How it was built."
 
 ## Test suite
 

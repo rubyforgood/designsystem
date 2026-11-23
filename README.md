@@ -1,19 +1,32 @@
 # Ruby For Good Design System
 
-**Storybook: <https://rubyforgood.github.io/designsystem/>** — every component, previewable, no
-clone required. Redeployed on every push to `main` by `.github/workflows/deploy-storybook.yml`.
+A shared design system for Ruby For Good apps, and for any other app that wants it. It gives
+nonprofit software, mostly built by volunteers, one consistent and accessible way to look and
+behave, so each team doesn't have to work out forms, tables, buttons and WCAG conformance from
+scratch.
 
-Ruby For Good's global design system. Any application in the Ruby For Good ecosystem (or outside
-it) can migrate its UI onto this system using [`design.md`](design.md), the [design
-tokens](tokens/), an installable [component layer](components/) built as Web Components, the
-[executable audit suite](bin/design/README.md), and the Claude Code skills in
-[`.claude/skills/`](.claude/skills/). Start with the `design-system-migration` skill: it's the
-step-by-step playbook (spec first, research precedent, preview before building, apply app-wide,
-enforce with an executable audit) for migrating an app onto this system.
+Adopting it gets an app:
 
-Unlike most design systems you can install, this one was built the other way round: every rule in
-`design.md` started as a real defect, found on a real, running application, fixed, and enforced
-with an executable check, not derived from first principles and hoped to hold up.
+- **A written spec** ([`design.md`](design.md)) for components, layout, copy and accessibility.
+  Each rule says whether it holds on any app or is just this system's default choice.
+- **Design tokens** for colour, type, spacing and so on, as plain CSS variables or a Tailwind v4
+  theme.
+- **Twenty-nine ready-made components** as Web Components. They work in Rails views, plain HTML,
+  React or Vue, with or without a JavaScript build step. You can
+  [see every one live in Storybook](https://rubyforgood.github.io/designsystem/).
+- **Automated audits** that check your running app against the rules, so a fixed problem can't
+  quietly come back.
+- **A migration playbook** as Claude Code skills, for moving an existing UI onto the system one
+  rule at a time.
+
+To start, install the package (`npm install @rubyforgood/design-system`, or see
+[Using it in a Rails app](#using-it-in-a-rails-app) for importmap apps without Node), load the
+tokens, and swap in one component. [Migrating an app onto this system](#migrating-an-app-onto-this-system)
+covers the rest.
+
+**How it was built.** Most design systems start from principles and hope they hold up. This one
+was built the other way round: every rule in `design.md` started as a real defect, found on a real,
+running application, fixed, and enforced with an executable check.
 `docs/field-notes.md` is the evidence trail; `docs/portability/` is the record of proving each rule
 portable beyond the app it was first found on, including where it turned out *not* to be, yet.
 
