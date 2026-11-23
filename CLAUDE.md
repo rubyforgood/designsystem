@@ -57,7 +57,11 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   page-header button-group composition, which doesn't exist on an isolated component story, so
   running it there is a vacuous pass by construction, not a check — see
   `docs/portability/adapter-storybook.md` for the measured outcomes, including a real
-  `keyboard-audit.js` bug this adapter found and fixed.
+  `keyboard-audit.js` bug this adapter found and fixed. It also holds
+  `component-behaviour-audit.js`, a Storybook-only check (also in CI) that `<rfg-table>`'s cell
+  styles apply and `<rfg-filter-bar>`'s controls submit, which axe and the keyboard audit can't
+  see. Both shipped broken in v0.1.0, and the check fails all 20 of its assertions against that
+  code.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target
   (`bin/design/adapters/reference-app/targets.js`), built specifically to test whether the adapter
   seam's portability claim actually holds, not just to have a demo app.

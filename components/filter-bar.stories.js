@@ -37,13 +37,13 @@ export default {
     <rfg-filter-bar>
       <div slot="fields">
         <label for="filter-bar-source" style=${labelStyle}>Owner</label>
-        <select id="filter-bar-source" style=${fieldStyle}>
+        <select id="filter-bar-source" name="owner" style=${fieldStyle}>
           <option>All owners</option>
         </select>
       </div>
       <div slot="fields">
         <label for="filter-bar-range" style=${labelStyle}>Date range</label>
-        <input id="filter-bar-range" type="text" style=${fieldStyle} value="Last 30 days" />
+        <input id="filter-bar-range" name="range" type="text" style=${fieldStyle} value="Last 30 days" />
       </div>
       <rfg-button slot="actions" variant="secondary" size="sm">Export</rfg-button>
     </rfg-filter-bar>
@@ -63,7 +63,7 @@ export const FourControlsFold = {
         (label, i) => html`
           <div slot="fields">
             <label for="filter-bar-fold-${i}" style=${labelStyle}>${label}</label>
-            <select id="filter-bar-fold-${i}" style=${fieldStyle}><option>All</option></select>
+            <select id="filter-bar-fold-${i}" name=${label.toLowerCase().replace(" ", "_")} style=${fieldStyle}><option>All</option></select>
           </div>
         `,
       )}

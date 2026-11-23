@@ -32,9 +32,10 @@ and adopting apps hear about a breaking release before it ships.
 ## Two component bugs found while rewriting the Storybook docs: fixed in v0.1.1
 
 **Fixed 2026-11-23** (see `components/README.md`'s `<rfg-table>` and `<rfg-filter-bar>`
-sections for the fix and how it was checked). Still open: neither audit could catch these, and the
-story-level check proposed in the last paragraph below doesn't exist yet. The original entry
-follows.
+sections for the fix and how it was checked). The story-level check proposed in the last paragraph
+below now exists too: `bin/design/adapters/storybook/component-behaviour-audit.js`, run in CI. It
+fails all 20 of its checks against the v0.1.0 code (see
+[`adapter-storybook.md`](portability/adapter-storybook.md)). The original entry follows.
 
 
 *About this repo, not Human Essentials.* Added 2026-11-23. Both ship in v0.1.0, and both are
