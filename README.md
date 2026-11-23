@@ -128,8 +128,8 @@ Things to know:
 How far this has been tested: Human Essentials (Rails, importmap, no Node) vendors six components
 this way: button, segmented-control, tooltip, menu, combobox and popover. On 2026-11-23 they were
 re-vendored from the published v0.1.0 files exactly as above. The 13 specs that touch them, 379
-examples including 7 system specs in headless Chrome, all pass. This was on a local branch
-(`design-rfg-v0.1.0`), not yet merged upstream. The `tailwindcss-rails` variant hasn't been tried
+examples including 7 system specs in headless Chrome, all pass. This is on Human Essentials'
+`design` branch, not yet merged into its `main`. The `tailwindcss-rails` variant hasn't been tried
 in a real app yet.
 
 ## Using the audits
