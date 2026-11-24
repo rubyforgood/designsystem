@@ -735,7 +735,7 @@ look. Backspace on an empty query removes the last selected chip, the same rule 
 already established for the same reason: a box full of chips with nothing typed reads as "edit the
 chips," not "edit the list."
 
-**Field edge contrast (fixed after v0.1.3).** Combobox, tag input and the date range picker's date
+**Field edge contrast (fixed in v0.1.4).** Combobox, tag input and the date range picker's date
 fields drew their border in `neutral-200` (1.23:1 on white). WCAG 1.4.11 asks 3:1 for the edge that
 shows where a field is, so they now use `neutral-500` (4.76:1). Checked by `field-edge.js` in the
 Storybook behavior audit.
