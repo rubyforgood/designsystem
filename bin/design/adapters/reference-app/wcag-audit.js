@@ -9,7 +9,8 @@
 // Run:           pw bin/design/wcag-audit.js [--json]
 const { chromium } = require("playwright");
 const fs = require("fs");
-const { signIn, targets: allTargets, BASE, RUNS, PRIMARY, SECONDARY, ADMIN } = require("./targets");
+const adapter = require("./targets");
+const { signIn, targets: allTargets, BASE, RUNS, PRIMARY, SECONDARY, ADMIN } = adapter;
 
 const AXE = "/tmp/axe/node_modules/axe-core/axe.min.js";
 const JSON_OUT = process.argv.includes("--json");
@@ -18,7 +19,9 @@ const JSON_OUT = process.argv.includes("--json");
 // never hidden among opinions.
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
-const SIGNED_OUT = [
+// Pages reached without signing in. An adapter can export its own SIGNED_OUT list (`[label, path]`
+// pairs); this default is the Rails/Devise origin app's, so an adapter for any other app should.
+const SIGNED_OUT = adapter.SIGNED_OUT || [
   ["sign in", "/users/sign_in"],
   ["forgot password", "/users/password/new"],
   ["account request", "/account_requests/new"],
