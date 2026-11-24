@@ -51,6 +51,13 @@ emptying an example can't make it pass vacuously. It's in CI after the keyboard 
 **Coverage, measured 2026-11-23:** 29 files, one per component, 436 checks, 0 failed, in about 50
 seconds (the flash-message auto-dismiss checks wait in real time).
 
+**2026-11-24: three more checks, one more bug class.** Combobox, tag input and date range picker
+drew a field's edge in `neutral-200`, 1.23:1 on white, below WCAG 1.4.11's 3:1 for the boundary
+that identifies a control. Found while migrating SkillRx, not by a check: axe doesn't test 1.4.11
+for borders. Fixed to `neutral-500` (4.76:1, like Material 3's outlined field and IBM Carbon), and
+`field-edge.js` now measures each one's computed border against the background behind it.
+Negative control: against the old borders all three fail at 1.23:1. 439 checks, 0 failed.
+
 **Every check has a negative control.** Each was shown to report a failure when its behavior was
 broken in the page (a method replaced with a no-op, an attribute stripped, a stylesheet removed),
 without editing source. The table and filter bar checks were also run against Storybook rebuilt

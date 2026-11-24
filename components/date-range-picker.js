@@ -91,7 +91,7 @@ const PANEL_STYLES = css`
     font-family: var(--font-sans);
     font-size: 0.875rem;
     padding: 0.375rem 0.5rem;
-    border: 1px solid var(--color-neutral-200);
+    border: 1px solid var(--color-neutral-500); /* 3:1+ field edge, WCAG 1.4.11 */
     border-radius: var(--radius-control);
   }
   .rfg-drp-custom input:focus-visible {

@@ -1,3 +1,4 @@
+const { fieldEdge } = require("../field-edge");
 // Behavior checks for <rfg-tag-input>. Each `run` drives the story page from Node with real
 // Playwright input and returns [{ name, ok, detail }]. See ../component-behavior-audit.js.
 // What components/README.md and the story promise: Enter, comma and Tab each add the typed value
@@ -93,4 +94,6 @@ const form = async (page) => {
 module.exports = [
   { id: "components-tag-input--default", tag: "rfg-tag-input", run },
   { id: "components-tag-input--in-a-real-form", tag: "rfg-tag-input", run: form },
+  // WCAG 1.4.11: the field's edge is 3:1 against the page (../field-edge.js).
+  { id: "components-tag-input--default", tag: "rfg-tag-input", run: async (page) => [await fieldEdge(page, () => { const t = document.querySelector("rfg-tag-input"); return (t.shadowRoot || t).querySelector(".box, .rfg-tag-input-box, [class*=box]"); })] },
 ];

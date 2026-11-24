@@ -1,3 +1,4 @@
+const { fieldEdge } = require("../field-edge");
 // Behavior checks for <rfg-date-range-picker>. Each `run` drives the story page from Node with
 // real Playwright input and returns [{ name, ok, detail }]. See ../component-behavior-audit.js.
 // What components/README.md and the story promise: choosing a preset applies it at once (rfg-change
@@ -129,6 +130,7 @@ const custom = async (page) => {
   out.push({ name: "two quick edits commit once", ok: s.events.length === 1, detail: `${s.events.length} rfg-change` });
   out.push({ name: "an inverted range is swapped, not rejected", ok: d.start === "2026-10-01" && d.end === "2026-10-05", detail: JSON.stringify(d) });
   out.push({ name: "the panel stays open while custom dates are edited", ok: s.open, detail: `open=${s.open}` });
+  out.push(await fieldEdge(page, () => document.querySelector('.rfg-drp-custom input[type="date"]'), "custom range date fields have a 3:1 edge (WCAG 1.4.11)"));
   return out;
 };
 

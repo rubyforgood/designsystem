@@ -57,7 +57,7 @@ const STYLES = `
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem;
-    border: 1px solid var(--color-neutral-200);
+    border: 1px solid var(--color-neutral-500); /* 3:1+ field edge, WCAG 1.4.11 */
     border-radius: var(--radius-control);
     cursor: text;
   }

@@ -1,3 +1,4 @@
+const { fieldEdge } = require("../field-edge");
 // Behavior checks for <rfg-combobox>. Each `run` drives the story page from Node with real
 // Playwright input and returns [{ name, ok, detail }]. See ../component-behavior-audit.js.
 // What components/README.md and the story promise: the wrapped native <select> stays the value
@@ -125,4 +126,6 @@ module.exports = [
   { id: "components-combobox--long-list", tag: "rfg-combobox", run: filter },
   { id: "components-combobox--single-select-pre-selected", tag: "rfg-combobox", run: preselected },
   { id: "components-combobox--multi-select", tag: "rfg-combobox", run: multi },
+  // WCAG 1.4.11: the field's edge is 3:1 against the page (../field-edge.js).
+  { id: "components-combobox--single-select", tag: "rfg-combobox", run: async (page) => [await fieldEdge(page, () => document.querySelector("rfg-combobox .rfg-combobox-box"))] },
 ];
