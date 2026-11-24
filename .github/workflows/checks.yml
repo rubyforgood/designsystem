@@ -84,6 +84,11 @@ jobs:
       - name: Build components
         run: npm run build
 
+      # Every var() in tokens/theme.css must exist in Tailwind v4. A missing one fails silently in
+      # the browser (v0.1.0-0.1.3 shipped square pills this way), so only a compile can catch it.
+      - name: Theme tokens resolve in Tailwind
+        run: node bin/design/theme-tokens-audit.js
+
       # Catches a broken story or a config regression (e.g. an addon that fails to load) before
       # it ships. The a11y addon (.storybook/preview.js, a11y.test: "error") runs axe-core against
       # every story on open, but that only fails interactively in the dev server right now — this
