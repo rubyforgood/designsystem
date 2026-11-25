@@ -30,7 +30,27 @@ const check = () => {
   return out;
 };
 
+// A visually hidden label in a header cell (position: absolute, as Tailwind's sr-only is) must be
+// positioned against the table, not an ancestor outside it. If it isn't, the label escapes the
+// table's scroll box and widens the page: SkillRx's topics list scrolled sideways to 744px on a
+// 390px phone. Storybook's own page clips that overflow, so measuring the page width here passed
+// against the old code; this checks the cause instead. Before v0.1.6 it failed.
+const contained = async () => {
+  const el = document.querySelector("rfg-table");
+  await el.updateComplete;
+  const th = [...el.querySelectorAll("th")].pop();
+  const label = document.createElement("span");
+  label.textContent = "Actions";
+  label.style.cssText = "position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap";
+  th.appendChild(label);
+  const cb = label.offsetParent;
+  const inside = !!cb && (cb === el || el.contains(cb));
+  label.remove();
+  return [{ name: "a hidden header label is positioned within the table", ok: inside, detail: cb ? cb.tagName.toLowerCase() + (cb.id ? "#" + cb.id : "") : "none" }];
+};
+
 module.exports = [
+  { id: "components-table--default", tag: "rfg-table", check: contained },
   { id: "components-table--default", tag: "rfg-table", check },
   { id: "components-table--wrapping-cell-still-top-aligns", tag: "rfg-table", check },
 ];

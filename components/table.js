@@ -75,8 +75,13 @@ function ensureCellStylesInjected() {
  */
 export class RfgTable extends LitElement {
   static styles = css`
+    /* Positioned, so anything absolutely positioned in a cell (a visually hidden header label:
+       Tailwind's sr-only is position: absolute) is measured against the table, not the page.
+       Without it, such a label escapes the scroll box and widens the page; measured in SkillRx,
+       a 390px phone scrolled sideways to 744px. Fixed in v0.1.6. */
     :host {
       display: block;
+      position: relative;
     }
 
     .scroll {

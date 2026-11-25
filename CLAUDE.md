@@ -60,7 +60,7 @@ a documented pattern wrong corrects it there rather than letting drift accumulat
   `keyboard-audit.js` bug this adapter found and fixed. It also holds
   `component-behavior-audit.js`, a Storybook-only check (also in CI) of what axe and the keyboard
   audit can't see: whether each component actually works. One file per component in
-  `behavior-checks/`, 445 checks across all 29 (as of 2026-11-25), each with a negative control. Writing them found
+  `behavior-checks/`, 446 checks across all 29 (as of 2026-11-25), each with a negative control. Writing them found
   seven real bugs (table and filter bar in v0.1.0; tooltip, date range picker, card, page header,
   and the menu story in v0.1.2), all fixed. A new component gets a file there too.
 - `examples/reference-app/` — a second, deliberately non-Rails, zero-framework Node adapter target

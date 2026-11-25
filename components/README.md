@@ -489,6 +489,12 @@ table CSS overrides them (checked: an app rule `.app td.numeric { text-align: ce
 Like `<rfg-button>`'s injected styles, this assumes the table lives in the main document, not
 inside another component's shadow root.
 
+**Hidden labels stay inside the table (fixed in v0.1.6).** The element is `position: relative`, so
+something absolutely positioned in a cell, such as a visually hidden "Actions" header label
+(Tailwind's `sr-only`), is placed against the table. Before, it was placed against the page, escaped
+the table's scroll box and widened the page: SkillRx's topics list scrolled sideways to 744px on a
+390px phone.
+
 ## `<rfg-date-range-picker>`
 
 Implements "Date range picker": one trigger showing the current range, a popover (composing
