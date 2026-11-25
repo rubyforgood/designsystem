@@ -633,9 +633,21 @@ only a bar that doesn't fold. Two is design.md's own measured threshold: a discl
 one or two controls is a click that buys nothing.
 
 Composes `<rfg-disclosure>` for the folded case (reuse, not a second accordion implementation).
-Slots: `fields` (each filter control, counted via `slotchange` to decide fold vs. inline — verified
+Slots: `search` (an always-visible field such as a search box, first in the row, never folded),
+`fields` (each filter control, counted via `slotchange` to decide fold vs. inline — verified
 in a real browser: two controls render inline with no disclosure at all, four render behind one),
-`actions` (right end of the row). Put a `type="submit"` button in `actions` to submit, or call
+`actions` (right end of the row).
+
+**Folded filters start open when any of them is set**, so a filtered list never looks like the
+whole list. A field counts as set when a text field has a value, a select's chosen option isn't its
+first (the first is the "any" or default option), a multi-select has anything chosen, or a checkbox
+is checked. Add `open` to start open regardless. Once someone closes the panel, it stays closed.
+
+**Layout (fixed in v0.1.5).** The row holds the search field, the "Filters" trigger (40px, the same
+as the controls, so it lines up with them) and the actions; the open panel takes its own full-width
+line below, with the fields in columns. Before, the disclosure was one shrink-to-fit block, so the
+trigger sat 10px below the controls and the fields stacked in a single 160px column. Found migrating
+SkillRx; `<rfg-disclosure>` gained `trigger` and `panel` parts so the bar could lay them out. Put a `type="submit"` button in `actions` to submit, or call
 `bar.form.requestSubmit()` to submit on change.
 
 **The form lives in light DOM.** The bar appends a hidden, empty `<form method="get">` as its own

@@ -3099,6 +3099,15 @@ other way (a POST, client-only state) breaks that for no compensating benefit. *
 (borderless) bar sits 16px above the table it filters; wrap it in a card only when it is a
 section in its own right.
 
+<a id="a-filtered-list-says-so"></a>
+**Portable — a filtered list must look filtered.** When filters fold behind a disclosure, the
+disclosure starts open whenever any filter is set, so nobody mistakes a filtered list for the whole
+list. A search box is the exception to folding: it is the filter people reach for first, so it
+stays visible in the row. **Local:** "set" means a text field with a value, a select on anything
+but its first ("any") option, or a checked checkbox; `<rfg-filter-bar>` does this, and its
+`search` slot holds the always-visible field. Added 2026-11-25, from SkillRx's topics list, where
+six filters folded with nothing to show that one was applied.
+
 <a id="a-bar-that-fits-on-a-line-is-shown"></a>
 **A bar whose controls fit on one line shows them; only a bar that does not fold.** Two is the
 threshold, because two is what fits: the panel is a four column grid whose cells are 261px at 1440,

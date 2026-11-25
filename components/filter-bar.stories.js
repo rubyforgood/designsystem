@@ -3,7 +3,7 @@ import "./filter-bar.js";
 import "./button.js";
 
 const labelStyle = "display:block; font-family: var(--font-sans); font-size: 0.75rem; color: var(--color-neutral-500); margin-bottom:0.25rem;";
-const fieldStyle = "width:100%; font-family: var(--font-sans); padding: 0.375rem;";
+const fieldStyle = "width:100%; box-sizing:border-box; min-height:2.5rem; font-family: var(--font-sans); padding: 0 0.5rem; border:1px solid var(--color-neutral-500); border-radius: var(--radius-control); background:#fff;";
 
 export default {
   title: "Components/Filter bar",
@@ -17,7 +17,8 @@ export default {
           "",
           "**When to use**",
           "- To narrow down a list or table.",
-          "- Up to two controls are shown in a row. With three or more, they fold behind a \"Filters\" disclosure.",
+          "- Up to two controls are shown in a row. With three or more, they fold behind a \"Filters\" disclosure, which starts open when any of them is already set, so a filtered list never looks like the whole list.",
+          "- Put a search box in the `search` slot: it stays visible, first in the row, and never folds.",
           "- Submit filters with a GET request (set `action`), so every filtered view has a URL people can share, bookmark and return to with the Back button.",
           "",
           "**When not to use**",
@@ -67,6 +68,56 @@ export const FourControlsFold = {
           </div>
         `,
       )}
+    </rfg-filter-bar>
+  `,
+};
+
+const filterFields = (selected = {}) =>
+  [
+    ["Language", ["Any language", "English", "Spanish"]],
+    ["Year published", ["Any year", "2026", "2025"]],
+    ["State", ["Any state", "Active", "Archived"]],
+    ["Sort", ["Newest first", "Oldest first"]],
+  ].map(
+    ([label, options], i) => html`
+      <div slot="fields">
+        <label for="filter-bar-s-${label}" style=${labelStyle}>${label}</label>
+        <select id="filter-bar-s-${label}" name=${label.toLowerCase().replace(" ", "_")} style=${fieldStyle}>
+          ${options.map((o) => html`<option ?selected=${selected[label] === o}>${o}</option>`)}
+        </select>
+      </div>
+    `,
+  );
+
+const searchField = (value = "") => html`
+  <div slot="search">
+    <label for="filter-bar-q" style=${labelStyle}>Search</label>
+    <input id="filter-bar-q" name="query" type="search" style=${fieldStyle} .value=${value} placeholder="Title or description" />
+  </div>
+`;
+
+export const SearchWithFoldedFilters = {
+  name: "Search, with filters folded",
+  parameters: {
+    docs: { description: { story: "A search box in the `search` slot stays visible. The four filters fold behind \"Filters\", which opens its panel on a full-width line below the row." } },
+  },
+  render: () => html`
+    <rfg-filter-bar>
+      ${searchField()} ${filterFields()}
+      <rfg-button slot="actions" variant="ghost">Clear filters</rfg-button>
+    </rfg-filter-bar>
+  `,
+};
+
+export const AFilterIsSet = {
+  name: "A filter is set, so they start open",
+  parameters: {
+    docs: { description: { story: "\"State\" is set to Archived, so the folded filters start open: someone looking at the list can see it's filtered." } },
+  },
+  render: () => html`
+    <rfg-filter-bar>
+      ${searchField()} ${filterFields({ State: "Archived" })}
+      <rfg-button slot="actions" variant="ghost">Clear filters</rfg-button>
     </rfg-filter-bar>
   `,
 };

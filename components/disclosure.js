@@ -79,13 +79,13 @@ export class RfgDisclosure extends LitElement {
 
   render() {
     return html`
-      <button class="trigger" type="button" aria-expanded=${this.open} @click=${this._toggle}>
+      <button class="trigger" part="trigger" type="button" aria-expanded=${this.open} @click=${this._toggle}>
         <svg class="chevron" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
           <path d="M6 3l5 5-5 5" />
         </svg>
         ${this.label}
       </button>
-      <div class="panel" ?hidden=${!this.open}>
+      <div class="panel" part="panel" ?hidden=${!this.open}>
         <slot></slot>
       </div>
     `;

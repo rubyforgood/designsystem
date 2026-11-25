@@ -18,6 +18,18 @@ import "./disclosure.js";
 // a control outside a form submit with it. Enter in a text field and a `type="submit"` button
 // in the actions slot both submit it natively, and so does a form-associated custom element.
 let formCount = 0;
+
+// Whether a field wrapper holds a filter that's set: a text field with a value, a select whose
+// chosen option isn't its first (the first is the "any" or default option), a multi-select with
+// anything chosen, or a checked checkbox. Radios are left out: one is always checked.
+function isSet(field) {
+  return [...field.querySelectorAll("input, select, textarea")].some((c) => {
+    if (c.tagName === "SELECT") return c.multiple ? c.selectedOptions.length > 0 : c.selectedIndex > 0;
+    if (c.type === "checkbox") return c.checked;
+    if (["radio", "hidden", "submit", "button", "reset"].includes(c.type)) return false;
+    return c.value.trim() !== "";
+  });
+}
 const CONTROLS = "input, select, textarea, button";
 
 /**
@@ -26,6 +38,7 @@ const CONTROLS = "input, select, textarea, button";
  * `<rfg-disclosure>` for the folded case.
  *
  * @element rfg-filter-bar
+ * @slot search - An always-visible field, e.g. a search box, first in the row. Never folds.
  * @slot fields - The filter controls, one wrapper element per field.
  * @slot actions - Trailing actions (e.g. an export button, or a `type="submit"` button).
  */
@@ -33,10 +46,16 @@ export class RfgFilterBar extends LitElement {
   static properties = {
     /** The form's `action` attribute, for a real GET submission. */
     action: { type: String },
+    /** Start with the folded filters open. Without it, they start open when any field is already set. */
+    open: { type: Boolean },
     /** @ignore */
     _count: { state: true },
     /** @ignore */
     _hasActions: { state: true },
+    /** @ignore */
+    _hasSearch: { state: true },
+    /** @ignore */
+    _filtered: { state: true },
   };
 
   static styles = css`
@@ -44,6 +63,8 @@ export class RfgFilterBar extends LitElement {
       display: block;
     }
 
+    /* One row: the search field (if any), the folded "Filters" trigger or the inline fields, then
+       the actions. Bottoms align, so labels above controls don't push anything off the line. */
     .bar {
       display: flex;
       align-items: flex-end;
@@ -51,11 +72,37 @@ export class RfgFilterBar extends LitElement {
       flex-wrap: wrap;
     }
 
+    .search {
+      display: block;
+      flex: 0 1 20rem;
+      min-width: 12rem;
+    }
+    .search.hidden {
+      display: none;
+    }
+
     .fields {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-      gap: 0.75rem;
-      flex: 1;
+      grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+      gap: 0.75rem 1rem;
+      flex: 1 1 auto;
+    }
+
+    /* Folded: the disclosure's trigger sits in the row, 40px tall like the controls beside it, and
+       its panel breaks onto its own full-width line below the row. Before v0.1.5 the disclosure was
+       one shrink-to-fit block, so the trigger sat 10px below the controls' centers and the fields
+       stacked in a single column inside it. */
+    rfg-disclosure {
+      display: contents;
+    }
+    rfg-disclosure::part(trigger) {
+      min-height: 2.5rem;
+      padding: 0 0.25rem;
+    }
+    rfg-disclosure::part(panel) {
+      flex-basis: 100%;
+      order: 1;
+      margin-top: 0;
     }
 
     ::slotted(*) {
@@ -65,6 +112,7 @@ export class RfgFilterBar extends LitElement {
     .actions {
       flex: none;
       display: flex;
+      align-items: flex-end;
       gap: 0.5rem;
     }
     .actions.hidden {
@@ -77,6 +125,9 @@ export class RfgFilterBar extends LitElement {
     this.action = "";
     this._count = 0;
     this._hasActions = false;
+    this._hasSearch = false;
+    this._filtered = false;
+    this.open = false;
     this._form = document.createElement("form");
     this._form.method = "get";
     this._form.id = `rfg-filter-bar-form-${++formCount}`;
@@ -128,7 +179,13 @@ export class RfgFilterBar extends LitElement {
   }
 
   _onFieldsSlotChange(e) {
-    this._count = e.target.assignedElements({ flatten: true }).length;
+    const fields = e.target.assignedElements({ flatten: true });
+    this._count = fields.length;
+    this._filtered = fields.some((f) => isSet(f));
+  }
+
+  _onSearchSlotChange(e) {
+    this._hasSearch = e.target.assignedNodes({ flatten: true }).length > 0;
   }
 
   _onActionsSlotChange(e) {
@@ -139,10 +196,17 @@ export class RfgFilterBar extends LitElement {
     const fields = html`<slot name="fields" @slotchange=${this._onFieldsSlotChange}></slot>`;
     // Two is the threshold: a bar whose controls fit on one line shows them; a disclosure in
     // front of one or two controls is a click that buys nothing.
-    const body = this._count > 2 ? html`<rfg-disclosure label="Filters"><div class="fields">${fields}</div></rfg-disclosure>` : html`<div class="fields">${fields}</div>`;
+    // Folded filters start open when one of them is already set (or the host says `open`), so a
+    // filtered list never looks like the whole list. A property binding, so it's applied when the
+    // state is found and not re-applied after someone closes the panel.
+    const startOpen = this.open || this._filtered;
+    const body = this._count > 2
+      ? html`<rfg-disclosure label="Filters" .open=${startOpen}><div class="fields">${fields}</div></rfg-disclosure>`
+      : html`<div class="fields">${fields}</div>`;
 
     return html`
       <div class="bar">
+        <div class="search ${this._hasSearch ? "" : "hidden"}"><slot name="search" @slotchange=${this._onSearchSlotChange}></slot></div>
         ${body}
         <div class="actions ${this._hasActions ? "" : "hidden"}">
           <slot name="actions" @slotchange=${this._onActionsSlotChange}></slot>
