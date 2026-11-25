@@ -29,7 +29,20 @@ const { chromium } = require("playwright");
  * PRIMARY-role user) simply doesn't export it, and this audit runs the three standard passes
  * instead of crashing trying to sign in as a user that doesn't exist.
  */
-const { targets, signIn, visit, RUNS, PRIMARY, BASE, PRIMARY_ALT_EMAIL } = require("./targets");
+const adapter = require("./targets");
+const { targets, signIn, visit, RUNS, PRIMARY, BASE, PRIMARY_ALT_EMAIL } = adapter;
+
+// How to read a button's variant back from the page: [class it contains, variant], first match
+// wins. An adapter can export its own BUTTON_VARIANTS; this default is the origin app's Tailwind
+// strings. Without an adapter's own list, another app's buttons all read "unknown" (found running
+// this against SkillRx, whose buttons are `.button-primary` and so on).
+const BUTTON_VARIANTS = adapter.BUTTON_VARIANTS || [
+  ["bg-brand-600", "primary"],
+  ["bg-rose-600", "danger"],
+  ["border-slate-300", "secondary"],
+  ["hover:bg-rose-50", "ghost-danger"],
+  ["hover:bg-slate-100", "ghost"],
+];
 
 const PASSES = PRIMARY_ALT_EMAIL ? [...RUNS, [PRIMARY_ALT_EMAIL, PRIMARY]] : RUNS;
 
@@ -41,7 +54,7 @@ async function auditPage(page, path) {
 
   return {
     path,
-    ...(await page.evaluate(() => {
+    ...(await page.evaluate((variantClasses) => {
       // The container is only rendered when there are actions, so its absence means "a header
       // carrying none" rather than "no header" -- which is a different defect, and page-audit's.
       const box = document.querySelector('[data-page-header="actions"]');
@@ -49,13 +62,9 @@ async function auditPage(page, path) {
 
       // The variant survives only in the classes the helper emitted, so it is read back from them.
       const variantOf = (el) => {
-        const c = el.className;
-        if (c.includes("bg-brand-600")) return "primary";
-        if (c.includes("bg-rose-600")) return "danger";
-        if (c.includes("border-slate-300")) return "secondary";
-        if (c.includes("hover:bg-rose-50")) return "ghost-danger";
-        if (c.includes("hover:bg-slate-100")) return "ghost";
-        return "unknown";
+        const c = ` ${el.className} `;
+        const hit = variantClasses.find(([cls]) => c.includes(cls));
+        return hit ? hit[1] : "unknown";
       };
 
       // A "More actions" trigger is one action however many items hang off it.
@@ -83,7 +92,7 @@ async function auditPage(page, path) {
         offHeight,
         labels: actions.map((el) => el.textContent.trim().replace(/\s+/g, " ").slice(0, 44))
       };
-    }))
+    }, BUTTON_VARIANTS))
   };
 }
 
@@ -117,6 +126,10 @@ async function auditPage(page, path) {
     (r) => r.variants.includes("primary") && r.variants[r.variants.length - 1] !== "primary"
   );
   const unknown = seen.filter((r) => r.variants.includes("unknown"));
+  // design.md, "not every page needs a primary": with no primary, the most destructive action
+  // must not inherit the last slot, where the main action belongs (/product_drives/:id had
+  // [Export] [Make a correction] [Delete], read as the buttons being reversed).
+  const destructiveLast = seen.filter((r) => /danger/.test(r.variants[r.variants.length - 1] || ""));
   const wrongHeight = results.filter((r) => r.offHeight && r.offHeight.length);
 
   const report = (title, rows, describe) => {
@@ -132,10 +145,11 @@ async function auditPage(page, path) {
   report("more than three actions", tooMany, (r) => `${r.count}: ${r.labels.join(" | ")}`);
   report("more than one primary", manyPrimary, (r) => r.labels.join(" | "));
   report("primary is not last", primaryNotLast, (r) => `${r.variants.join(",")} -- ${r.labels.join(" | ")}`);
+  report("a destructive action in the last slot", destructiveLast, (r) => `${r.variants.join(",")} -- ${r.labels.join(" | ")}`);
   report("a variant the helper never emits", unknown, (r) => r.labels.join(" | "));
   report("not the 38px control height", wrongHeight, (r) => `${r.offHeight.join(", ")}px`);
 
-  const bad = tooMany.length + manyPrimary.length + primaryNotLast.length + unknown.length +
+  const bad = tooMany.length + manyPrimary.length + primaryNotLast.length + destructiveLast.length + unknown.length +
     wrongHeight.length;
   console.log(`\n${bad} finding(s)`);
   process.exit(0);
