@@ -108,7 +108,7 @@ component ships as a **standalone file** with `lit` bundled in and no imports of
 vendor it like any other file. Download the tokens and the components you use, at a pinned version:
 
 ```bash
-V=https://cdn.jsdelivr.net/npm/@rubyforgood/design-system@0.1.6
+V=https://cdn.jsdelivr.net/npm/@rubyforgood/design-system@0.1.7
 curl -fo app/assets/stylesheets/rfg-tokens.css $V/tokens/tokens.css
 curl -fo vendor/javascript/rfg-button.js       $V/dist/standalone/button.mjs
 curl -fo vendor/javascript/rfg-modal.js        $V/dist/standalone/modal.mjs
@@ -218,7 +218,7 @@ build is also hosted — **<https://rubyforgood.github.io/designsystem/>** — r
 without cloning. See `components/README.md` and
 [ADR 14](docs/architecture/decisions/0014-add-an-installable-component-layer.md).
 
-Published to the npm registry; the current version is **v0.1.6**
+Published to the npm registry; the current version is **v0.1.7**
 (<https://www.npmjs.com/package/@rubyforgood/design-system>), cut through
 `.github/workflows/release.yml` ([ADR 15](docs/architecture/decisions/0015-publish-to-npm-via-a-tag-triggered-release-workflow.md)):
 pushing a `vX.Y.Z` tag builds and publishes. Each version's changes are in its [release
