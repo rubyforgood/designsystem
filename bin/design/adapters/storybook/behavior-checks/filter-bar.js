@@ -86,6 +86,7 @@ const leadAndEnd = async () => {
   const before = leads.map((l) => Math.round(box(l).top));
   const out = [];
   out.push({ name: "the always-visible fields share one row", ok: new Set(before).size === 1, detail: `tops ${before.join(", ")}` });
+  const gapAcross = box(leads[1]).left - box(leads[0]).right;
   const sortBox = box(sort.querySelector("select"));
   const searchBox = box(bar.querySelector('[slot="search"] input'));
   const mid = (b) => b.top + b.height / 2;
@@ -96,6 +97,9 @@ const leadAndEnd = async () => {
   const after = leads.map((l) => Math.round(box(l).top));
   out.push({ name: "opening Filters doesn't move the always-visible fields", ok: after.join() === before.join(), detail: `${before.join(", ")} → ${after.join(", ")}` });
   const first = box(bar.querySelector('[slot="fields"]'));
+  const second = box(bar.querySelectorAll('[slot="fields"]')[1]);
+  const panelGap = second.left - first.right;
+  out.push({ name: "always-visible fields are as far apart as the panel's columns", ok: Math.abs(gapAcross - panelGap) <= 1, detail: `${gapAcross}px vs ${panelGap}px` });
   out.push({ name: "the open panel starts at the bar's left edge", ok: Math.abs(first.left - barBox.left) <= 1, detail: `${(first.left - barBox.left).toFixed(1)}px in` });
   const inPanel = !!sort.closest('[slot="fields"]') || box(sort).top > searchBox.bottom;
   out.push({ name: "Sort stays out of the panel", ok: !inPanel, detail: inPanel ? "in the panel" : "in the row" });

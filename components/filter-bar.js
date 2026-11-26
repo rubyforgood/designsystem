@@ -86,7 +86,9 @@ export class RfgFilterBar extends LitElement {
       display: flex;
       flex-wrap: wrap;
       align-items: flex-end;
-      gap: 0.75rem;
+      /* 1rem across, like the panel's columns, so every field in the bar is the same distance from
+         the next (v0.1.7 used 0.75rem here: 12px beside 16px, reported as too tight). */
+      gap: 0.75rem 1rem;
       flex: 0 1 auto;
       min-width: 0;
     }

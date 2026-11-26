@@ -9989,3 +9989,8 @@ New story "A lead filter beside search, with sort at the end" and six checks. Ag
 fail (the always-visible fields on two lines; Sort 112px off the row and not at its end); against the
 change all pass. Behavior audit: 456 checks, 0 failed.
 
+**Follow-up, same day:** the always-visible fields were 12px apart while the panel's columns are
+16px, reported as "not enough padding between the provider and search inputs". Now 16px across, like
+the panel. New check: the gap between always-visible fields equals the panel's column gap (fails at
+12px against 16px, passes after). Unreleased; ships in the next version.
+
