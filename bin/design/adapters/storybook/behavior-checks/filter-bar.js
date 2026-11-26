@@ -69,7 +69,42 @@ const startsOpen = async () => {
   ];
 };
 
+// Several always-visible fields and an end slot (v0.1.7). Before, the search slot held one field, so
+// SkillRx put Provider outside the bar: opening "Filters" pushed it down a line and the panel started
+// under the search box. Measured: the row doesn't move when the panel opens, the panel starts at the
+// bar's left edge, and Sort sits at the far right of the row, outside the panel.
+const leadAndEnd = async () => {
+  const bar = document.querySelector("rfg-filter-bar");
+  await bar.updateComplete;
+  const d = bar.shadowRoot.querySelector("rfg-disclosure");
+  if (!d) return [{ name: "filters fold behind a disclosure", ok: false, detail: "no disclosure" }];
+  await d.updateComplete;
+  const box = (el) => el.getBoundingClientRect();
+  const leads = [...bar.querySelectorAll('[slot="search"]')];
+  const sort = bar.querySelector('[slot="end"]');
+  const barBox = box(bar);
+  const before = leads.map((l) => Math.round(box(l).top));
+  const out = [];
+  out.push({ name: "the always-visible fields share one row", ok: new Set(before).size === 1, detail: `tops ${before.join(", ")}` });
+  const sortBox = box(sort.querySelector("select"));
+  const searchBox = box(bar.querySelector('[slot="search"] input'));
+  const mid = (b) => b.top + b.height / 2;
+  out.push({ name: "Sort is on the same row", ok: Math.abs(mid(sortBox) - mid(searchBox)) <= 1, detail: `${(mid(sortBox) - mid(searchBox)).toFixed(1)}px` });
+  out.push({ name: "Sort sits at the row's far end", ok: Math.abs(box(sort).right - barBox.right) <= 1, detail: `${(barBox.right - box(sort).right).toFixed(1)}px from the end` });
+  d.shadowRoot.querySelector(".trigger").click();
+  await d.updateComplete;
+  const after = leads.map((l) => Math.round(box(l).top));
+  out.push({ name: "opening Filters doesn't move the always-visible fields", ok: after.join() === before.join(), detail: `${before.join(", ")} → ${after.join(", ")}` });
+  const first = box(bar.querySelector('[slot="fields"]'));
+  out.push({ name: "the open panel starts at the bar's left edge", ok: Math.abs(first.left - barBox.left) <= 1, detail: `${(first.left - barBox.left).toFixed(1)}px in` });
+  const inPanel = !!sort.closest('[slot="fields"]') || box(sort).top > searchBox.bottom;
+  out.push({ name: "Sort stays out of the panel", ok: !inPanel, detail: inPanel ? "in the panel" : "in the row" });
+  return out;
+};
+
 module.exports = [
+  { id: "components-filter-bar--lead-filter-and-sort", tag: "rfg-filter-bar", check: leadAndEnd },
+  { id: "components-filter-bar--lead-filter-and-sort", tag: "rfg-filter-bar", check },
   { id: "components-filter-bar--search-with-folded-filters", tag: "rfg-filter-bar", check: layout },
   { id: "components-filter-bar--a-filter-is-set", tag: "rfg-filter-bar", check: startsOpen },
   { id: "components-filter-bar--two-controls-shown-inline", tag: "rfg-filter-bar", check },

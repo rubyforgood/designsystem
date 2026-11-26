@@ -18,7 +18,8 @@ export default {
           "**When to use**",
           "- To narrow down a list or table.",
           "- Up to two controls are shown in a row. With three or more, they fold behind a \"Filters\" disclosure, which starts open when any of them is already set, so a filtered list never looks like the whole list.",
-          "- Put a search box in the `search` slot: it stays visible, first in the row, and never folds.",
+          "- Put a search box in the `search` slot: it stays visible, first in the row, and never folds. A filter people change on most visits (which provider, which team) can go there too, beside the search box.",
+          "- Put Sort, and anything else that changes how the list is shown rather than what's in it, in the `end` slot. It isn't a filter: it never folds, and Clear filters leaves it alone.",
           "- Submit filters with a GET request (set `action`), so every filtered view has a URL people can share, bookmark and return to with the Back button.",
           "",
           "**When not to use**",
@@ -77,7 +78,7 @@ const filterFields = (selected = {}) =>
     ["Language", ["Any language", "English", "Spanish"]],
     ["Year published", ["Any year", "2026", "2025"]],
     ["State", ["Any state", "Active", "Archived"]],
-    ["Sort", ["Newest first", "Oldest first"]],
+    ["Tags", ["Any tag", "Hygiene", "Nutrition"]],
   ].map(
     ([label, options], i) => html`
       <div slot="fields">
@@ -118,6 +119,33 @@ export const AFilterIsSet = {
     <rfg-filter-bar>
       ${searchField()} ${filterFields({ State: "Archived" })}
       <rfg-button slot="actions" variant="ghost">Clear filters</rfg-button>
+    </rfg-filter-bar>
+  `,
+};
+
+const selectField = (slot, id, label, options) => html`
+  <div slot=${slot}>
+    <label for=${id} style=${labelStyle}>${label}</label>
+    <select id=${id} name=${id} style=${fieldStyle}>${options.map((o) => html`<option>${o}</option>`)}</select>
+  </div>
+`;
+
+export const LeadFilterAndSort = {
+  name: "A lead filter beside search, with sort at the end",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Provider is changed on most visits, so it stays visible beside Search instead of folding. Sort sits at the far end: it changes the order, not what's listed, so it isn't one of the filters. Opening \"Filters\" leaves the row where it is and opens the panel below it, from the left edge.",
+      },
+    },
+  },
+  render: () => html`
+    <rfg-filter-bar>
+      ${selectField("search", "provider", "Provider", ["All providers", "Ministry of Health", "Community health clinic"])}
+      ${searchField()} ${filterFields()}
+      <rfg-button slot="actions" variant="ghost">Clear filters</rfg-button>
+      ${selectField("end", "order", "Sort", ["Newest first", "Oldest first"])}
     </rfg-filter-bar>
   `,
 };

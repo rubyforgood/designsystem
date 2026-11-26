@@ -38,9 +38,12 @@ const CONTROLS = "input, select, textarea, button";
  * `<rfg-disclosure>` for the folded case.
  *
  * @element rfg-filter-bar
- * @slot search - An always-visible field, e.g. a search box, first in the row. Never folds.
+ * @slot search - Always-visible fields, first in the row, one wrapper element per field: a search
+ *   box, and any filter people change on most visits (e.g. which provider or team). Never folds.
  * @slot fields - The filter controls, one wrapper element per field.
- * @slot actions - Trailing actions (e.g. an export button, or a `type="submit"` button).
+ * @slot actions - Trailing actions (e.g. Clear filters, an export button, or a `type="submit"` button).
+ * @slot end - Controls that change how the list is shown, not what's in it (Sort, a view switch), at
+ *   the row's far end. Not filters: they never fold, and clearing filters leaves them as they are.
  */
 export class RfgFilterBar extends LitElement {
   static properties = {
@@ -54,6 +57,8 @@ export class RfgFilterBar extends LitElement {
     _hasActions: { state: true },
     /** @ignore */
     _hasSearch: { state: true },
+    /** @ignore */
+    _hasEnd: { state: true },
     /** @ignore */
     _filtered: { state: true },
   };
@@ -72,9 +77,23 @@ export class RfgFilterBar extends LitElement {
       flex-wrap: wrap;
     }
 
+    /* The always-visible fields sit side by side, 20rem each, and wrap on a narrow screen. Before
+       v0.1.7 this slot held one field, so an app with a second always-visible filter (SkillRx's
+       Provider) had to put it outside the bar, where opening "Filters" pushed it down a line and
+       started the panel under the search box instead of at the row's left edge. An app's own width
+       on a slotted field wins over this one. */
     .search {
-      display: block;
-      flex: 0 1 20rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 0.75rem;
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+    .search ::slotted(*) {
+      flex: 0 1 auto;
+      width: 20rem;
+      max-width: 100%;
       min-width: 12rem;
     }
     .search.hidden {
@@ -118,6 +137,18 @@ export class RfgFilterBar extends LitElement {
     .actions.hidden {
       display: none;
     }
+
+    /* Sort and view controls: pushed to the far end of the row, outside the folded panel. */
+    .end {
+      flex: none;
+      display: flex;
+      align-items: flex-end;
+      gap: 0.75rem;
+      margin-inline-start: auto;
+    }
+    .end.hidden {
+      display: none;
+    }
   `;
 
   constructor() {
@@ -126,6 +157,7 @@ export class RfgFilterBar extends LitElement {
     this._count = 0;
     this._hasActions = false;
     this._hasSearch = false;
+    this._hasEnd = false;
     this._filtered = false;
     this.open = false;
     this._form = document.createElement("form");
@@ -192,6 +224,10 @@ export class RfgFilterBar extends LitElement {
     this._hasActions = e.target.assignedNodes({ flatten: true }).length > 0;
   }
 
+  _onEndSlotChange(e) {
+    this._hasEnd = e.target.assignedNodes({ flatten: true }).length > 0;
+  }
+
   render() {
     const fields = html`<slot name="fields" @slotchange=${this._onFieldsSlotChange}></slot>`;
     // Two is the threshold: a bar whose controls fit on one line shows them; a disclosure in
@@ -210,6 +246,9 @@ export class RfgFilterBar extends LitElement {
         ${body}
         <div class="actions ${this._hasActions ? "" : "hidden"}">
           <slot name="actions" @slotchange=${this._onActionsSlotChange}></slot>
+        </div>
+        <div class="end ${this._hasEnd ? "" : "hidden"}">
+          <slot name="end" @slotchange=${this._onEndSlotChange}></slot>
         </div>
       </div>
     `;

@@ -9961,3 +9961,31 @@ and `app/assets/builds/tailwind.css` correctly rejected, `tmp/` reported as skip
 `CLAUDE.md` said five, `docs/skill-proposal-v2.md` and a migration-skill reference said six, and the
 change log had already numbered one #8. All now say nine. A number in prose about an ongoing event
 goes stale silently; the change log numbering them is what makes it checkable.
+
+## 2026-11-26 · Filter bar: several always-visible fields, and sort at the end
+
+**Asked (SkillRx, topics list):** "when the filter button is triggered, it drops all the filters to
+the line below and search stays above in the middle of the line, it looks pretty wonky." Then: move
+sort out, and log the reason.
+
+### Why it happened
+
+SkillRx's Provider filter needed to stay visible, and the `search` slot held one field, so Provider
+sat outside the bar, aligned to the bar's bottom edge. Opening "Filters" made the bar taller:
+Provider slid down to the panel's last line, and the panel started under the search box.
+
+### Decided
+
+- **The `search` slot takes any number of fields** (20rem each, wrapping). The row stays put and the
+  panel opens below it from the left edge. Rejected: aligning the outside field to the top (the
+  panel still started indented under Search) and a second lead slot (two slots for one idea).
+- **Sort moves to a new `end` slot.** It isn't a filter: it changes order, not membership. Inside the
+  panel it was the sixth field, so at 1280px it wrapped onto a line by itself, and Clear filters reset
+  it. At the row's far end it's always visible, like GitHub's, Gmail's and Polaris's sort control.
+
+### Measured
+
+New story "A lead filter beside search, with sort at the end" and six checks. Against v0.1.6 three
+fail (the always-visible fields on two lines; Sort 112px off the row and not at its end); against the
+change all pass. Behavior audit: 456 checks, 0 failed.
+

@@ -3105,8 +3105,25 @@ disclosure starts open whenever any filter is set, so nobody mistakes a filtered
 list. A search box is the exception to folding: it is the filter people reach for first, so it
 stays visible in the row. **Local:** "set" means a text field with a value, a select on anything
 but its first ("any") option, or a checked checkbox; `<rfg-filter-bar>` does this, and its
-`search` slot holds the always-visible field. Added 2026-11-25, from SkillRx's topics list, where
+`search` slot holds the always-visible fields. Added 2026-11-25, from SkillRx's topics list, where
 six filters folded with nothing to show that one was applied.
+
+<a id="the-row-stays-put"></a>
+**Portable — a filter people change on most visits stays visible beside the search box, and opening
+the folded filters never moves the row.** The always-visible fields share the first row; the folded
+panel opens below the whole row, from its left edge. A field placed outside the bar to keep it
+visible drops a line when the panel opens and leaves the panel indented under the search box, which
+was reported as "wonky". **Local:** `<rfg-filter-bar>`'s `search` slot takes any number of fields,
+20rem each, wrapping on a narrow screen (v0.1.7). Added 2026-11-26, from SkillRx's Provider filter.
+
+<a id="sort-is-not-a-filter"></a>
+**Portable — sort is not a filter.** A filter changes *which* records are listed; sort changes only
+their order. So sort doesn't fold with the filters, doesn't count toward "a filtered list must look
+filtered", and Clear filters leaves it as it was: someone who chose "Oldest first" and clears a
+language filter still wants oldest first. It sits at the far end of the filter row, where GitHub,
+Gmail and Shopify Polaris put it. **Local:** `<rfg-filter-bar>`'s `end` slot (v0.1.7). Added
+2026-11-26: with sort folded among SkillRx's filters, the six-field panel wrapped one field onto a
+line by itself at laptop width, and Clear filters reset the order.
 
 <a id="a-bar-that-fits-on-a-line-is-shown"></a>
 **A bar whose controls fit on one line shows them; only a bar that does not fold.** Two is the
