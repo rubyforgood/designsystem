@@ -9995,6 +9995,20 @@ the panel. New check: the gap between always-visible fields equals the panel's c
 12px against 16px, passes after). Released in v0.1.8.
 
 
+## 2026-11-27 — Error messages say what to do
+
+**What happened:** SkillRx's topic form said "Title can't be blank", and the person asked whether
+that matched the design system. It didn't contradict it: the forms section set where an error goes
+(summary, field, `aria-invalid`, `aria-describedby`) but not what it says, so Rails' defaults
+shipped. Listing every message SkillRx could show also found duplicates ("Language must exist" and
+"Language can't be blank" for one field) and a column name ("Password digest can't be blank").
+
+**Decision:** a portable wording rule in `design.md`
+([`#error-message-wording`](../design.md#error-message-wording)), following GOV.UK's error message
+guidance, which the US Web Design System also uses: an instruction in the form's words, one per
+problem, the same text at the field and in the summary, in the form's order. SkillRx applied it to
+every model (its `decisions.md`, 2026-11-27, has the before and after for each message).
+
 ## 2026-11-26 — Page tabs keep their look under a CSS reset
 
 **What happened:** SkillRx's Jobs page used `<rfg-page-tabs>` and the tabs had no padding, no

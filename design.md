@@ -4543,6 +4543,25 @@ that isn't really about that one field alone).
 `form-validation-audit` reads a legend for any field now, not only for a radio or checkbox, so a
 condition stated there still counts as marked.
 
+<a id="error-message-wording"></a>
+**Portable — an error message says what to do, in the form's own words, not what the framework
+found wrong.** "Enter a title", not "Title can't be blank"; "Choose a language", not "Language must
+exist"; "Enter an email address in the right format, like name@example.com", not "Email is
+invalid". This is GOV.UK's error message guidance, which the US Web Design System follows.
+Framework defaults (Rails' "%{attribute} %{message}") fail it by construction: they name the
+attribute (sometimes a column, as in "Password digest"), state a fault, and stack: a blank email
+gets "can't be blank" *and* "is invalid".
+
+- **One message per problem.** Skip format and length checks on a blank value (`allow_blank`), and
+  check a required association once.
+- **"Enter" for a field you type in, "Choose" or "Select" for one you pick from**, used the same
+  way across the app.
+- **A whole sentence, identical in the summary and at the field**, with no full stop. In Rails,
+  `config.active_model.i18n_customize_full_message = true` and `format: "%{message}"` per
+  attribute in the locale file.
+- **Listed in the form's order**, so the summary reads top to bottom like the page.
+- **US English, sentence case, contractions** ("can't", "don't").
+
 **Portable — a validation error belongs to its specific field (marked invalid, described by
 the message, both programmatically) in addition to appearing in any page-level summary — never
 only in the summary.**
