@@ -2988,6 +2988,12 @@ default's two components:**
 | **Panel tabs** | Panels swap in place, same URL | `shared/essentials/tabs` |
 | **Page tabs** | Each tab is its own URL | `shared/essentials/page_tabs` |
 
+<a id="slotted-styles-survive-resets"></a>
+**Portable — a component's styles for slotted children must survive the page's CSS reset.** A page
+rule beats `::slotted`, so Tailwind's preflight erased `<rfg-page-tabs>`' padding, color and
+underline (SkillRx Jobs, 2026-11-26). Slotted declarations that make the component look like itself
+are `!important`; apps restyle through tokens. Each such component has a story under a reset.
+
 `role="tab"` tells a screen reader that activating this swaps a panel in the current document.
 If the tab loads a page, that promise is false, and the tablist takes the arrow keys from the
 browser on the way. Page tabs are a `<nav>` of links with `aria-current="page"` on the current

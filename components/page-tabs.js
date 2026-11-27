@@ -33,28 +33,33 @@ export class RfgPageTabs extends LitElement {
       border-bottom: 1px solid var(--color-neutral-200);
     }
 
+    /* !important on every ::slotted declaration: a page's own stylesheet beats ::slotted, so a
+       CSS reset like Tailwind's preflight (* { padding: 0; border: 0 solid }, a { color:
+       inherit }) silently erased the tab look in SkillRx. Inside a shadow root, !important wins
+       over the page's rules, even the page's own !important, so it's the one way a component keeps
+       slotted styling. Restyle through the color tokens. */
     ::slotted(a) {
-      display: inline-block;
-      padding: 0.625rem 0.25rem;
-      margin-bottom: -1px;
-      border-bottom: 2px solid transparent;
-      font-family: var(--font-sans);
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-neutral-500);
-      text-decoration: none;
-      white-space: nowrap;
+      display: inline-block !important;
+      padding: 0.625rem 0.25rem !important;
+      margin-bottom: -1px !important;
+      border-bottom: 2px solid transparent !important;
+      font-family: var(--font-sans) !important;
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
+      color: var(--color-neutral-500) !important;
+      text-decoration: none !important;
+      white-space: nowrap !important;
     }
     ::slotted(a:hover) {
-      color: var(--color-neutral-900);
+      color: var(--color-neutral-900) !important;
     }
     ::slotted(a[aria-current="page"]) {
-      color: var(--color-brand-700);
-      border-bottom-color: var(--color-brand-600);
+      color: var(--color-brand-700) !important;
+      border-bottom-color: var(--color-brand-600) !important;
     }
     ::slotted(a:focus-visible) {
-      outline: 2px solid var(--color-brand-600);
-      outline-offset: 2px;
+      outline: 2px solid var(--color-brand-600) !important;
+      outline-offset: 2px !important;
     }
   `;
 

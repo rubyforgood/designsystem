@@ -40,3 +40,19 @@ export default {
 };
 
 export const Default = {};
+
+// A page with a CSS reset, like Tailwind's preflight. The page's own rules beat ::slotted, so
+// before v0.1.8 the tabs lost their padding, color and underline here (seen in SkillRx's Jobs).
+export const UnderACssReset = {
+  render: () => html`
+    <style>
+      *, ::before, ::after { margin: 0; padding: 0; border: 0 solid; }
+      a { color: inherit; text-decoration: inherit; }
+    </style>
+    <rfg-page-tabs label="Website redesign sections">
+      <a href="#overview" aria-current="page">Overview</a>
+      <a href="#tasks">Tasks</a>
+      <a href="#documents">Documents</a>
+    </rfg-page-tabs>
+  `,
+};

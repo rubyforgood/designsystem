@@ -55,7 +55,18 @@ const check = async () => {
     ok: lookCurrent.length === 0,
     detail: lookCurrent.map((a) => a.textContent.trim()).join(", ") || "none",
   });
+  const pad = parseFloat(getComputedStyle(others[0]).paddingTop);
+  out.push({
+    name: "tabs keep their padding (10px top)",
+    ok: Math.abs(pad - 10) < 0.5,
+    detail: `${pad}px`,
+  });
   return out;
 };
 
-module.exports = [{ id: "components-page-tabs--default", tag: "rfg-page-tabs", check }];
+// The same checks on a page with a CSS reset (Tailwind's preflight): the page's rules beat
+// ::slotted, so the component's slotted styles are !important.
+module.exports = [
+  { id: "components-page-tabs--default", tag: "rfg-page-tabs", check },
+  { id: "components-page-tabs--under-a-css-reset", tag: "rfg-page-tabs", check },
+];
