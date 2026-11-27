@@ -1453,6 +1453,16 @@ panel's own `role="menu"` attribute instead, which travels with it wherever it's
 identical bug, same root cause, was found in `<rfg-combobox>`'s own equivalent rule at the same
 time — see that section below.
 
+<a id="menu-items-have-a-default-look"></a>
+**Update, 2026-11-27 — menu items have a default look, and the panel uses the control radius.**
+"Items are any markup" left every app to style them, and SkillRx didn't: its account menu showed
+"Sign out" as an unstyled button (no padding, 16px text, no hover) in a 16px-radius panel that read
+as a speech bubble. **Portable — a component that accepts arbitrary children still owes them a
+default look, or the first app that forgets ships the browser's.** `<rfg-menu>` now styles
+`[role="menuitem"]` in `@layer base` (below an app's own classes, above Tailwind's preflight), makes
+a wrapping `<form>` a block, and gives the panel `--radius-control`. Checked by
+`components-menu--under-a-css-reset`; the old component fails all three of its checks.
+
 **The kebab trigger gets no tooltip.** It is a menu opener rather than an action, `aria-haspopup`
 already identifies it, and "More actions for <this row>" repeated down every row is noise — the menu
 it opens carries the labels.

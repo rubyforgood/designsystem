@@ -36,22 +36,15 @@ export default {
   render: () => html`
     <rfg-menu label="Actions for Website redesign">
       <rfg-button slot="trigger" variant="ghost" size="xs" aria-label="Actions for Website redesign">⋮</rfg-button>
-      <a role="menuitem" href="#edit" style=${ITEM_STYLE}>Edit</a>
-      <a role="menuitem" href="#share" style=${ITEM_STYLE}>Share</a>
-      <button role="menuitem" type="button" style=${ITEM_STYLE} @click=${() => {}}>
+      <a role="menuitem" href="#edit">Edit</a>
+      <a role="menuitem" href="#share">Share</a>
+      <button role="menuitem" type="button" @click=${() => {}}>
         Archive
       </button>
-      <button role="menuitem" type="button" style=${DANGER_ITEM_STYLE}>Delete project</button>
+      <button role="menuitem" type="button">Delete project</button>
     </rfg-menu>
   `,
 };
-
-const ITEM_STYLE =
-  "display: flex; width: 100%; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; " +
-  "text-align: left; font-family: var(--font-sans); font-size: 0.875rem; text-decoration: none; " +
-  "color: var(--color-neutral-700); background: none; border: none; cursor: pointer; box-sizing: border-box;";
-
-const DANGER_ITEM_STYLE = ITEM_STYLE + "color: var(--color-neutral-700);";
 
 export const Default = {};
 
@@ -68,8 +61,8 @@ export const WithADisabledItem = {
   render: () => html`
     <rfg-menu label="Actions for Annual report">
       <rfg-button slot="trigger" variant="ghost" size="xs" aria-label="Actions for Annual report">⋮</rfg-button>
-      <a role="menuitem" href="#edit" style=${ITEM_STYLE}>Edit</a>
-      <button role="menuitem" type="button" aria-disabled="true" style=${ITEM_STYLE + "opacity: 0.6; cursor: not-allowed;"}>
+      <a role="menuitem" href="#edit">Edit</a>
+      <button role="menuitem" type="button" aria-disabled="true">
         Archive
         <span style="display: block; font-size: 0.75rem; font-weight: 400;">
           Can't archive a project with open tasks
@@ -79,7 +72,7 @@ export const WithADisabledItem = {
         role="menuitem"
         aria-disabled="true"
         tabindex="0"
-        style=${ITEM_STYLE + "opacity: 0.6; cursor: not-allowed;"}
+       
       >
         Delete project
         <span style="display: block; font-size: 0.75rem; font-weight: 400;">
@@ -106,10 +99,38 @@ export const NearTheRightEdge = {
     >
       <rfg-menu label="Actions for Spring newsletter" placement="bottom-end">
         <rfg-button slot="trigger" variant="ghost" size="xs" aria-label="Actions for Spring newsletter">⋮</rfg-button>
-        <a role="menuitem" href="#view" style=${ITEM_STYLE}>View</a>
-        <a role="menuitem" href="#edit" style=${ITEM_STYLE}>Edit</a>
-        <button role="menuitem" type="button" style=${DANGER_ITEM_STYLE}>Delete project</button>
+        <a role="menuitem" href="#view">View</a>
+        <a role="menuitem" href="#edit">Edit</a>
+        <button role="menuitem" type="button">Delete project</button>
       </rfg-menu>
     </div>
+  `,
+};
+
+export const UnderACssReset = {
+  name: "Under a CSS reset, with a form item",
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "An account menu on a page with Tailwind's preflight (in `@layer base`), and a sign-out button inside a `<form>`, as Rails' `button_to` renders it. The items keep their padding and the form's item spans the menu.",
+      },
+    },
+  },
+  render: () => html`
+    <style>
+      @layer base {
+        *, ::before, ::after { margin: 0; padding: 0; border: 0 solid; }
+        a { color: inherit; text-decoration: inherit; }
+        button { font: inherit; background-color: transparent; }
+      }
+    </style>
+    <rfg-menu label="Account">
+      <rfg-button slot="trigger" variant="ghost" size="xs" aria-label="Account menu">⋯</rfg-button>
+      <a role="menuitem" href="#settings">Settings</a>
+      <form action="#sign-out" method="post" @submit=${(e) => e.preventDefault()}>
+        <button role="menuitem" type="submit">Sign out</button>
+      </form>
+    </rfg-menu>
   `,
 };

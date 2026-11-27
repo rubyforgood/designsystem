@@ -64,10 +64,65 @@ const STYLE_ID = "rfg-menu-styles";
 // `role` attribute is set unconditionally and travels with the element wherever it's portalled,
 // so an attribute selector on the panel itself is the one thing that still matches reliably
 // either way.
+//
+// **Items have a default look, in `@layer base`** (added after SkillRx's account menu shipped a bare
+// "Sign out" button: no padding, no hover, in a 16px-radius bubble). The header above said items are
+// any markup, and every app had to restyle them by hand; one that didn't got the browser's button.
+// The defaults sit in the `base` cascade layer on purpose. Tailwind's preflight is in `base` too, so
+// these beat it (same layer, higher specificity), while an app's own item classes (utilities, or any
+// unlayered CSS) still beat these. An app that styles its items keeps its look. A `<form>` holding an
+// item (Rails' `button_to`, a sign-out) is a block, so the item spans the menu.
+//
+// **The panel takes `--radius-control`**, the token for "buttons, inputs, menus" (tokens/theme.css),
+// not `<rfg-popover>`'s `--radius-surface`, which is for cards and dialogs. At 16px, a one-item menu
+// read as a speech bubble.
 const STYLES = css`
   .rfg-popover-panel[role="menu"] {
     padding: 0.25rem 0;
     min-width: 12rem;
+    border-radius: var(--radius-control);
+  }
+
+  @layer base {
+    .rfg-popover-panel[role="menu"] form {
+      display: block;
+      margin: 0;
+    }
+
+    .rfg-popover-panel[role="menu"] [role="menuitem"] {
+      display: block;
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      padding: 0.5rem 0.75rem;
+      border: 0;
+      background: none;
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.25rem;
+      color: var(--color-neutral-700);
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .rfg-popover-panel[role="menu"] [role="menuitem"]:hover,
+    .rfg-popover-panel[role="menu"] [role="menuitem"]:focus-visible {
+      background: var(--color-neutral-100);
+      color: var(--color-neutral-900);
+    }
+
+    .rfg-popover-panel[role="menu"] [role="menuitem"]:focus-visible {
+      outline: 2px solid var(--color-brand-600);
+      outline-offset: -2px;
+    }
+
+    .rfg-popover-panel[role="menu"] [role="menuitem"][aria-disabled="true"] {
+      color: var(--color-neutral-500);
+      background: none;
+      cursor: not-allowed;
+    }
   }
 `;
 
@@ -86,7 +141,7 @@ function ensureMenuStylesInjected() {
  *
  * @element rfg-menu
  * @slot trigger - The element that opens the menu (typically an icon-only `<rfg-button size="xs">`), marked `slot="trigger"`.
- * @slot - The menu's items — real `<a role="menuitem">`/`<button role="menuitem">`/disabled `<span role="menuitem" aria-disabled="true">` elements, any markup.
+ * @slot - The menu's items — real `<a role="menuitem">`/`<button role="menuitem">`/disabled `<span role="menuitem" aria-disabled="true">` elements, any markup. They get a default look (8px 12px, 14px medium, gray hover); an item inside a `<form>` spans the menu. An app's own classes override it.
  * @fires rfg-open - Dispatched when the menu opens.
  * @fires rfg-close - Dispatched when the menu closes.
  */

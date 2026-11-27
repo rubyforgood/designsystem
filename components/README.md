@@ -410,6 +410,14 @@ no business knowing — ghost vs. ghost_danger tone, a disabled *form* action re
 disabled `<button>` vs. a disabled *link* rendered as a focusable `aria-disabled` `<span>` with
 visible reason text.
 
+**Items have a default look** (v0.1.9): 8px 12px, 14px medium, gray text with a gray hover, full
+width, an `aria-disabled` item grayed out. An item inside a `<form>` (Rails' `button_to`, a sign-out)
+spans the menu. The rules sit in the `base` cascade layer, so they beat Tailwind's preflight but
+lose to an app's own classes: an app that already styles its items keeps its look. The panel takes
+`--radius-control` (8px, the token for menus), not the 16px surface radius. Added after SkillRx
+shipped its account menu with no item styles: "Sign out" rendered as a bare button in a rounded
+bubble.
+
 **Keyboard focus lands on a disabled item, rather than skipping it** — a deliberate departure from
 the plain WAI-ARIA APG menu default. design.md's own "inert on arrival" rule, already applied
 elsewhere to a disabled link in `<rfg-button>`, is that a control which costs something to reason

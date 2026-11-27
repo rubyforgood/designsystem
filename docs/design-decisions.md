@@ -9995,6 +9995,21 @@ the panel. New check: the gap between always-visible fields equals the panel's c
 12px against 16px, passes after). Released in v0.1.8.
 
 
+## 2026-11-27 — Menu items have a default look
+
+**What happened:** SkillRx's account menu (the ⋯ by the avatar at the bottom of the rail) opened a
+16px-radius panel holding a bare "Sign out" button: no padding, 16px text, no hover, not full width.
+`<rfg-menu>` left item styling to the app, and SkillRx, unlike Human Essentials, had none. The panel
+used `--radius-surface` (cards, dialogs) though the token file names `--radius-control` for menus.
+
+**Decision:** the component gives items a default look in `@layer base`, so Tailwind's preflight
+can't strip it and an app's own item classes still win (Human Essentials' row menus are unchanged).
+A `<form>` holding an item is a block. The panel takes `--radius-control`.
+
+**Check:** new story `UnderACssReset` (preflight in `@layer base`, a link item and a `button_to`
+style form item) with three checks: 8px panel radius; 8px 12px padding and 14px text; form item
+spans the menu. Against the old component, all three fail. 466 checks, 0 failed.
+
 ## 2026-11-27 — Error messages say what to do
 
 **What happened:** SkillRx's topic form said "Title can't be blank", and the person asked whether

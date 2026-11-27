@@ -78,7 +78,32 @@ const disabled = async (page) => {
   return out;
 };
 
+// Items keep their default look under a page's reset (Tailwind's preflight, in @layer base), a form's
+// item spans the menu, and the panel takes the control radius. Found on SkillRx's account menu.
+const underReset = async (page) => {
+  const out = [];
+  await page.waitForSelector(TRIGGER);
+  await page.locator(TRIGGER).click();
+  await page.waitForTimeout(100);
+  const m = await page.evaluate(() => {
+    const control = document.querySelector('rfg-menu rfg-button[slot="trigger"] .control');
+    const panel = document.getElementById(control.getAttribute("aria-controls"));
+    const items = [...panel.querySelectorAll('[role="menuitem"]')];
+    const box = (el) => el.getBoundingClientRect();
+    return {
+      radius: getComputedStyle(panel).borderTopLeftRadius,
+      panelWidth: box(panel).width - 2,
+      items: items.map((el) => ({ text: el.textContent.trim(), padding: getComputedStyle(el).padding, width: box(el).width, size: getComputedStyle(el).fontSize })),
+    };
+  });
+  out.push({ name: "the panel takes the control radius (8px), not the surface radius", ok: m.radius === "8px", detail: `radius ${m.radius}` });
+  out.push({ name: "items keep 8px 12px padding and 14px text under a reset", ok: m.items.every((i) => i.padding === "8px 12px" && i.size === "14px"), detail: JSON.stringify(m.items) });
+  out.push({ name: "an item inside a form spans the menu", ok: m.items.every((i) => Math.abs(i.width - m.panelWidth) <= 1), detail: `panel ${m.panelWidth}px, items ${m.items.map((i) => i.width).join(", ")}px` });
+  return out;
+};
+
 module.exports = [
   { id: "components-menu--default", tag: "rfg-menu", run },
   { id: "components-menu--with-a-disabled-item", tag: "rfg-menu", run: disabled },
+  { id: "components-menu--under-a-css-reset", tag: "rfg-menu", run: underReset },
 ];
