@@ -10008,7 +10008,7 @@ A `<form>` holding an item is a block. The panel takes `--radius-control`.
 
 **Check:** new story `UnderACssReset` (preflight in `@layer base`, a link item and a `button_to`
 style form item) with three checks: 8px panel radius; 8px 12px padding and 14px text; form item
-spans the menu. Against the old component, all three fail. 466 checks, 0 failed.
+spans the menu. Against the old component, all three fail. 466 checks, 0 failed. Released in v0.1.9.
 
 ## 2026-11-27 — Error messages say what to do
 
