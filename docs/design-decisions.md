@@ -9992,5 +9992,22 @@ change all pass. Behavior audit: 456 checks, 0 failed.
 **Follow-up, same day:** the always-visible fields were 12px apart while the panel's columns are
 16px, reported as "not enough padding between the provider and search inputs". Now 16px across, like
 the panel. New check: the gap between always-visible fields equals the panel's column gap (fails at
-12px against 16px, passes after). Unreleased; ships in the next version.
+12px against 16px, passes after). Released in v0.1.8.
 
+
+## 2026-11-26 — Page tabs keep their look under a CSS reset
+
+**What happened:** SkillRx's Jobs page used `<rfg-page-tabs>` and the tabs had no padding, no
+gray, and no underline on the current tab. Tailwind's preflight (`* { padding: 0; border: 0 solid }`,
+`a { color: inherit }`) is a page rule, and a page's rules beat a component's `::slotted` rules
+whatever their specificity. Any app with a CSS reset, which is most of them, lost the tab look.
+
+**Decision:** every `::slotted` declaration in page tabs is `!important`. Inside a shadow root,
+`!important` beats the page's rules, including the page's own `!important`, so it's the one way a
+component keeps the styling of light-DOM children. Apps restyle through the color tokens. Other
+components' `::slotted` rules were left alone: the filter bar's widths are meant to be overridden
+by the page, and the rest only set things a reset doesn't touch.
+
+**Check:** new story `UnderACssReset` with a preflight-like reset, running the same page-tabs
+checks plus a new one (tabs keep 10px top padding). Before the fix: 2 failures (no brand color or
+underline, 0px padding). After: 463 checks, 0 failed. Released in v0.1.8.
