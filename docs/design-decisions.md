@@ -9995,6 +9995,16 @@ the panel. New check: the gap between always-visible fields equals the panel's c
 12px against 16px, passes after). Released in v0.1.8.
 
 
+## 2026-11-27 — Menu items are regular weight
+
+**What happened:** upgrading Human Essentials from 0.1.3 to 0.1.9 showed that 0.1.9's default item
+weight (500) would apply to every Human Essentials menu item, because its item classes set size,
+color and padding but no weight. Its items have always been regular (400), and so was this
+component's own story before 0.1.9. Primer's ActionList, Material's menus and Radix's dropdowns are
+regular too.
+
+**Decision:** the default is 400. New check: items are regular weight. Fails against 0.1.9.
+
 ## 2026-11-27 — Menu items have a default look
 
 **What happened:** SkillRx's account menu (the ⋯ by the avatar at the bottom of the rail) opened a

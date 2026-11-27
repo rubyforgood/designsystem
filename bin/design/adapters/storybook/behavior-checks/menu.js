@@ -93,11 +93,13 @@ const underReset = async (page) => {
     return {
       radius: getComputedStyle(panel).borderTopLeftRadius,
       panelWidth: box(panel).width - 2,
-      items: items.map((el) => ({ text: el.textContent.trim(), padding: getComputedStyle(el).padding, width: box(el).width, size: getComputedStyle(el).fontSize })),
+      items: items.map((el) => ({ text: el.textContent.trim(), padding: getComputedStyle(el).padding, width: box(el).width, size: getComputedStyle(el).fontSize, weight: getComputedStyle(el).fontWeight })),
     };
   });
   out.push({ name: "the panel takes the control radius (8px), not the surface radius", ok: m.radius === "8px", detail: `radius ${m.radius}` });
   out.push({ name: "items keep 8px 12px padding and 14px text under a reset", ok: m.items.every((i) => i.padding === "8px 12px" && i.size === "14px"), detail: JSON.stringify(m.items) });
+  // Regular weight, as Human Essentials' items (which set none) have always been.
+  out.push({ name: "items are regular weight (400)", ok: m.items.every((i) => i.weight === "400"), detail: m.items.map((i) => i.weight).join(", ") });
   out.push({ name: "an item inside a form spans the menu", ok: m.items.every((i) => Math.abs(i.width - m.panelWidth) <= 1), detail: `panel ${m.panelWidth}px, items ${m.items.map((i) => i.width).join(", ")}px` });
   return out;
 };

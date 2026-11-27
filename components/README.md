@@ -410,7 +410,7 @@ no business knowing — ghost vs. ghost_danger tone, a disabled *form* action re
 disabled `<button>` vs. a disabled *link* rendered as a focusable `aria-disabled` `<span>` with
 visible reason text.
 
-**Items have a default look** (v0.1.9): 8px 12px, 14px medium, gray text with a gray hover, full
+**Items have a default look** (v0.1.9; regular weight since v0.1.10): 8px 12px, 14px, gray text with a gray hover, full
 width, an `aria-disabled` item grayed out. An item inside a `<form>` (Rails' `button_to`, a sign-out)
 spans the menu. The rules sit in the `base` cascade layer, so they beat Tailwind's preflight but
 lose to an app's own classes: an app that already styles its items keeps its look. The panel takes
