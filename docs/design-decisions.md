@@ -10003,7 +10003,7 @@ color and padding but no weight. Its items have always been regular (400), and s
 component's own story before 0.1.9. Primer's ActionList, Material's menus and Radix's dropdowns are
 regular too.
 
-**Decision:** the default is 400. New check: items are regular weight. Fails against 0.1.9.
+**Decision:** the default is 400. New check: items are regular weight. Fails against 0.1.9. Released in v0.1.10.
 
 ## 2026-11-27 — Menu items have a default look
 
